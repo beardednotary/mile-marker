@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mile Marker — Southwest Desert Run</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+--paper: #f5f0e8;
+--paper-dark: #ede8dc;
+--ink: #2a1f0e;
+--ink-light: #5a3e1b;
+--ink-faint: #8a7560;
+--rule: #c8b99a;
+--rule-dark: #3a2e1e;
+--night: #1a1208;
+--night-mid: #2a1f0e;
+--gold: #e8a84a;
+--green: #3b6d11;
+--green-bg: #eaf3de;
+--red: #993c1d;
+--red-bg: #faece7;
+--amber: #854f0b;
+--amber-bg: #faeeda;
+}
+
+body {
+background: #d4c9b0;
+font-family: 'Courier Prime', monospace;
+color: var(--ink);
+min-height: 100vh;
+display: flex;
+justify-content: center;
+padding: 1rem 0 3rem;
+}
+
+#app {
+width: 100%;
+max-width: 420px;
+background: var(--paper);
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+box-shadow: 0 0 40px rgba(0,0,0,0.3);
+}
+
+/* HEADER */
+#header {
+background: var(--night);
+padding: 14px 18px 10px;
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+flex-shrink: 0;
+}
+#char-name { font-family: 'Special Elite', cursive; font-size: 15px; color: var(--paper); line-height: 1.2; }
+#char-type { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+#route-label { font-size: 9px; color: var(--ink-faint); letter-spacing: 0.1em; text-transform: uppercase; text-align: right; }
+#route-name { font-family: 'Special Elite', cursive; font-size: 13px; color: var(--gold); text-align: right; }
+
+/* ODOMETER */
+#odometer {
+background: var(--night-mid);
+padding: 7px 18px;
+display: flex;
+align-items: center;
+gap: 8px;
+flex-shrink: 0;
+}
+.odo-label { font-size: 9px; color: var(--ink-faint); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+#odo-track { flex: 1; height: 3px; background: var(--rule-dark); border-radius: 2px; overflow: hidden; }
+#odo-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.8s ease; width: 0%; }
+#odo-num { font-size: 11px; color: var(--gold); font-family: 'Courier Prime', monospace; white-space: nowrap; min-width: 80px; text-align: right; }
+
+/* SCENE */
+#scene { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+#scene-header { padding: 12px 18px 4px; display: flex; align-items: center; gap: 8px; }
+.location-dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; flex-shrink: 0; }
+#location-name { font-size: 9px; color: var(--ink-faint); letter-spacing: 0.12em; text-transform: uppercase; }
+
+#scene-tags { padding: 0 18px 8px; display: flex; gap: 6px; flex-wrap: wrap; min-height: 24px; }
+.tag { font-size: 9px; padding: 2px 8px; border-radius: 2px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid; }
+.tag-tension { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+.tag-money { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+.tag-night { background: #1a1208; color: #c8b99a; border-color: #3a2e1e; }
+.tag-character { background: var(--amber-bg); color: var(--amber); border-color: var(--gold); }
+.tag-travel { background: var(--paper-dark); color: var(--ink-faint); border-color: var(--rule); }
+.tag-elcamino { background: #f0ede6; color: var(--ink-light); border-color: var(--rule); }
+.tag-navigation { background: var(--paper-dark); color: var(--ink-faint); border-color: var(--rule); }
+.tag-final { background: var(--amber-bg); color: var(--amber); border-color: var(--gold); }
+.tag-morning { background: var(--paper); color: var(--ink-faint); border-color: var(--rule); }
+.tag-victory { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+.tag-gut { background: var(--amber-bg); color: var(--amber); border-color: var(--gold); }
+.tag-nerve { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+.tag-opening { background: var(--paper-dark); color: var(--ink-faint); border-color: var(--rule); }
+
+#scene-text { padding: 0 18px 16px; border-bottom: 1px dashed var(--rule); }
+
+.scene-paragraph {
+font-size: 14px; line-height: 1.75; color: var(--ink); margin-bottom: 14px;
+opacity: 0; transform: translateY(10px);
+transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.scene-paragraph:last-child { margin-bottom: 0; }
+.scene-paragraph.visible { opacity: 1; transform: translateY(0); }
+.scene-paragraph em { color: var(--ink-light); font-style: italic; }
+
+/* CHOICES */
+#choices-section { padding: 12px 18px 20px; opacity: 0; transition: opacity 0.4s ease; }
+#choices-section.visible { opacity: 1; }
+#choices-label { font-size: 9px; color: var(--ink-faint); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 10px; }
+#choices { display: flex; flex-direction: column; gap: 8px; }
+
+.choice-btn {
+border-radius: 3px; padding: 10px 13px; cursor: pointer; border: 1px solid;
+text-align: left; background: none; width: 100%;
+transition: opacity 0.15s, transform 0.1s;
+}
+.choice-btn:active { transform: scale(0.98); opacity: 0.85; }
+.choice-btn.safe { background: var(--green-bg); border-color: var(--green); }
+.choice-btn.neutral { background: var(--paper); border-color: var(--rule); }
+.choice-btn.risky { background: var(--red-bg); border-color: var(--red); }
+.choice-btn.locked { background: var(--paper-dark); border-color: var(--rule); opacity: 0.45; cursor: not-allowed; }
+
+.choice-text { font-size: 13px; font-weight: 700; color: var(--ink); display: block; font-family: 'Courier Prime', monospace; line-height: 1.3; }
+.choice-btn.locked .choice-text { color: var(--ink-faint); }
+.choice-sub { font-size: 10px; color: var(--ink-faint); display: block; margin-top: 3px; font-style: italic; }
+.choice-btn.safe .choice-sub { color: var(--green); }
+.choice-btn.risky .choice-sub { color: var(--red); }
+
+/* TAP HINT */
+#tap-hint { text-align: center; padding: 6px; font-size: 10px; color: var(--ink-faint); font-style: italic; cursor: pointer; display: none; }
+
+/* FOOTER */
+#footer {
+background: var(--paper-dark); border-top: 1px solid var(--rule);
+padding: 8px 18px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+}
+.footer-item { text-align: center; }
+.footer-label { font-size: 8px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; display: block; }
+.footer-val { font-size: 11px; color: var(--ink); font-weight: 700; display: block; }
+
+/* CHARACTER SELECT */
+#char-select { padding: 24px 20px 20px; flex: 1; overflow-y: auto; }
+.cs-title { font-family: 'Special Elite', cursive; font-size: 22px; color: var(--ink); text-align: center; margin-bottom: 4px; }
+.cs-sub { font-size: 11px; color: var(--ink-faint); text-align: center; font-style: italic; margin-bottom: 20px; }
+.cs-card { border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 10px; cursor: pointer; overflow: hidden; }
+.cs-card.selected { border: 2px solid var(--gold); background: #fdf8f0; }
+.purpose-card { border: 1px solid var(--rule); border-radius: 4px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; background: var(--paper); }
+.purpose-card.selected { border: 2px solid var(--gold); background: #fdf8f0; }
+.purpose-title { font-size: 12px; font-weight: 700; color: var(--ink); display: block; }
+.purpose-sub { font-size: 10px; color: var(--ink-faint); font-style: italic; display: block; margin-top: 2px; line-height: 1.4; }
+.lock-reason { color: var(--red) !important; }
+.cs-card-top { padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; }
+.cs-avatar { width: 44px; height: 44px; background: var(--night); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'Special Elite', cursive; font-size: 20px; color: var(--gold); flex-shrink: 0; }
+.cs-info { flex: 1; }
+.cs-name { font-family: 'Special Elite', cursive; font-size: 15px; color: var(--ink); display: block; }
+.cs-archetype { font-size: 9px; color: var(--ink-faint); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 1px; }
+.cs-flavor { font-size: 11px; color: var(--ink-light); font-style: italic; display: block; margin-top: 5px; line-height: 1.5; }
+.cs-stats { border-top: 1px dashed var(--rule); padding: 8px 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+.cs-stat-row { display: flex; justify-content: space-between; align-items: center; }
+.cs-stat-n { font-size: 9px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; }
+.cs-pips { display: flex; gap: 2px; }
+.pip { width: 8px; height: 8px; border-radius: 1px; border: 1px solid var(--rule); background: transparent; }
+.pip.on { background: var(--ink); border-color: var(--ink); }
+.pip.on.hi { background: var(--green); border-color: var(--green); }
+.pip.on.lo { background: var(--red); border-color: var(--red); }
+
+.name-label { font-size: 9px; color: var(--ink-faint); letter-spacing: 0.15em; text-transform: uppercase; display: block; margin: 14px 0 6px; }
+#player-name { width: 100%; background: var(--paper-dark); border: 1px solid var(--rule); border-radius: 3px; padding: 10px 12px; font-family: 'Courier Prime', monospace; font-size: 14px; color: var(--ink); }
+#player-name::placeholder { color: var(--ink-faint); font-style: italic; }
+#player-name:focus { outline: none; border-color: var(--gold); }
+
+.start-btn { display: block; width: 100%; background: var(--gold); border: none; border-radius: 3px; padding: 14px; font-family: 'Special Elite', cursive; font-size: 16px; color: var(--night); cursor: pointer; text-align: center; margin-top: 18px; }
+.start-btn-sub { display: block; font-family: 'Courier Prime', monospace; font-size: 10px; color: #5a3e1b; margin-top: 3px; font-style: italic; }
+
+/* VICTORY */
+#victory-screen { background: var(--paper); flex: 1; display: flex; flex-direction: column; }
+.victory-header { background: var(--night); padding: 24px 20px; text-align: center; }
+.victory-mile { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; }
+.victory-title { font-family: 'Special Elite', cursive; font-size: 26px; color: var(--gold); }
+.victory-sub { font-size: 12px; color: #c8b99a; margin-top: 6px; font-style: italic; }
+.victory-text { padding: 20px 22px; flex: 1; overflow-y: auto; border-bottom: 1px dashed var(--rule); }
+.victory-paragraph { font-size: 14px; line-height: 1.75; color: var(--ink); margin-bottom: 14px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.victory-paragraph.visible { opacity: 1; transform: translateY(0); }
+.victory-actions { padding: 16px 20px 24px; }
+
+/* PAYWALL */
+#paywall-screen { background: var(--paper); flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; text-align: center; }
+.paywall-divider { width: 60px; height: 2px; background: var(--rule); margin: 20px auto; }
+.paywall-miles { font-size: 11px; color: var(--ink-faint); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px; }
+.paywall-title { font-family: 'Special Elite', cursive; font-size: 24px; color: var(--ink); margin-bottom: 8px; }
+.paywall-body { font-size: 13px; color: var(--ink-light); line-height: 1.7; margin-bottom: 6px; font-style: italic; }
+.paywall-details { font-size: 11px; color: var(--ink-faint); margin-bottom: 24px; line-height: 1.6; }
+.paywall-btn { background: var(--gold); border: none; border-radius: 3px; padding: 14px 32px; font-family: 'Special Elite', cursive; font-size: 18px; color: var(--night); cursor: pointer; display: block; width: 100%; margin-bottom: 10px; }
+.paywall-btn-sub { font-family: 'Courier Prime', monospace; font-size: 10px; color: #5a3e1b; display: block; margin-top: 3px; font-style: italic; }
+.paywall-skip { font-size: 11px; color: var(--ink-faint); font-style: italic; cursor: pointer; text-decoration: underline; background: none; border: none; margin-top: 8px; }
+
+#scene::-webkit-scrollbar { width: 4px; }
+#scene::-webkit-scrollbar-track { background: var(--paper-dark); }
+#scene::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+
+
+/* TESTABLE STATS SYSTEM */
+#stats-panel {
+  background: var(--paper-dark);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 8px 18px 9px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 12px;
+  flex-shrink: 0;
+}
+.stat-line { display: grid; grid-template-columns: 42px 1fr 38px; gap: 7px; align-items: center; }
+.stat-name { font-size: 8px; color: var(--ink-faint); letter-spacing: 0.09em; text-transform: uppercase; }
+.stat-bar { height: 5px; background: rgba(42,31,14,0.12); border-radius: 4px; overflow: hidden; }
+.stat-fill { height: 100%; background: var(--gold); width: 50%; transition: width 0.35s ease; }
+.stat-fill.low { background: var(--red); }
+.stat-fill.good { background: var(--green); }
+.stat-val { font-size: 10px; color: var(--ink); font-weight: 700; text-align: right; }
+#effects-log {
+  background: #fbf6ec;
+  border-top: 1px dashed var(--rule);
+  padding: 7px 18px;
+  font-size: 10px;
+  color: var(--ink-light);
+  min-height: 28px;
+  display: none;
+  line-height: 1.45;
+}
+.effect-positive { color: var(--green); font-weight: 700; }
+.effect-negative { color: var(--red); font-weight: 700; }
+.effect-neutral { color: var(--amber); font-weight: 700; }
+.choice-btn.locked { pointer-events: none; }
+
+</style>
+
+</head>
+<body>
+<div id="app">
+
+  <div id="header" style="display:none">
+    <div>
+      <div id="char-name">The Drifter</div>
+      <div id="char-type">Solo Traveler</div>
+    </div>
+    <div>
+      <div id="route-label">Route 1</div>
+      <div id="route-name">Southwest Desert</div>
+    </div>
+  </div>
+
+  <div id="odometer" style="display:none">
+    <span class="odo-label">Mile</span>
+    <div id="odo-track"><div id="odo-fill"></div></div>
+    <span id="odo-num">0 / 675</span>
+  </div>
+
+  <div id="stats-panel" style="display:none">
+    <div class="stat-line"><span class="stat-name">Tank</span><div class="stat-bar"><div id="stat-tank-fill" class="stat-fill"></div></div><span id="stat-tank-val" class="stat-val">--</span></div>
+    <div class="stat-line"><span class="stat-name">Wallet</span><div class="stat-bar"><div id="stat-wallet-fill" class="stat-fill"></div></div><span id="stat-wallet-val" class="stat-val">--</span></div>
+    <div class="stat-line"><span class="stat-name">Nerve</span><div class="stat-bar"><div id="stat-nerve-fill" class="stat-fill"></div></div><span id="stat-nerve-val" class="stat-val">--</span></div>
+    <div class="stat-line"><span class="stat-name">Gut</span><div class="stat-bar"><div id="stat-gut-fill" class="stat-fill"></div></div><span id="stat-gut-val" class="stat-val">--</span></div>
+  </div>
+  <div id="effects-log"></div>
+
+  <div id="main-screen">
+    <div id="char-select">
+      <div class="cs-title">Who are you?</div>
+      <div class="cs-sub">Your archetype shapes how the road reads you.</div>
+
+  <div class="cs-card selected" data-archetype="drifter" onclick="selectArchetype(this)">
+    <div class="cs-card-top">
+      <div class="cs-avatar">⟁</div>
+      <div class="cs-info">
+        <span class="cs-name">The Drifter</span>
+        <span class="cs-archetype">Instinct · Improvisation</span>
+        <span class="cs-flavor">No plan, no problem. Reads people fast and talks his way out of most things.</span>
+      </div>
+    </div>
+    <div class="cs-stats">
+      <div class="cs-stat-row"><span class="cs-stat-n">Nerve</span><div class="cs-pips"><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Gut</span><div class="cs-pips"><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Wallet</span><div class="cs-pips"><div class="pip on lo"></div><div class="pip on lo"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Tank</span><div class="cs-pips"><div class="pip on"></div><div class="pip on"></div><div class="pip on"></div><div class="pip"></div><div class="pip"></div></div></div>
+    </div>
+  </div>
+
+  <div class="cs-card" data-archetype="planner" onclick="selectArchetype(this)">
+    <div class="cs-card-top">
+      <div class="cs-avatar">◈</div>
+      <div class="cs-info">
+        <span class="cs-name">The Planner</span>
+        <span class="cs-archetype">Preparation · Resources</span>
+        <span class="cs-flavor">AAA card, full tank, printed directions. Boring until things go sideways.</span>
+      </div>
+    </div>
+    <div class="cs-stats">
+      <div class="cs-stat-row"><span class="cs-stat-n">Nerve</span><div class="cs-pips"><div class="pip on"></div><div class="pip on"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Gut</span><div class="cs-pips"><div class="pip on"></div><div class="pip on"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Wallet</span><div class="cs-pips"><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip"></div><div class="pip"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Tank</span><div class="cs-pips"><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div></div></div>
+    </div>
+  </div>
+
+  <div class="cs-card" data-archetype="broke" onclick="selectArchetype(this)">
+    <div class="cs-card-top">
+      <div class="cs-avatar">◬</div>
+      <div class="cs-info">
+        <span class="cs-name">The Broke Kid</span>
+        <span class="cs-archetype">Desperation · Charm</span>
+        <span class="cs-flavor">Almost empty tank, almost empty wallet. Somehow always finds a way. Hard mode.</span>
+      </div>
+    </div>
+    <div class="cs-stats">
+      <div class="cs-stat-row"><span class="cs-stat-n">Nerve</span><div class="cs-pips"><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip on hi"></div><div class="pip"></div><div class="pip"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Gut</span><div class="cs-pips"><div class="pip on"></div><div class="pip on"></div><div class="pip on"></div><div class="pip"></div><div class="pip"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Wallet</span><div class="cs-pips"><div class="pip on lo"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div></div>
+      <div class="cs-stat-row"><span class="cs-stat-n">Tank</span><div class="cs-pips"><div class="pip on lo"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div></div></div>
+    </div>
+  </div>
+
+  <span class="name-label">What do they call you?</span>
+  <input id="player-name" type="text" placeholder="A name or a nickname…" maxlength="24">
+  <button class="start-btn" onclick="startGame()">
+    Hit the road
+    <span class="start-btn-sub">Barstow → Albuquerque — 675 miles</span>
+  </button>
+</div>
+
+  </div>
+
+  <div id="game-screen" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+    <div id="scene">
+      <div id="scene-header"><div class="location-dot"></div><div id="location-name"></div></div>
+      <div id="scene-tags"></div>
+      <div id="scene-text"></div>
+      <div id="tap-hint" onclick="skipAnimation()">tap to skip</div>
+    </div>
+    <div id="choices-section">
+      <div id="choices-label">Your move</div>
+      <div id="choices"></div>
+    </div>
+  </div>
+
+  <div id="footer" style="display:none">
+    <div class="footer-item"><span class="footer-label">Choices</span><span class="footer-val" id="footer-choices">0</span></div>
+    <div class="footer-item"><span class="footer-label">Archetype</span><span class="footer-val" id="footer-arch">—</span></div>
+    <div class="footer-item"><span class="footer-label">Run</span><span class="footer-val" id="footer-run">1</span></div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE — narrative flags + testable resource stats
+// ═══════════════════════════════════════════════════════
+const ARCHETYPES = {
+  drifter: {
+    name: 'The Drifter', type: 'Solo Traveler',
+    stats: { tank: 30, wallet: 25, nerve: 8, gut: 9 },
+    max: { tank: 100, wallet: 80, nerve: 10, gut: 10 }
+  },
+  planner: {
+    name: 'The Planner', type: 'Prepared Traveler',
+    stats: { tank: 100, wallet: 65, nerve: 4, gut: 4 },
+    max: { tank: 100, wallet: 80, nerve: 10, gut: 10 }
+  },
+  broke: {
+    name: 'The Broke Kid', type: 'Running on Empty',
+    stats: { tank: 20, wallet: 20, nerve: 7, gut: 7 },
+    max: { tank: 100, wallet: 80, nerve: 10, gut: 10 }
+  }
+};
+
+let state = {
+  archetype: 'drifter',
+  playerName: '',
+  flags: {},
+  road: 0, // hidden conduct/road response. Never shown to player.
+  choices: 0,
+  run: 1,
+  paid: false,
+  animating: false,
+  timeouts: [],
+  currentMile: 0,
+  stats: {},
+  maxStats: {},
+  lastEffects: [],
+  pendingCheckStat: null,
+  debugRolls: true
+};
+
+// ═══════════════════════════════════════════════════════
+// STASHED ITEMS
+// ═══════════════════════════════════════════════════════
+const STASHED_ITEMS = [
+  "They step into the scrub beside the guardrail and come back with a leather satchel. Old. Initialed. Not their initials, you don't think. They set it between their feet after they climb in and don't mention it.",
+  "They step off the shoulder into the scrub and come back with a car seat. An infant is asleep in it, somehow, in this heat. They settle the car seat on their lap after they climb in and face forward and don't explain anything.",
+  "They step into the scrub and come back with a rifle case. Hard plastic, latched. They open the back door, lay it across the seat, and get in front without asking. 'Hunting trip,' they say. First words out of their mouth. You didn't ask. They don't say anything else.",
+  "They step off the shoulder and come back with a paper bag folded over twice at the top. They clutch it in both hands after they climb in and don't say what's in it.",
+  "You could've sworn you saw something on the shoulder before you stopped. Whatever it was isn't here now. Just them. Just the road."
+];
+
+// ═══════════════════════════════════════════════════════
+// NODES
+// ═══════════════════════════════════════════════════════
+// Cord / El Camino continuity rules:
+// 1. He is never impossible, only improbable. The player looks away, the road curves, or a plausible alternate road exists.
+// 2. Until flags.knows_cord_name is true, player-facing text must not call him Cord.
+// 3. He does not explain himself. He gives useful information, non-answers, or exits.
+// 4. Future routes can reference him as "the El Camino driver" until the player earns or hears the name.
+const NODES = {
+
+  sw_001: {
+    location: "Barstow, CA — Desert Rose Diner",
+    tags: ["money","opening"],
+    mile: 0,
+    paywall: false,
+    text: [
+      "You've been sitting in this booth for twenty minutes. The coffee is bad but it's cheap and the AC works.",
+      "Your waitress has refilled your cup twice without asking. That's either hospitality or pity. Hard to tell out here.",
+      "The laminated menu says the breakfast plate is eggs, toast, hash browns, choice of meat. Your stomach says yes. Your wallet has other opinions.",
+      "The El Paso exit is visible through the window. Heat already coming off the asphalt and it's not even nine."
+    ],
+    choices: [
+      { text: "Order the breakfast plate", sub: "Costs Wallet — starts with full Gut", type: "safe", next: 'sw_002' },
+      { text: "Just the coffee and go", sub: "Safe — keeps Wallet intact, Gut starts low", type: "neutral", next: 'sw_002' },
+      { text: "Ask if they're hiring", sub: "Risky — costs time, Wallet gain if it lands", type: "risky",
+        resolve: () => rollCheck(6) ? { next: 'sw_002', outcome: "deb_success" } : { next: 'sw_002', outcome: "deb_fail" }
+      }
+    ],
+    outcomes: {
+      deb_success: ["The manager is a woman named Deb. She looks at you the way people look at cars with out-of-state plates.", "Two hours later you're back on the highway with more than you started with and a to-go box of hash browns Deb said were going to waste anyway."],
+      deb_fail: ["The manager looks at you. Looks past you. 'We're all set,' she says.", "You buy the coffee and leave."]
+    }
+  },
+
+  sw_002: {
+    location: "Mojave Desert — I-40 Eastbound",
+    tags: ["tension","character"],
+    mile: 40,
+    paywall: false,
+    text: [
+      "Forty miles out of Barstow the road goes flat and the world goes quiet.",
+      "No exits. No overpasses. Nothing but creosote and powerlines and the kind of heat that makes distant asphalt look like water.",
+      "You almost miss them.",
+      "Someone is standing on the shoulder. Not walking. Standing. Facing the oncoming lane with a hand out and no sign. Empty-handed. No hat. Just a person in the middle of the Mojave acting like this is a reasonable place to be.",
+      "You have maybe four seconds before you're past them."
+    ],
+    choices: [
+      { text: "Pull over", sub: "Gut check — something feels off but they look harmless enough", type: "neutral", next: 'sw_002a' },
+      { text: "Keep driving", sub: "Safe — none of your business what they're doing out here", type: "safe", next: 'sw_003_drove' },
+      { text: "Slow down, get a look, decide", sub: "Costs Nerve — what you see doesn't make it easier", type: "risky", next: 'sw_002b' }
+    ]
+  },
+
+  sw_002a: {
+    location: "Mojave Desert — I-40 Eastbound",
+    tags: ["character","tension"],
+    mile: 40,
+    paywall: false,
+    onLoad: (s) => { s.flags.hitchhiker_picked_up = true; s.flags.elcamino_context_unlocked = true; },
+    text: [
+      "They reach for the passenger door, then stop.",
+      "'One second.'",
+      "%%STASHED_ITEM%%",
+      "Then they get in without another word.",
+      "You pull back onto the highway. The AC is fighting a losing battle. Neither of you speaks for a while and somehow that feels correct.",
+      "The miles go. You learn three things about them: they don't fidget, they don't ask questions, and they watch the side mirrors more than the road ahead.",
+      "Needles comes up faster than you expected. They say 'here' and you pull off without thinking.",
+      "They're out of the car before it fully stops. Door closed. Then they lean back through the open window.",
+      "'He'll catch up.'",
+      "They're gone before you can ask who they meant."
+    ],
+    choices: [
+      { text: "Sit with that for a minute", sub: "Nerve check — some things don't have good answers", type: "neutral", next: 'sw_003' },
+      { text: "Get back on the highway", sub: "Safe — you've got miles to cover", type: "safe", next: 'sw_003' }
+    ]
+  },
+
+  sw_002b: {
+    location: "Mojave Desert — I-40 Eastbound",
+    tags: ["tension","character"],
+    mile: 40,
+    paywall: false,
+    text: [
+      "You ease off the gas.",
+      "They turn toward you as you slow. You get a better look than you wanted.",
+      "There is nothing wrong with their face. That's what stays with you. You were braced for something — desperation, vacancy, anger. Instead just a face. Waiting. Patient in a way that has nothing to do with hope.",
+      "Four seconds becomes eight. Becomes twelve.",
+      "The highway behind you is empty in both directions."
+    ],
+    choices: [
+      { text: "Stop the car", sub: "You've come this far", type: "neutral", next: 'sw_002a' },
+      { text: "Accelerate", sub: "Safe — you've seen enough", type: "safe", next: 'sw_003_drove' }
+    ]
+  },
+
+  sw_003_drove: {
+    location: "Mojave Desert — I-40 Eastbound",
+    tags: ["travel"],
+    mile: 67,
+    paywall: false,
+    text: [
+      "You check the mirror once. They've turned to watch you go. There's something on the ground beside them you didn't see before. You don't look again.",
+      "The road keeps going."
+    ],
+    choices: [
+      { text: "Keep going", sub: "Rattlesnake Flats is ahead", type: "neutral", next: 'sw_004' }
+    ]
+  },
+
+  sw_003: {
+    location: "Mojave Desert — I-40 Eastbound",
+    tags: ["travel"],
+    mile: 67,
+    paywall: false,
+    textFn: (s) => s.flags.hitchhiker_picked_up
+      ? ["The highway opens back up past Needles. Flat and long and exactly the same as before. You turn the radio on. Static mostly. Something country underneath it.", "The road keeps going."]
+      : ["You check the mirror once. They've turned to watch you go. There's something on the ground beside them you didn't see before. You don't look again.", "The road keeps going."],
+    choices: [
+      { text: "Keep going", sub: "Rattlesnake Flats is ahead", type: "neutral", next: 'sw_004' }
+    ]
+  },
+
+  sw_004: {
+    location: "Rattlesnake Flats — Desert Gas Stop",
+    tags: ["tension","money","elcamino"],
+    mile: 83,
+    paywall: false,
+    textFn: (s) => {
+      const base = [
+        "The sign comes up fast. RATTLESNAKE FLATS — GAS — COLD DRINKS — LAST STOP 47 MI.",
+        "You pull in.",
+        "Two pumps. A cinderblock building painted the color of old bone. A hand-painted thermometer on the wall reads 107. Somebody has drawn a face on the sun at the top.",
+        "You start pumping. The numbers climb slow. You watch them the way you watch things you can't control.",
+        "The pump clicks off. Your tank is still short.",
+        "The attendant leans out the sliding window. He has the kind of face that's been outside for thirty years.",
+        "'Card machine's down. Cash only today.'",
+        "That's when you notice the El Camino at the far pump.",
+        "Dusty. Dark. Idling like it's been there a while. The driver hasn't moved. You can't see his face from here. Just hands on the wheel. Waiting."
+      ];
+      if (s.flags.elcamino_context_unlocked) base.push("He'll catch up, they said. Maybe this is what that meant.");
+      return base;
+    },
+    choices: [
+      { text: "Pay and go", sub: "Empties your Wallet — tank still short", type: "neutral", next: 'sw_004a' },
+      { text: "Ask the El Camino driver for help", sub: "Uncertain — Gut check. You don't know this person.", type: "neutral",
+        resolve: (s) => rollCheck(5) ? { next: 'sw_004b', flags: { elcamino_approached: true } } : { next: 'sw_004c' }
+      },
+      { text: "Tell the attendant your card worked fine yesterday", sub: "Risky — costs Nerve if he calls it", type: "risky",
+        resolve: (s) => rollCheck(5) ? { next: 'sw_004d', flags: { elcamino_witnessed_bluff: true } } : { next: 'sw_004e' }
+      }
+    ]
+  },
+
+  sw_004a: {
+    location: "Rattlesnake Flats — Desert Gas Stop",
+    tags: ["tension","money"],
+    mile: 83, paywall: false,
+    text: ["You pay. Every bill counted out.", "The attendant takes it without counting. You get back in the car. Wallet empty. Tank not where you want it. Enough to get somewhere. Maybe.", "The El Camino hasn't moved.", "You pull out without looking at it directly. Old instinct. Don't stare at things that might stare back.", "A mile out you check the mirror. The El Camino is still at the pump.", "Then it isn't."],
+    choices: [{ text: "Keep driving", sub: "Nothing to do but make miles", type: "neutral", next: 'sw_005' }]
+  },
+
+  sw_004b: {
+    location: "Rattlesnake Flats — Desert Gas Stop",
+    tags: ["tension","elcamino"],
+    mile: 83, paywall: false,
+    textFn: (s) => {
+      const offer = s.stats && s.stats.wallet >= 50
+        ? "'Split it with you. Enough to keep moving.' You have it. That's not why you hesitate."
+        : "'Split it with you. Enough to keep moving.' You're not sure if that's generous or not. You say yes before you figure it out.";
+      return ["You walk over.", "Up close the El Camino is older than it looked. Primer patches on the passenger door. A crack in the windshield that's been there long enough to stop spreading.", "The window is already down.", "The driver looks at you the way people look at things they've already thought about. Like you showing up was one of several possibilities he'd already considered.", "You explain the situation. Card machine. Short tank. Long road.", "He listens to the whole thing before he speaks.", offer];
+    },
+    choices: [{ text: "Take the deal", sub: "Full tank. A face you'll remember.", type: "safe", next: 'sw_005' }]
+  },
+
+  sw_004c: {
+    location: "Rattlesnake Flats — Desert Gas Stop",
+    tags: ["tension","elcamino"],
+    mile: 83, paywall: false,
+    text: ["You walk over.", "The window is up. Engine running. You can see the shape of him through the glass but not much else.", "You knock anyway.", "Nothing.", "You stand there longer than you should. Long enough to feel it. Then you walk back to your car and pay what you owe and don't look over again.", "Behind you, the El Camino idles.", "You have the specific feeling of having failed a test you didn't know you were taking."],
+    choices: [{ text: "Get back on the road", sub: "Wallet down. Tank short. Something else too.", type: "neutral", next: 'sw_005' }]
+  },
+
+  sw_004d: {
+    location: "Rattlesnake Flats — Desert Gas Stop",
+    tags: ["tension","nerve"],
+    mile: 83, paywall: false,
+    text: ["He looks at you. Looks at the card. Looks at you again.", "Runs it.", "The machine thinks about it longer than machines should. Then it approves.", "You don't react. That's the whole trick. You take the receipt like it means nothing and get back in your car with enough fuel to keep moving and your wallet still in your pocket.", "Across the lot the El Camino driver watched the whole thing.", "You can't tell if he's impressed or if that's just his face."],
+    choices: [{ text: "Pull out before anyone thinks too hard", sub: "Fuel gained. Wallet intact. Don't push it.", type: "neutral", next: 'sw_005' }]
+  },
+
+  sw_004e: {
+    location: "Rattlesnake Flats — Desert Gas Stop",
+    tags: ["tension","nerve"],
+    mile: 83, paywall: false,
+    text: ["He doesn't even run it.", "'Cash only today,' he says again. Slower this time. Like maybe you didn't hear him.", "There's a long moment where neither of you moves.", "Then you put the card away and count out the cash and slide it under the window and get back in your car.", "The attendant watches you leave.", "The El Camino watches you leave.", "Everyone at Rattlesnake Flats has seen something today."],
+    choices: [{ text: "Get out of here", sub: "Wallet down. Nerve down. Tank still short.", type: "neutral", next: 'sw_005' }]
+  },
+
+  sw_005: {
+    location: "Unnamed Pull-off — I-40 Eastbound",
+    tags: ["elcamino","tension","choice"],
+    mile: 91,
+    paywall: false,
+    textFn: (s) => {
+      const base = ["You don't decide to stop. You just stop.", "A pull-off. Unmarked. A picnic table nobody has used in years and a trash can chained to a post. The kind of place that exists because roads need places like it.", "The same El Camino is already there.", "Engine off. Driver's door open. He's leaning against the front quarter panel with his arms crossed, looking at nothing in particular down the road.", "He doesn't look surprised.", "You sit in your car for a moment. The engine ticks. The heat comes in fast when you're not moving."];
+      if (s.flags.elcamino_context_unlocked) base.push("He'll catch up. That's what they said. You look at the El Camino and decide not to do the math.");
+      if (s.flags.elcamino_witnessed_bluff) base.push("The corner of his mouth moves. Just barely. 'Nice thing you did back there. With the card.'");
+      base.push("He doesn't look at you. He speaks anyway.", "'Figured you'd come through here.'");
+      if (s.flags.elcamino_approached) base.push("He says it like a continuation of a conversation you already started.");
+      base.push("He finally looks at you.", "'Road's long from here. I know a way that saves you nearly an hour and a bad decision.'", "He lets that sit.", "'Up to you.'");
+      return base;
+    },
+    choices: [
+      { text: '"What\'s in it for you?"', sub: "Nerve check — direct. He'll respect it or he won't.", type: "neutral",
+        resolve: () => rollCheck(6) ? { next: 'sw_005a', flags: { elcamino_trusted: true } } : { next: 'sw_005b' }
+      },
+      { text: '"Show me."', sub: "Gut check — you're trusting something you can't name.", type: "risky",
+        resolve: () => rollCheck(5) ? { next: 'sw_005a', flags: { elcamino_trusted: true } } : { next: 'sw_005c', flags: { elcamino_debt: true } }
+      },
+      { text: '"I\'m good on my own."', sub: "Safe — he nods like he expected that too.", type: "safe",
+        next: 'sw_005d', flags: { elcamino_refused: true }
+      }
+    ]
+  },
+
+  sw_005a: {
+    location: "Unnamed Two-Lane — off I-40",
+    tags: ["elcamino","travel"],
+    mile: 98, paywall: false,
+    text: ["He doesn't explain. He just gets in the El Camino and pulls out.", "You follow.", "The shortcut isn't on any map you've seen. A two-lane road that branches off the highway without a sign, running parallel to nothing, through country that looks like it was left over after everything else got named.", "He drives exactly the speed limit. Not one over.", "Twenty minutes later you're back on I-40, east of where you would've been. The El Camino pulls to the shoulder.", "You pull up alongside.", "His window comes down.", "'Stay on this road,' he says. 'Don't stop at the fruit stand.'", "Then he's gone. The next exit. Just like that.", "You look in the mirror. Nothing.", "You don't stop at the fruit stand."],
+    choices: [{ text: "Keep going", sub: "Time saved. One warning you intend to keep.", type: "safe", next: 'sw_006' }]
+  },
+
+  sw_005b: {
+    location: "Unnamed Pull-off — I-40 Eastbound",
+    tags: ["elcamino","tension"],
+    mile: 91, paywall: false,
+    text: ["He looks at you for a long moment.", "Then he smiles. It's not a bad smile. That's what makes it hard to read.", "'Good question,' he says.", "He doesn't answer it.", "The silence goes long enough that you understand he's not going to. He pushes off the quarter panel and walks back to the El Camino.", "'Road'll take you where you're going,' he says, opening his door. 'It always does.'", "He gets in.", "You stand there.", "By the time you get back in your car your hands are doing something they don't usually do. You put them on the wheel and wait for it to stop.", "The El Camino is gone before you look up."],
+    choices: [{ text: "Get back on the highway", sub: "No shortcut. No answers. Just road.", type: "neutral", next: 'sw_006' }]
+  },
+
+  sw_005c: {
+    location: "Shuttered Stop — Off I-40",
+    tags: ["elcamino","tension","gut"],
+    mile: 95, paywall: false,
+    text: ["You follow him.", "The shortcut branches off the highway and the pavement changes. Older. Patchwork. The kind of road that got repaired so many times it forgot what it originally was.", "He drives fast out here. Faster than the limit.", "You keep up.", "Then he turns.", "Not onto another road. Into what looks like a lot. A shuttered something — gas station or diner or both, you can't tell anymore. The sign is gone. Just the pole.", "He stops.", "You stop.", "He gets out and walks to the back of the El Camino and opens the bed.", "He looks at you.", "'Help me with something and I'll get you back on the highway.'", "You don't know what's in the bed.", "You help him anyway.", "You never find out what it was. That part goes fast and strange and afterward you're back on I-40 with enough fuel to keep moving and the feeling that you traded something you can't name."],
+    choices: [{ text: "Drive. Don't think about it.", sub: "Full tank. Something missing. Keep moving.", type: "neutral", next: 'sw_006' }]
+  },
+
+  sw_005d: {
+    location: "Unnamed Pull-off — I-40 Eastbound",
+    tags: ["elcamino","tension"],
+    mile: 91, paywall: false,
+    text: ["'I'm good on my own.'", "He nods.", "Once. Slow.", "Like that was always one of the options and he's fine with it.", "He pushes off the quarter panel and walks back to the El Camino without another word. Gets in. Starts it.", "You wait for him to pull out.", "He does.", "Not the way you came. The other direction. Back toward Barstow or wherever he came from or wherever he was always going.", "You watch until the dust settles.", "Then you get in your car and pull back onto I-40 and drive east and wait for the feeling of being watched to go away.", "It mostly does."],
+    choices: [{ text: "Keep driving", sub: "Your call. Your road.", type: "safe", next: 'sw_006' }]
+  },
+
+  sw_006: {
+    location: "I-40 Eastbound — Exit 131",
+    tags: ["navigation","tension"],
+    mile: 180,
+    paywall: true,
+    text: ["The sign is handwritten. That's the first thing wrong with it.", "DETOUR — ROAD WORK AHEAD — TAKE EXIT 131", "Except the highway ahead looks fine. No cones. No trucks. Nothing.", "You slow down anyway.", "Exit 131 is a two-lane that goes south. The kind of road that has a name instead of a number. According to your phone — which has had one bar since Needles — it adds miles but avoids something called the Painted Flats construction zone.", "Your phone shows no construction zone.", "Behind you, nothing. Ahead, the highway runs straight and clear to the horizon.", "The exit is coming up."],
+    choices: [
+      { text: "Take the detour", sub: "Costs time and miles — but something about the sign feels deliberate", type: "neutral", next: 'sw_006a', flags: { took_detour: true } },
+      { text: "Stay on the highway", sub: "Safe — no construction visible. Sign might be old.", type: "safe", next: 'sw_006b' },
+      { text: "Pull over and check the phone", sub: "One bar — Gut check on whether the map knows something", type: "neutral",
+        resolve: () => rollCheck(5) ? { next: 'sw_006c', flags: { checked_phone: true } } : { next: 'sw_006d', flags: { checked_phone: true } }
+      }
+    ]
+  },
+
+  sw_006a: {
+    location: "Exit 131 — Unnamed Two-Lane",
+    tags: ["navigation","travel"],
+    mile: 200, paywall: false,
+    text: ["Exit 131 is quiet.", "The two-lane runs south through scrubland that doesn't have a name on any sign. A dry creek bed. A water tower with something painted on it you can't read from the road.", "Then the construction zone.", "It's real. Three miles of torn-up highway, equipment sitting idle, no workers visible. Mid-afternoon on a Tuesday and nobody working.", "You would've sat in that for an hour.", "The detour rejoins I-40 east of the zone. Your tank is down but your time isn't.", "Somewhere back there someone put up a handwritten sign that knew about construction your phone didn't.", "You don't think about that too long."],
+    choices: [{ text: "Keep moving", sub: "Miles up. Someone was looking out for you. Maybe.", type: "neutral", next: 'sw_007' }]
+  },
+
+  sw_006b: {
+    location: "I-40 Eastbound — Painted Flats Construction",
+    tags: ["navigation","tension"],
+    mile: 195, paywall: false,
+    text: ["The highway stays clear for two miles.", "Then the cones start.", "Orange barrels in the median first, then both lanes narrowing to one, then a flagger in a yellow vest holding a SLOW paddle with the look of someone who has been standing in the sun since six this morning.", "You sit.", "The line ahead is seven cars. Eight. A pickup behind you closes off the exit.", "Painted Flats Construction Zone — Next 3 Miles.", "Your tank ticks down while you idle. You watch the temperature gauge. You watch the cars ahead not move.", "Thirty-eight minutes. That's how long it takes.", "When you finally clear it your tank is measurably worse and the sun is lower than you wanted it to be."],
+    choices: [{ text: "Finally. Keep moving.", sub: "Tank down. Sun lower. Should've taken the detour.", type: "neutral", next: 'sw_007' }]
+  },
+
+  sw_006c: {
+    location: "I-40 Eastbound — Shoulder",
+    tags: ["navigation"],
+    mile: 180, paywall: false,
+    text: ["One bar.", "You pull up the map and wait for it to load and it loads just enough.", "Painted Flats. Three miles of active construction. Started six weeks ago. Estimated completion — unknown.", "The detour adds miles but the math works.", "You take Exit 131."],
+    choices: [{ text: "Take the detour", sub: "Information earned. Detour taken.", type: "safe", next: 'sw_006a', flags: { took_detour: true } }]
+  },
+
+  sw_006d: {
+    location: "I-40 Eastbound — Shoulder",
+    tags: ["navigation","tension"],
+    mile: 180, paywall: false,
+    text: ["One bar.", "The map spins.", "Loads halfway. Enough to see you're on a road. Not enough to see what's ahead.", "You sit on the shoulder for four minutes waiting for it to finish.", "It doesn't.", "The exit is behind you now.", "You pull back onto the highway and hope for the best and get the construction zone instead."],
+    choices: [{ text: "Of course.", sub: "Missed the exit. Heading into construction.", type: "neutral", next: 'sw_006b' }]
+  },
+
+  sw_007: {
+    location: "I-40 Eastbound — Open Road",
+    tags: ["travel","tension"],
+    mile: 280, paywall: false,
+    text: ["The highway opens back up.", "Late afternoon light now. The kind that makes everything look better than it is. Sandstone going amber. Shadows getting long.", "Your tank is where it is. Your wallet is where it is.", "Kingman is ahead. There's a gas station there, probably two, and a motel strip on the main drag that's been there since the highway was new.", "You do the math.", "The light keeps getting better. The desert doesn't care what you're worried about."],
+    choices: [
+      { text: "Push straight through to Kingman", sub: "Tank is what it is. Road is clear.", type: "neutral",
+        resolve: () => rollCheck(6) ? { next: 'sw_007_kingman' } : { next: 'sw_007_stall' }
+      },
+      { text: "Find somewhere to stop short", sub: "Safer on the tank. Something is out there.", type: "safe", next: 'sw_007a' }
+    ]
+  },
+
+  sw_007_stall: {
+    location: "I-40 Eastbound — Roadside",
+    tags: ["tension"],
+    mile: 295, paywall: false,
+    text: ["The engine doesn't sputter. It just stops.", "That's always how it happens. Not dramatic. Just suddenly quiet in a way engines aren't supposed to be quiet.", "You coast to the shoulder.", "The desert is the same as it was five seconds ago. Everything is exactly the same except you're not moving anymore and it's getting dark.", "You sit there for a while.", "Nobody comes.", "Later — much later — someone stops.", "You make it to Kingman. Just not the way you planned."],
+    choices: [{ text: "Keep going — eventually", sub: "Late. Rattled. But moving.", type: "neutral", next: 'sw_007_kingman' }]
+  },
+
+  sw_007_kingman: {
+    location: "Kingman, AZ — Motel Strip",
+    tags: ["money","night"],
+    mile: 300, paywall: false,
+    text: ["Kingman comes up in pieces. Gas stations first. Fast food signs. Motel vacancy signs humming against the dark.", "You pull into the Desert Wind because the sign says cheap and because cheap is a relative word when you are tired enough.", "The clerk tells you the price without looking away from the little TV behind the counter.", "You check your wallet before you answer."],
+    choices: [
+      { text: "Take a room at the Desert Wind", sub: "Requires $42 — bed, AC, lock on the door.", type: "safe", requires: { walletMin: 42 }, next: 'sw_008', flags: { stayed_roys: true, stayed_desert_wind: true } },
+      { text: "Sleep in the car", sub: "No room. No lock. But still your car.", type: "neutral", next: 'sw_008', flags: { slept_car: true } },
+      { text: "Keep driving through the night", sub: "Risky — saves money, spends everything else.", type: "risky", resolve: () => rollCheck(7) ? { next: 'sw_0105', flags: { drove_through_night: true } } : { next: 'death_night', death: true } }
+    ]
+  },
+
+  sw_007a: {
+    location: "Roy's — Desert Gas Stop",
+    tags: ["money","travel"],
+    mile: 270, paywall: false,
+    text: ["There's a place a few miles short of Kingman.", "A combination gas station and taxidermy shop — the sign makes this seem normal — called Roy's. The gas is more expensive than anywhere else and the man behind the counter doesn't look up when you come in.", "You fill what you need.", "Roy's has rooms out back. Cash a night. The sun is almost gone.", "Kingman can wait until morning."],
+    choices: [
+      { text: "Take a room at Roy's", sub: "Requires $28 — fuel, key, four walls.", type: "safe", requires: { walletMin: 28 }, next: 'sw_008', flags: { stayed_roys: true } },
+      { text: "Sleep in the car", sub: "Saves the Wallet. Roy doesn't care either way.", type: "neutral", next: 'sw_008', flags: { slept_car: true } },
+      { text: "Keep driving through the night", sub: "Risky — Kingman can wait, if you can.", type: "risky", resolve: () => rollCheck(7) ? { next: 'sw_0105', flags: { drove_through_night: true } } : { next: 'death_night', death: true } }
+    ]
+  },
+
+  sw_008: {
+    location: "Kingman, AZ — Night Stop",
+    tags: ["tension","night","choice"],
+    mile: 300, paywall: false,
+    textFn: (s) => {
+      if (s.flags.slept_car) {
+        return [
+          "The back seat is exactly as comfortable as it looks.",
+          "You wake up twice. Once at midnight for no reason. Once later because something taps the driver's side glass.",
+          "Two taps.",
+          "Patient.",
+          "You open your eyes to darkness. The dashboard clock reads 2:03.",
+          "Someone is standing just outside the cone of the parking lot light. Close enough to be real. Far enough that your brain starts making suggestions."
+        ];
+      }
+      const room = s.flags.stayed_roys && !s.flags.stayed_desert_wind
+        ? "Roy's room is exactly what it costs. A bed, a window unit that works, a TV with four channels. The taxidermy on the office wall doesn't follow you back here. You checked."
+        : "The motel is called the Desert Wind and it's been called that since 1961 according to the sign. The room smells like the last ten people who stayed here but the AC works and the lock catches.";
+      return [
+        room,
+        "Somewhere around two in the morning you're awake.",
+        "A knock at the door.",
+        "Not urgent. Not loud. Just two knocks. Measured. Patient.",
+        "The parking lot outside your window is dark. You can see one car you don't recognize. You can't see who's at the door from this angle.",
+        "The knock comes again. Same rhythm. Same patience."
+      ];
+    },
+    choices: [
+      { text: (s) => s.flags.slept_car ? "Crack the window" : "Answer the door", sub: "Nerve check — could be anything. That's the problem.", type: "risky",
+        resolve: () => rollCheck(6) ? { next: 'sw_008a' } : { next: 'sw_008b' }
+      },
+      { text: (s) => s.flags.slept_car ? "Stay perfectly still" : "Don't move. Wait.", sub: "Safe — locked doors and patience.", type: "safe", next: 'sw_008c' },
+      { text: (s) => s.flags.slept_car ? "Look through the windshield" : "Look out the window first", sub: "Gut check — you might see something. You might not want to.", type: "neutral",
+        resolve: () => rollCheck(5) ? { next: 'sw_008d' } : { next: 'sw_008e' }
+      }
+    ]
+  },
+
+  sw_008a: {
+    location: "Night Stop — Two Taps",
+    tags: ["night","character"],
+    mile: 300, paywall: false,
+    textFn: (s) => s.flags.slept_car
+      ? ["You crack the window an inch.", "A woman stands beside the car. Forties. Road-worn in the specific way of someone who drives for a living. She's holding a wallet.", "'This yours?'", "Your wallet. You didn't know you'd dropped it.", "She passes it through the gap before you finish answering.", "By the time you get the window down far enough to thank her, she's already walking back across the lot. She doesn't turn around.", "You check the wallet. Everything's there.", "Two in the morning and someone tapped on the glass to give something back.", "The desert contains multitudes."]
+      : ["You open the door.", "A woman. Forties. Road-worn in the specific way of someone who drives for a living. She's holding a wallet.", "'Found this in the lot,' she says. 'Room number's on the card inside.'", "Your wallet. You didn't know you'd dropped it.", "She's already walking back to her room before you finish thanking her. Doesn't turn around.", "You check the wallet. Everything's there.", "You lock the door and sit on the edge of the bed for a while.", "Two in the morning and someone knocked to give something back.", "The desert contains multitudes."],
+    choices: [{ text: "Try to sleep", sub: "Wallet safe. Morning is coming.", type: "safe", next: 'sw_009' }]
+  },
+
+  sw_008b: {
+    location: "Night Stop — Empty Lot",
+    tags: ["night","tension"],
+    mile: 300, paywall: false,
+    textFn: (s) => s.flags.slept_car
+      ? ["You sit up too fast and hit your shoulder against the door.", "The glass is black with your own reflection.", "You lower the window before you decide not to.", "Nobody there.", "The lot is empty in every direction that matters.", "You roll the window back up, lock the door again, and sit with both hands on your knees until the sky starts going gray.", "You don't sleep again."]
+      : ["Your hand is on the knob before you decide to open it.", "The lot is empty.", "Nobody there.", "The door across from yours is closed. The one to the left. All of them closed.", "You stand in the doorway for longer than makes sense.", "Nothing.", "You close the door and lock it and put the chain on and get back into bed and lie there with your eyes open until the sky starts going gray.", "You don't sleep again."],
+    choices: [{ text: "Wait for morning", sub: "Eyes open. Sky going gray. Nobody slept well tonight.", type: "neutral", next: 'sw_009' }]
+  },
+
+  sw_008c: {
+    location: "Night Stop — Waiting It Out",
+    tags: ["night"],
+    mile: 300, paywall: false,
+    textFn: (s) => s.flags.slept_car
+      ? ["You don't move.", "The taps don't come again.", "You listen to the car settle around you. Plastic cooling. Metal ticking. Your own breathing too loud in the closed space.", "Nothing else happens.", "At some point you sleep. You know this because you wake up and the light through the windshield is different.", "Morning. The lot is ordinary. Two cars. A delivery truck at the far end.", "Whatever it was is gone.", "Whatever it was."]
+      : ["The knock doesn't come a third time.", "You lie there and count your heartbeats and wait for something else to happen.", "Nothing does.", "At some point you sleep. You know this because you wake up and the light under the curtain is different.", "Morning. The parking lot is ordinary. Two cars. A delivery truck at the far end.", "Whatever it was is gone.", "Whatever it was."],
+    choices: [{ text: "Get up. Get moving.", sub: "Morning. Road. Questions you won't get answers to.", type: "neutral", next: 'sw_009' }]
+  },
+
+  sw_008d: {
+    location: "Night Stop — Glass",
+    tags: ["night","tension","elcamino"],
+    mile: 300, paywall: false,
+    textFn: (s) => s.flags.slept_car
+      ? ["You look through the windshield without lifting your head much.", "A man stands near the front of your car with his back to you. You can't see his face. You can see his jacket.", "Denim. Faded. A patch on the left shoulder you can't quite make out.", "He taps the glass again. Patient.", "You blink once. Longer than you mean to.", "When you look again he's gone. The lot is empty except for a denim jacket folded under the passenger-side wiper.", "You don't get out to take it.", "In the morning it's still there."]
+      : ["You ease the curtain back an inch.", "A man. Standing at your door with his back to the window. You can't see his face. You can see his jacket.", "Denim. Faded. A patch on the left shoulder you can't quite make out.", "He knocks again. Patient.", "You let the curtain fall.", "You don't open the door.", "Five minutes later you look again. He's gone. The lot is empty except for a denim jacket folded over your door handle.", "You don't open the door to get it.", "In the morning it's still there."],
+    choices: [
+      { text: "Take the jacket", sub: "It's just a jacket. Probably.", type: "risky", next: 'sw_009', flags: { took_jacket: true } },
+      { text: "Leave it. Don't touch it.", sub: "Some things you leave where they are.", type: "safe", next: 'sw_009' }
+    ]
+  },
+
+  sw_008e: {
+    location: "Night Stop — Nothing There",
+    tags: ["night","tension"],
+    mile: 300, paywall: false,
+    textFn: (s) => s.flags.slept_car
+      ? ["You look through the windshield.", "The lot is empty.", "But the taps came from the driver's side glass. You're certain of it.", "You sit up and scan the lot for a full minute.", "Nothing moves.", "You lie back down in the specific discomfort of someone who looked and found nothing and isn't sure if that's better.", "The tapping doesn't come again.", "Morning arrives like it always does. Indifferent."]
+      : ["You ease the curtain back.", "The lot is empty.", "But the knock came from the door. You're certain of it.", "You stand at the window for a full minute.", "Nothing moves.", "You get back into bed and pull the sheet up and lie there in the specific discomfort of someone who looked and found nothing and isn't sure if that's better.", "The knock doesn't come again.", "Morning arrives like it always does. Indifferent."],
+    choices: [{ text: "Get up. Face the day.", sub: "Nerve down. Questions up.", type: "neutral", next: 'sw_009' }]
+  },
+
+  sw_009: {
+    location: "Arizona — Morning",
+    tags: ["morning","tension"],
+    mile: 300, paywall: false,
+    textFn: (s) => {
+      const place = s.flags.stayed_roys || s.flags.slept_car ? "Roy's" : "the Desert Wind";
+      const base = ["Morning.", `You're packed and ready by seven. The lot at ${place} is quiet.`, "You put your bag in the back seat.", "Something is wrong."];
+      if (s.flags.took_jacket) base.push("The jacket is gone from the back seat. You remember taking it. You remember putting it there. That makes the empty space worse, not better.");
+      else base.push("Something small is missing. You stand there and inventory without meaning to. Something was taken in the night.", "Whoever it was had standards. Or at least a sense of proportion.");
+      base.push("You look at the other car in the lot.", "It's empty.", "The office isn't open yet.");
+      return base;
+    },
+    choices: [
+      { text: "Ask at the office", sub: "Nerve check — the office opens at eight. You have time.", type: "neutral",
+        resolve: () => rollCheck(5) ? { next: 'sw_009a' } : { next: 'sw_009b' }
+      },
+      { text: "Let it go", sub: "Safe — not worth the hour. Road is waiting.", type: "safe", next: 'sw_009c' },
+      { text: "Check the car more carefully", sub: "Gut check — maybe you missed something.", type: "neutral",
+        resolve: () => rollCheck(5) ? { next: 'sw_009d', flags: { found_note: true } } : { next: 'sw_009c' }
+      }
+    ]
+  },
+
+  sw_009a: {
+    location: "Morning — Office",
+    tags: ["morning"],
+    mile: 300, paywall: false,
+    textFn: (s) => {
+      const clerk = s.flags.stayed_roys || s.flags.slept_car ? "Roy" : "a heavyset man named Phil";
+      return [`The office opens late. ${clerk} takes your report like a man who takes reports.`, "He doesn't believe you. He doesn't disbelieve you. He writes things down.", "When you're leaving he calls after you. 'Found this in the lost and found. Could be nothing.'", "A folded bill. Not yours. Or maybe it is. You take it anyway.", "Some days the road gives a little back."];
+    },
+    choices: [{ text: "Hit the road", sub: "Late start. Something recovered. Questions unanswered.", type: "neutral", next: 'sw_010' }]
+  },
+
+  sw_009b: {
+    location: "Morning — Office",
+    tags: ["morning","tension"],
+    mile: 300, paywall: false,
+    textFn: (s) => {
+      const question = s.flags.slept_car ? "You sure it was locked?" : "You sure you locked your car?";
+      return ["The person behind the counter listens to the whole thing.", `Then: '${question}'`, "You're sure.", "'People forget,' he says.", "That's all he says.", "You stand there for a moment processing the specific kind of tired that comes from being told you're wrong about something you know.", "You leave without filing anything."];
+    },
+    choices: [{ text: "Get out of here", sub: "Nothing recovered. Late start.", type: "neutral", next: 'sw_010' }]
+  },
+
+  sw_009c: {
+    location: "Kingman, AZ — Parking Lot",
+    tags: ["morning"],
+    mile: 300, paywall: false,
+    text: ["You stand in the lot for a moment.", "Then you get in the car and start it.", "Whatever was taken is gone. Whatever was there is still there.", "The road doesn't know or care about either of those things.", "You pull out."],
+    choices: [{ text: "Keep moving", sub: "Lighter than you came in. Road's the same.", type: "neutral", next: 'sw_010' }]
+  },
+
+  sw_009d: {
+    location: "Kingman, AZ — Your Car",
+    tags: ["morning","character"],
+    mile: 300, paywall: false,
+    text: ["You go through everything.", "Under the seat. Behind the visor. In the door pocket.", "There's something wedged between the seat and the center console.", "A note. Folded once. Torn from a local motel notepad.", "A highway number and a time. That's all.", "You don't know what highway. You don't know what the time means.", "You put it in your pocket and try not to think about it."],
+    choices: [{ text: "Whatever it means, it can wait", sub: "Note in pocket. Road ahead.", type: "neutral", next: 'sw_010' }]
+  },
+
+  sw_010: {
+    location: "I-40 Eastbound — Rest Area Mile 400",
+    tags: ["elcamino","tension","choice"],
+    mile: 400, paywall: false,
+    textFn: (s) => {
+      const base = ["A rest stop.", "You pull in for the bathroom and because your legs need it.", "The El Camino is there.", "Of course it is.", "Engine off. He's sitting at one of the concrete picnic tables eating something from a paper bag. Not looking at the road. Not looking at you.", "Looking at a map.", "A paper map. Folded wrong the way maps always get folded wrong after the first time."];
+      if (s.flags.elcamino_trusted) base.push("He looks up when you approach. Like he was expecting you again.");
+      else if (s.flags.elcamino_debt) base.push("He looks up. His eyes go to your hands first. Then your face. Like he's checking something.");
+      else if (s.flags.took_jacket) base.push("He looks at you for a long time before he says anything. Long enough that you become aware of what you're wearing.");
+      else if (s.flags.found_note) base.push("His eyes go to your jacket pocket. Where the note is. Just for a second.");
+      else base.push("He doesn't look up.");
+      base.push("He folds the map.", "'You made it this far,' he says.", "It's not a question.");
+      return base;
+    },
+    choices: [
+      { text: "Sit down", sub: "You've earned a minute. So has this.", type: "neutral", next: 'sw_010a' },
+      { text: "Ask him who he is", sub: "Direct — Nerve check. You might get an answer.", type: "risky",
+        resolve: () => rollCheck(7) ? { next: 'sw_010b', flags: { knows_cord_name: true } } : { next: 'sw_010c' }
+      },
+      { text: "Just nod and keep walking", sub: "You don't owe him a conversation.", type: "safe", next: 'sw_010d' }
+    ]
+  },
+
+  sw_010a: {
+    location: "Rest Area — Picnic Table",
+    tags: ["elcamino","character"],
+    mile: 400, paywall: false,
+    text: ["The concrete is warm from the afternoon sun.", "He finishes what's in the paper bag and folds it flat and puts it in his pocket. Neat.", "You sit across from him.", "Neither of you says anything for a while. The highway noise fills it.", "'Albuquerque's a few hours,' he says finally.", "'I know,' you say.", "He nods.", "'Road gets easier from here.' He picks up the map. Stands. 'Or it doesn't.'", "He walks to the El Camino.", "'Either way,' he says, opening the door, 'you'll know which one it is.'", "He pulls out.", "West. Back toward everything you came from.", "You sit at the picnic table for another minute.", "Then you get up and finish the road."],
+    choices: [{ text: "Finish the road", sub: "You know what you're doing now. For now.", type: "safe", next: 'sw_0105' }]
+  },
+
+  sw_010b: {
+    location: "Rest Area — Picnic Table",
+    tags: ["elcamino","character"],
+    mile: 400, paywall: false,
+    text: ["He looks at you.", "Long enough that you wonder if you made a mistake.", "Then he says: 'Someone who drives this road.'", "'That's not an answer,' you say.", "'No,' he agrees.", "He stands up. Picks up the map.", "'Name's Cord,' he says. Like it's a concession. Like you earned it.", "He doesn't offer a hand.", "'Watch the second gas station on the right before the city. The prices are posted wrong.'", "Then he's in the El Camino and pulling out.", "The name stays with you.", "You think about what it means for about three miles. Then you stop, because it doesn't mean anything, and also because it means everything, and you can't hold both of those at once while driving."],
+    choices: [{ text: "Drive", sub: "His name is Cord. That's what you have.", type: "neutral", next: 'sw_0105' }]
+  },
+
+  sw_010c: {
+    location: "Rest Area — Picnic Table",
+    tags: ["elcamino","tension"],
+    mile: 400, paywall: false,
+    text: ["He looks at you.", "You hold it for about four seconds.", "Then something in you flinches. Just slightly. Just enough.", "He sees it.", "He picks up the map and stands.", "'A few hours,' he says.", "That's all.", "He walks to the El Camino and you watch him go and you don't ask again.", "Some questions you only get to ask once."],
+    choices: [{ text: "Get back on the road", sub: "No name. No answers.", type: "neutral", next: 'sw_0105' }]
+  },
+
+  sw_010d: {
+    location: "Rest Area",
+    tags: ["elcamino","travel"],
+    mile: 400, paywall: false,
+    text: ["He watches you walk past.", "You don't stop.", "You use the bathroom and splash water on your face and look at yourself in the mirror for a second longer than usual.", "When you come back out the El Camino is still there.", "He's reading the map again.", "You get in your car.", "You pull out.", "In the mirror he's still at the table.", "Then the highway curves and he's gone and that's the last time you see the El Camino.", "You think."],
+    choices: [{ text: "The road", sub: "Just you now.", type: "neutral", next: 'sw_0105' }]
+  },
+
+  sw_0105: {
+    location: "Outside Flagstaff, AZ — Mountain Grade",
+    tags: ["tension","travel"],
+    mile: 455, paywall: false,
+    textFn: (s) => {
+      const base = [];
+      if (s.flags.drove_through_night) base.push("You do not remember deciding to keep driving. You remember yellow lines. Black sky. The small mercy of not seeing how far the shoulder drops away.");
+      base.push("The desert changes without asking permission.", "The road starts to climb. The air cools. Pines appear in the dark like witnesses.", "Then the temperature gauge starts moving the wrong way.", "Not the fuel gauge. The other one.", "You ease off the gas and listen to the engine work harder than it should.");
+      if (s.flags.elcamino_trusted || s.flags.elcamino_debt) base.push("Whatever help the El Camino gave you got you this far. It does not fix an overheating engine.");
+      base.push("There is a pullout ahead. There is also traffic behind you and a long grade still climbing.");
+      return base;
+    },
+    choices: [
+      { text: "Pull over and let it cool", sub: "Safe — costs time, fuel, and nerve. Keeps the car alive.", type: "safe", next: 'sw_0105a' },
+      { text: "Turn off the AC and nurse it uphill", sub: "Gut check — slow, ugly, maybe enough.", type: "neutral", resolve: () => rollCheck(6) ? { next: 'sw_0105b' } : { next: 'sw_0105_fail' } },
+      { text: "Push to the next exit", sub: "Risky — Nerve check. Bad idea unless you can hold steady.", type: "risky", resolve: () => rollCheck(7) ? { next: 'sw_0105b' } : { next: 'sw_0105_fail' } },
+      { text: "Take the frontage road", sub: "Gut check — fewer cars, fewer services, one guess.", type: "neutral", resolve: () => rollCheck(7) ? { next: 'sw_0105c' } : { next: 'sw_0105_fail' } }
+    ]
+  },
+
+  sw_0105a: {
+    location: "Outside Flagstaff — Pullout",
+    tags: ["travel"],
+    mile: 455, paywall: false,
+    text: ["You pull over before the gauge makes the choice for you.", "The engine ticks under the hood. Heat rises into the cold air.", "Cars pass. Nobody stops. Nobody needs to.", "After twenty minutes the needle falls back toward normal.", "You get moving again slower than before."],
+    choices: [{ text: "Ease back onto I-40", sub: "You lost time. You kept the car.", type: "safe", next: 'sw_011' }]
+  },
+
+  sw_0105b: {
+    location: "Flagstaff, AZ — Eastbound",
+    tags: ["travel"],
+    mile: 470, paywall: false,
+    text: ["You shut off the AC and keep your foot light.", "The cabin turns stale. Your shirt sticks to your back even with the cold outside.", "The gauge rises, holds, then drops just enough to let you breathe again.", "Flagstaff goes by in fragments: exits, lights, pines, trucks grinding uphill in the right lane.", "You make it over the grade."],
+    choices: [{ text: "Keep the engine easy", sub: "No coasting. Not yet.", type: "neutral", next: 'sw_011' }]
+  },
+
+  sw_0105c: {
+    location: "Flagstaff Frontage Road",
+    tags: ["tension","travel"],
+    mile: 465, paywall: false,
+    text: ["The frontage road runs close enough to I-40 that you can see the traffic and far enough that it feels like a different trip.", "For ten minutes you think you made the wrong choice.", "Then the road drops slightly, the engine noise softens, and the gauge settles.", "You rejoin the interstate east of town with less fuel than you wanted and more silence than you needed."],
+    choices: [{ text: "Back on the interstate", sub: "A little worse off. Still moving.", type: "neutral", next: 'sw_011' }]
+  },
+
+  sw_0105_fail: {
+    location: "Outside Flagstaff — Shoulder",
+    tags: ["tension"],
+    mile: 470, paywall: false,
+    text: ["The gauge climbs into the red and stays there.", "Then the engine gives you a sound you have never heard before and immediately understand.", "You coast to the shoulder with semis shaking the car every few seconds.", "Steam leaks from under the hood.", "This is no longer a driving problem. This is a stranded problem."],
+    choices: [
+      { text: "Call for a tow", sub: "Requires $35 — expensive, humiliating, survivable.", type: "safe", requires: { walletMin: 35 }, next: 'sw_011' },
+      { text: "Flag someone down", sub: "Nerve check — you need a stranger to care.", type: "risky", resolve: () => rollCheck(7) ? { next: 'sw_011', flags: { roadside_help: true } } : { next: 'death_stranded', death: true } },
+      { text: "Wait it out and try again", sub: "Gut check — maybe it cools. Maybe it doesn't.", type: "neutral", resolve: () => rollCheck(8) ? { next: 'sw_011' } : { next: 'death_stranded', death: true } }
+    ]
+  },
+
+  sw_011: {
+    location: "I-40 Eastbound — New Mexico State Line",
+    tags: ["tension","travel","final"],
+    mile: 550, paywall: false,
+    textFn: (s) => {
+      const base = ["The road flattens.", "New Mexico is different from Arizona. Not dramatically. Just enough. The light is slightly different. The scrub is slightly different. The air through the window has something in it that wasn't there before.", "Albuquerque is still a stretch. Your tank is what it is. Your wallet is what it is.", "A couple of gas stations between here and the city limits according to the last sign."];
+      if (s.flags.knows_cord_name) base.push("Watch the second one. That's what he said. You remember it.");
+      return base;
+    },
+    choices: [
+      { text: "Stop at the first station", sub: "Requires $22 — known quantity. Whatever it costs.", type: "safe", requires: { walletMin: 22 }, next: 'sw_011a' },
+      { text: "Push to the second station", sub: (s) => s.flags.knows_cord_name ? "Requires $12 — he said watch it. You're watching." : "Requires $12 — gamble. Second might be cheaper. Might not exist.", type: "neutral", requires: { walletMin: 12 },
+        resolve: (s) => rollCheck(6) ? { next: 'sw_011b' } : { next: 'sw_011c' }
+      },
+      { text: "Ask someone at the pump for help", sub: "Nerve check — no money, no pride left to protect.", type: "risky",
+        resolve: () => rollCheck(7) ? { next: 'sw_011_help', flags: { asked_for_gas: true } } : { next: 'sw_011c' }
+      },
+      { text: "Check if you can make it on what you have", sub: "Gut check — math or instinct. Failure leaves no easy bailout.", type: "neutral",
+        resolve: () => rollCheck(7) ? { next: 'sw_011d' } : { next: 'sw_011c' }
+      }
+    ]
+  },
+
+  sw_011a: {
+    location: "New Mexico — Gas Station",
+    tags: ["travel"],
+    mile: 580, paywall: false,
+    text: ["The first station is fine. Expensive but fine. The kind of place that knows it's the last option for a while and prices accordingly.", "You fill what you need.", "Albuquerque is close.", "The road is clear."],
+    choices: [{ text: "Last stretch", sub: "You're going to make it.", type: "safe", next: 'sw_012' }]
+  },
+
+  sw_011b: {
+    location: "New Mexico — Second Gas Station",
+    tags: ["travel"],
+    mile: 600, paywall: false,
+    textFn: (s) => {
+      const base = ["The second station is cheaper.", "Not dramatically. But cheaper. And on a long drive that matters."];
+      if (s.flags.knows_cord_name) base.push("Cord knew it.");
+      else base.push("Your gut knew it. Sometimes that's enough.");
+      base.push("The attendant is a teenager who doesn't look up from his phone.", "Normal. Finally.", "Albuquerque is close.");
+      return base;
+    },
+    choices: [{ text: "Almost there", sub: (s) => s.flags.knows_cord_name ? "Cord was right. Whatever that means." : "Your gut was right. Keep moving.", type: "safe", next: 'sw_012' }]
+  },
+
+  sw_011_help: {
+    location: "New Mexico — First Gas Station",
+    tags: ["money","character"],
+    mile: 580, paywall: false,
+    text: ["You ask a man at the next pump for help and hate every word as it leaves your mouth.", "He looks at you. Looks at your plates. Looks at the road behind you like it might explain you.", "Then he buys you six dollars of gas and says, 'Don\'t make me regret it.'", "You thank him too many times.", "It is not enough to feel safe. It is enough to continue."],
+    choices: [{ text: "Use what he gave you", sub: "A stranger bought you miles. Don't waste them.", type: "neutral", next: 'sw_012' }]
+  },
+
+  sw_011c: {
+    location: "New Mexico — Roadside",
+    tags: ["tension","travel"],
+    mile: 595, paywall: false,
+    text: ["The second station is closed.", "Permanently, by the look of it. Plywood on the windows. No sign explaining it.", "You sit on the shoulder and do the math.", "It's close.", "Very close.", "You make a decision and live with it."],
+    choices: [
+      { text: "Push for Albuquerque", sub: "Tank is what it is. City is close.", type: "risky",
+        resolve: () => rollCheck(7) ? { next: 'sw_012' } : { next: 'sw_011_stall' }
+      },
+      { text: "Turn back for the first station", sub: "Requires $22 — costs time, pride, and cash. Saves the run.", type: "safe", requires: { walletMin: 22 }, next: 'sw_011a' }
+    ]
+  },
+
+  sw_011_stall: {
+    location: "I-40 Eastbound — Final Miles",
+    tags: ["tension"],
+    mile: 620, paywall: false,
+    text: ["The engine stops somewhere between the closed station and the city limits.", "You coast to the shoulder.", "Albuquerque is visible on the horizon. The buildings. The mountains behind them. The whole thing right there.", "You sit with the engine off and the windows down and watch the city not come to you.", "Eventually headlights appear behind you. Then pass. Then disappear.", "Albuquerque stays where it is.", "Close enough to see is not close enough to survive."],
+    choices: [{ text: "Sit with the silence", sub: "The city is visible. That is not the same as arriving.", type: "neutral", next: 'death_stranded', death: true }]
+  },
+
+  sw_011d: {
+    location: "I-40 Eastbound — Final Miles",
+    tags: ["travel"],
+    mile: 610, paywall: false,
+    text: ["The math works.", "Barely. But it works.", "You don't stop.", "The first station passes on your right. The second one too — closed, plywood on the windows.", "You watch your tank the way you watch things you can't control.", "It holds.", "Albuquerque comes up like it was always going to."],
+    choices: [{ text: "There it is.", sub: "Your gut was right. It usually is.", type: "neutral", next: 'sw_012' }]
+  },
+
+  sw_012: {
+    location: "Albuquerque, NM — Mile 675",
+    tags: ["victory"],
+    mile: 675,
+    paywall: false,
+    isVictory: true,
+    textFn: (s) => {
+      const base = ["Mile 675.", "The city comes in fast after the desert. That's always how it works. Nothing nothing nothing and then exits and overpasses and a Walmart and a cluster of hotels and the skyline behind all of it.", "You take the first exit you see.", "A gas station on the corner. Fluorescent lights. A man walking a small dog around the perimeter of the lot for reasons of his own.", "You park.", "You turn the engine off.", "You sit there.", "The Sandia Mountains are pink in the late light. That's a real thing that happens here — the mountains turn pink at certain hours, which is why they're called what they're called.", "You didn't know that before today.", "You know it now."];
+      if (s.flags.knows_cord_name) base.push("Cord. Someone who drives this road. You wonder if he's driven this one before. You wonder if he's driven all of them.");
+      if (s.flags.elcamino_debt) base.push("Whatever you helped him with at that shuttered lot — it got you here. You're not sure how to hold that.");
+      if (s.flags.hitchhiker_picked_up) base.push("He'll catch up, they said. You've been here a while now and nothing has happened. Maybe that means something. Maybe whatever was behind you stopped being behind you somewhere in the desert.");
+      if (s.flags.elcamino_refused) base.push("You did it alone. Mostly. The desert had opinions but you made it through on your own terms.");
+      if ((s.road || 0) >= 3) base.push("At the first light, a dark El Camino waits two lanes over. Not impossible. Just unlikely. The driver does not look your way. When the light changes, he lets you go first.");
+      else if ((s.road || 0) <= -2) base.push("You expected something to change when you got here. It doesn't. The car ticks in the parking lot. Your hands smell like gas and old vinyl. Behind you, the westbound lanes keep moving.");
+      else base.push("At a red light, you check the rearview. Nothing behind you but traffic. For once, that feels like enough.");
+      base.push("Your phone has bars.", "You could call someone.", "You sit with that option for a while.");
+      if (s.stats.wallet > 8) base.push("There's a diner two blocks east. You can see the sign from here.", "You've been driving all day and you're hungry and you have just enough left for a meal.");
+      else base.push("There's a diner two blocks east. You can see the sign from here. You are hungry enough to notice it and broke enough to keep driving.");
+      base.push("You start the car.", "That's enough.", "That's the whole thing.");
+      return base;
+    },
+    choices: []
+  },
+
+  death_night: {
+    location: "I-40 Eastbound — Night",
+    tags: ["tension"],
+    mile: 330,
+    paywall: false,
+    text: [
+      "You tell yourself you are awake enough.",
+      "That is the last useful lie you get to tell.",
+      "The road narrows to headlights and yellow paint and the soft mechanical hum of tires crossing the rumble strip.",
+      "By the time you understand you are drifting, the car already has.",
+      "This run is over."
+    ],
+    choices: [
+      { text: "Try the route again", sub: "Same traveler. New run.", type: "safe", action: "retrySame" },
+      { text: "Choose a different traveler", sub: "Back to character select.", type: "neutral", action: "newTraveler" }
+    ]
+  },
+
+  death_stranded: {
+    location: "I-40 Eastbound — Shoulder",
+    tags: ["tension"],
+    mile: 0,
+    paywall: false,
+    text: [
+      "The engine quits for good.",
+      "No sputter. No drama. Just silence where motion used to be.",
+      "The road keeps going without you.",
+      "Eventually headlights appear in the distance. Maybe help. Maybe not.",
+      "This run is over."
+    ],
+    choices: [
+      { text: "Try the route again", sub: "Same traveler. New run.", type: "safe", action: "retrySame" },
+      { text: "Choose a different traveler", sub: "Back to character select.", type: "neutral", action: "newTraveler" }
+    ]
+  }
+
+
+};
+
+// ═══════════════════════════════════════════════════════
+// ENGINE
+// ═══════════════════════════════════════════════════════
+let selectedArchetype = 'drifter';
+
+function selectArchetype(card) {
+  document.querySelectorAll('.cs-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedArchetype = card.dataset.archetype;
+}
+
+function inferCheckStat(choice) {
+  const label = typeof choice?.text === 'function' ? choice.text(state) : (choice?.text || '');
+  const haystack = `${label} ${typeof choice?.sub === 'function' ? choice.sub(state) : (choice?.sub || '')}`.toLowerCase();
+  if (haystack.includes('nerve')) return 'nerve';
+  if (haystack.includes('gut') || haystack.includes('instinct')) return 'gut';
+  if (haystack.includes('tank')) return 'tank';
+  return choice?.type === 'risky' ? 'nerve' : 'gut';
+}
+
+function rollCheck(statOrDifficulty, maybeDifficulty) {
+  // Backward-compatible: existing prototype calls rollCheck(6).
+  // New form also works: rollCheck('gut', 6).
+  let stat, difficulty;
+  if (typeof statOrDifficulty === 'string') {
+    stat = statOrDifficulty;
+    difficulty = maybeDifficulty ?? 6;
+  } else {
+    stat = state.pendingCheckStat || 'gut';
+    difficulty = statOrDifficulty ?? 6;
+  }
+
+  let value = state.stats?.[stat] ?? 5;
+  if (stat === 'tank') value = Math.round((value / (state.maxStats?.tank || 100)) * 10);
+  if (stat === 'wallet') value = Math.round((value / (state.maxStats?.wallet || 80)) * 10);
+
+  const target = Math.max(1, Math.min(10, value - (difficulty - 5)));
+  const roll = Math.random() * 10;
+  state.lastRoll = { stat, value, difficulty, target, roll: Number(roll.toFixed(2)), passed: roll <= target };
+  return roll <= target;
+}
+
+function clampStats() {
+  state.stats.tank = Math.max(0, Math.min(state.maxStats.tank, Math.round(state.stats.tank)));
+  state.stats.wallet = Math.max(0, Math.min(state.maxStats.wallet, Math.round(state.stats.wallet)));
+  state.stats.nerve = Math.max(0, Math.min(10, Math.round(state.stats.nerve)));
+  state.stats.gut = Math.max(0, Math.min(10, Math.round(state.stats.gut)));
+}
+
+function applyDeltas(deltas = {}) {
+  const effects = [];
+  Object.entries(deltas).forEach(([stat, delta]) => {
+    if (!delta || state.stats[stat] === undefined) return;
+    state.stats[stat] += delta;
+    const label = stat === 'tank' ? 'Fuel' : stat.charAt(0).toUpperCase() + stat.slice(1);
+    const sign = delta > 0 ? '+' : '-';
+    let amount = Math.abs(delta);
+    if (stat === 'wallet') amount = `$${amount}`;
+    if (stat === 'tank') amount = `${amount}%`;
+    effects.push({ stat, delta, text: `${label} ${sign}${amount}` });
+  });
+  clampStats();
+  state.lastEffects = effects;
+  updateStatsUI(effects);
+  if (state.stats.tank <= 0) loadNode('death_stranded');
+}
+
+function applyFlags(flags = {}) {
+  Object.assign(state.flags, flags);
+}
+
+function updateStatsUI(effects = []) {
+  if (!state.stats || !state.maxStats) return;
+  const set = (stat, suffix = '') => {
+    const max = state.maxStats[stat] || 10;
+    const val = state.stats[stat] ?? 0;
+    const pct = Math.max(0, Math.min(100, (val / max) * 100));
+    const fill = document.getElementById(`stat-${stat}-fill`);
+    const label = document.getElementById(`stat-${stat}-val`);
+    if (!fill || !label) return;
+    fill.style.width = pct + '%';
+    fill.classList.toggle('low', pct <= 25);
+    fill.classList.toggle('good', pct >= 70);
+    label.textContent = stat === 'wallet' ? `$${val}` : `${val}${suffix}`;
+  };
+  set('tank', '%'); set('wallet'); set('nerve', '/10'); set('gut', '/10');
+
+  const log = document.getElementById('effects-log');
+  if (log && effects.length) {
+    const parts = effects.map(e => `<span class="${e.delta > 0 ? 'effect-positive' : 'effect-negative'}">${e.text}</span>`);
+    if (state.lastRoll && state.debugRolls) {
+      const r = state.lastRoll;
+      parts.push(`<span class="effect-neutral">${r.stat.toUpperCase()} check ${r.passed ? 'passed' : 'failed'} (${r.roll}/${r.target})</span>`);
+    }
+    log.innerHTML = parts.join(' &nbsp;•&nbsp; ');
+    log.style.display = 'block';
+  } else if (log && !effects.length && state.lastRoll && state.debugRolls) {
+    const r = state.lastRoll;
+    log.innerHTML = `<span class="effect-neutral">${r.stat.toUpperCase()} check ${r.passed ? 'passed' : 'failed'} (${r.roll}/${r.target})</span>`;
+    log.style.display = 'block';
+  }
+}
+
+function getOutcomeDelta(currentNodeId, choice, result) {
+  // Manual balancing layer for the current prototype. This avoids hardcoding dollars/fuel into prose.
+  const node = currentNodeId;
+  const label = typeof choice.text === 'function' ? choice.text(state) : (choice.text || '');
+  const text = `${label} ${typeof choice.sub === 'function' ? choice.sub(state) : (choice.sub || '')}`.toLowerCase();
+  const next = result?.next || choice.next || '';
+  const outcome = result?.outcome || choice.outcome || '';
+
+  const table = {
+    sw_001: {
+      'Order the breakfast plate': { wallet: -9, gut: +1 },
+      'Just the coffee and go': { wallet: -3, gut: -1 },
+      deb_success: { wallet: +18, gut: +1, tank: -4 },
+      deb_fail: { wallet: -3, nerve: -1, tank: -2 }
+    },
+    sw_002: {
+      'Pull over': { gut: +1, tank: -2 },
+      'Keep driving': { nerve: +1 },
+      'Slow down, get a look, decide': { nerve: -1 }
+    },
+    sw_002a: { default: { tank: -5, nerve: -1 } },
+    sw_003: { default: { tank: -8 } },
+    sw_003_drove: { default: { tank: -8 } },
+    sw_004: {
+      'Pay and go': { wallet: -18, tank: +18 },
+      sw_004b: { wallet: -10, tank: +28, gut: +1 },
+      sw_004c: { wallet: -18, tank: +18, gut: -1 },
+      sw_004d: { tank: +32, nerve: +1 },
+      sw_004e: { wallet: -18, tank: +18, nerve: -1 }
+    },
+    sw_005: {
+      sw_005a: { tank: +3, gut: +1 },
+      sw_005b: { nerve: -1 },
+      sw_005c: { tank: +22, gut: -1, nerve: -1 },
+      sw_005d: { nerve: +1 }
+    },
+    sw_006: {
+      'Take the detour': { tank: -6, gut: +1 },
+      'Stay on the highway': { tank: -16, nerve: -1 },
+      sw_006c: { tank: -6, gut: +1 },
+      sw_006d: { tank: -16, gut: -1 }
+    },
+    sw_007: {
+      sw_007_kingman: { tank: -18 },
+      sw_007_stall: { tank: -30, nerve: -2 },
+      'Find somewhere to stop short': { tank: -8 }
+    },
+    sw_007_kingman: {
+      "Take a room at the Desert Wind": { wallet: -42, tank: +10, nerve: +1 },
+      'Sleep in the car': { tank: +2, nerve: -2, gut: -1 },
+      'Keep driving through the night': { tank: -38, nerve: -3, gut: -2 }
+    },
+    sw_007a: {
+      "Take a room at Roy's": { wallet: -28, tank: +30, nerve: +1 },
+      'Sleep in the car': { tank: +8, nerve: -2, gut: -1 },
+      'Keep driving through the night': { tank: -34, nerve: -3, gut: -2 }
+    },
+    sw_008: {
+      sw_008a: { nerve: +1 },
+      sw_008b: { nerve: -1 },
+      sw_008c: { nerve: +1 },
+      sw_008d: { gut: +1 },
+      sw_008e: { gut: -1 }
+    },
+    sw_009: {
+      sw_009a: { wallet: +10, nerve: +1 },
+      sw_009b: { nerve: -1, tank: -2 },
+      sw_009c: { tank: -3 },
+      sw_009d: { gut: +1, nerve: +1 }
+    },
+    sw_010: {
+      sw_010a: { nerve: +2, gut: +1 },
+      sw_010b: { nerve: +1, gut: +1 },
+      sw_010c: { nerve: -1 },
+      sw_010d: { nerve: +1 }
+    },
+    sw_0105: {
+      sw_0105a: { tank: -8, nerve: -1 },
+      sw_0105b: { tank: -14, gut: +1 },
+      sw_0105c: { tank: -18, gut: +1 },
+      sw_0105_fail: { tank: -25, nerve: -2 }
+    },
+    sw_0105_fail: {
+      sw_011: { wallet: -35, tank: +10, nerve: -1 },
+      death_stranded: { nerve: -3, gut: -2 }
+    },
+    sw_011: {
+      sw_011a: { wallet: -22, tank: +35 },
+      sw_011b: { wallet: -12, tank: +35, gut: +1 },
+      sw_011c: { tank: -18, gut: -1 },
+      sw_011d: { tank: -28, gut: +1 },
+      sw_011_help: { tank: +12, nerve: -1 }
+    },
+    sw_011c: {
+      sw_012: { tank: -20, nerve: +1 },
+      sw_011_stall: { tank: -50, nerve: -2 },
+      sw_011a: { tank: -12, wallet: -22 }
+    },
+    sw_011_stall: { default: { wallet: -8, tank: +15, nerve: -1 } }
+  };
+
+  const nodeRules = table[node] || {};
+  if (outcome && nodeRules[outcome]) return nodeRules[outcome];
+  if (next && nodeRules[next]) return nodeRules[next];
+  const exact = Object.keys(nodeRules).find(k => label === k);
+  if (exact) return nodeRules[exact];
+  if (nodeRules.default) return nodeRules.default;
+
+  // Fallbacks so every choice still touches the system slightly.
+  if (text.includes('wallet down') || text.includes('costs') || text.includes('pay')) return { wallet: -8 };
+  if (text.includes('tank up') || text.includes('fuel gained')) return { tank: +18 };
+  if (text.includes('nerve check')) return next.includes('fail') ? { nerve: -1 } : {};
+  if (text.includes('gut check')) return next.includes('fail') ? { gut: -1 } : {};
+  return {};
+}
+
+function getRoadDelta(currentNodeId, choice, result) {
+  const label = typeof choice.text === 'function' ? choice.text(state) : (choice.text || '');
+  const next = result?.next || choice.next || '';
+  const outcome = result?.outcome || choice.outcome || '';
+  const key = `${currentNodeId}:${label}:${next}:${outcome}`.toLowerCase();
+  let delta = 0;
+  if (key.includes('pull over') || key.includes('stop the car')) delta += 1;
+  if (key.includes('keep driving') && currentNodeId === 'sw_002') delta -= 1;
+  if (key.includes('pay and go') || key.includes('order the breakfast')) delta += 1;
+  if (key.includes('bluff') || key.includes('card worked')) delta -= 1;
+  if (key.includes('ask someone at the pump')) delta += 1;
+  if (key.includes('help') || key.includes('flag someone')) delta += 1;
+  if (key.includes('push through') || key.includes('push to the next exit')) delta -= 1;
+  if (key.includes('let it go') || key.includes('pull over and let it cool')) delta += 1;
+  if (next.includes('death')) delta -= 2;
+  return delta;
+}
+
+function isChoiceLocked(choice) {
+  if (!choice.requires) return false;
+  if (typeof choice.requires === 'function') return !choice.requires(state);
+  const req = choice.requires;
+  if (req.walletMin !== undefined && (state.stats.wallet || 0) < req.walletMin) return true;
+  if (req.tankMin !== undefined && (state.stats.tank || 0) < req.tankMin) return true;
+  if (req.nerveMin !== undefined && (state.stats.nerve || 0) < req.nerveMin) return true;
+  if (req.gutMin !== undefined && (state.stats.gut || 0) < req.gutMin) return true;
+  const flagReqs = req.flags || Object.fromEntries(Object.entries(req).filter(([k]) => !['walletMin','tankMin','nerveMin','gutMin'].includes(k)));
+  return Object.entries(flagReqs).some(([flag, needed]) => Boolean(state.flags[flag]) !== Boolean(needed));
+}
+
+function getLockReason(choice) {
+  const req = choice.requires;
+  if (!req || typeof req === 'function') return 'Unavailable';
+  if (req.walletMin !== undefined && (state.stats.wallet || 0) < req.walletMin) return `Unavailable — need $${req.walletMin}; you have $${state.stats.wallet || 0}`;
+  if (req.tankMin !== undefined && (state.stats.tank || 0) < req.tankMin) return `Unavailable — need ${req.tankMin}% fuel`;
+  if (req.nerveMin !== undefined && (state.stats.nerve || 0) < req.nerveMin) return `Unavailable — nerve too low`;
+  if (req.gutMin !== undefined && (state.stats.gut || 0) < req.gutMin) return `Unavailable — gut too low`;
+  return 'Unavailable — requirement not met';
+}
+
+
+function startGame() {
+  const arch = ARCHETYPES[selectedArchetype];
+  const name = document.getElementById('player-name').value.trim() || arch.name;
+  state.archetype = selectedArchetype;
+  state.playerName = name;
+  state.flags = {};
+  state.road = 0;
+  state.choices = 0;
+  state.paid = false;
+  state.currentMile = 0;
+  state.stats = JSON.parse(JSON.stringify(arch.stats));
+  state.maxStats = JSON.parse(JSON.stringify(arch.max));
+  state.lastEffects = [];
+  state.lastRoll = null;
+
+  document.getElementById('char-name').textContent = name;
+  document.getElementById('char-type').textContent = arch.type;
+  document.getElementById('footer-arch').textContent = arch.name.split(' ').pop();
+  document.getElementById('footer-choices').textContent = '0';
+  document.getElementById('footer-run').textContent = state.run;
+
+  document.getElementById('main-screen').style.display = 'none';
+  document.getElementById('header').style.display = 'flex';
+  document.getElementById('odometer').style.display = 'flex';
+  document.getElementById('footer').style.display = 'flex';
+  document.getElementById('stats-panel').style.display = 'grid';
+  document.getElementById('effects-log').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'flex';
+  updateStatsUI();
+
+  loadNode('sw_001');
+}
+
+function updateOdometer(mile) {
+  const pct = Math.min(100, (mile / 675) * 100);
+  document.getElementById('odo-fill').style.width = pct + '%';
+  const el = document.getElementById('odo-num');
+  const from = state.currentMile;
+  const steps = 20;
+  let step = 0;
+  const interval = setInterval(() => {
+    step++;
+    el.textContent = Math.round(from + ((mile - from) * step / steps)) + ' / 675';
+    if (step >= steps) clearInterval(interval);
+  }, 40);
+  state.currentMile = mile;
+}
+
+function clearTimeouts() {
+  state.timeouts.forEach(t => clearTimeout(t));
+  state.timeouts = [];
+}
+
+function skipAnimation() {
+  clearTimeouts();
+  document.querySelectorAll('.scene-paragraph').forEach(p => p.classList.add('visible'));
+  document.getElementById('tap-hint').style.display = 'none';
+  document.getElementById('choices-section').classList.add('visible');
+  state.animating = false;
+}
+
+function loadNode(nodeId) {
+  state.currentNode = nodeId;
+  clearTimeouts();
+  state.animating = true;
+
+  const node = NODES[nodeId];
+  if (!node) { console.error('Node not found:', nodeId); return; }
+
+  if (node.paywall && !state.paid) { showPaywall(nodeId); return; }
+
+  if (node.onLoad) node.onLoad(state);
+  updateOdometer(node.mile);
+
+  document.getElementById('location-name').textContent = node.location;
+
+  const tagsEl = document.getElementById('scene-tags');
+  tagsEl.innerHTML = '';
+  (node.tags || []).forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'tag tag-' + t;
+    span.textContent = t.replace('-', ' ');
+    tagsEl.appendChild(span);
+  });
+
+  let text = node.textFn ? node.textFn(state) : (node.text || []);
+  const stashedIdx = text.indexOf('%%STASHED_ITEM%%');
+  if (stashedIdx >= 0) {
+    const copy = [...text];
+    copy[stashedIdx] = STASHED_ITEMS[Math.floor(Math.random() * STASHED_ITEMS.length)];
+    text = copy;
+  }
+
+  const sceneText = document.getElementById('scene-text');
+  sceneText.innerHTML = '';
+  text.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'scene-paragraph';
+    div.innerHTML = p;
+    sceneText.appendChild(div);
+  });
+
+  const choicesSection = document.getElementById('choices-section');
+  choicesSection.classList.remove('visible');
+  document.getElementById('choices').innerHTML = '';
+  document.getElementById('tap-hint').style.display = 'block';
+  document.getElementById('scene').scrollTop = 0;
+
+  const paragraphs = sceneText.querySelectorAll('.scene-paragraph');
+  paragraphs.forEach((p, i) => {
+    state.timeouts.push(setTimeout(() => p.classList.add('visible'), i * 550 + 200));
+  });
+
+  const afterText = paragraphs.length * 550 + 600;
+
+  if (node.isVictory) {
+    state.timeouts.push(setTimeout(() => {
+      document.getElementById('tap-hint').style.display = 'none';
+      showVictory(node);
+      state.animating = false;
+    }, afterText));
+    return;
+  }
+
+  state.timeouts.push(setTimeout(() => {
+    document.getElementById('tap-hint').style.display = 'none';
+    renderChoices(node);
+    choicesSection.classList.add('visible');
+    state.animating = false;
+  }, afterText));
+}
+
+function renderChoices(node) {
+  const container = document.getElementById('choices');
+  container.innerHTML = '';
+  const choices = node.choices || [];
+
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    const locked = isChoiceLocked(choice);
+    btn.className = 'choice-btn ' + (locked ? 'locked' : (choice.type || 'neutral'));
+    const choiceText = typeof choice.text === 'function' ? choice.text(state) : (choice.text || '');
+    const sub = typeof choice.sub === 'function' ? choice.sub(state) : (choice.sub || '');
+    const lockText = locked ? getLockReason(choice) : sub;
+    btn.innerHTML = `<span class="choice-text">${choiceText}</span><span class="choice-sub ${locked ? 'lock-reason' : ''}">${lockText}</span>`;
+    btn.onclick = () => handleChoice(choice);
+    container.appendChild(btn);
+  });
+}
+
+function handleChoice(choice) {
+  if (state.animating || isChoiceLocked(choice)) return;
+
+  if (choice.action === 'retrySame') {
+    restartSameRoute();
+    return;
+  }
+  if (choice.action === 'newTraveler') {
+    chooseNewTraveler();
+    return;
+  }
+
+  state.choices++;
+  document.getElementById('footer-choices').textContent = state.choices;
+  state.lastRoll = null;
+  state.pendingCheckStat = inferCheckStat(choice);
+
+  applyFlags(choice.flags);
+
+  let result = { next: choice.next, outcome: choice.outcome, flags: choice.flags || {}, deltas: choice.deltas || choice.statDeltas || {} };
+
+  if (choice.resolve) {
+    result = { ...result, ...choice.resolve(state) };
+  } else if (choice.check) {
+    const passed = rollCheck(choice.check.stat, choice.check.difficulty);
+    result = passed ? choice.success : choice.failure;
+  }
+
+  applyFlags(result.flags);
+  const inferredDeltas = getOutcomeDelta(state.currentNode || 'sw_001', choice, result);
+  const deltas = { ...inferredDeltas, ...(choice.deltas || choice.statDeltas || {}), ...(result.deltas || result.statDeltas || {}) };
+  applyDeltas(deltas);
+  state.road = Math.max(-6, Math.min(6, (state.road || 0) + getRoadDelta(state.currentNode || 'sw_001', choice, result)));
+  if (state.stats.tank <= 0) { state.pendingCheckStat = null; return; }
+  state.pendingCheckStat = null;
+
+  const currentNode = NODES[state.currentNode || 'sw_001'];
+  if (result.outcome && currentNode && currentNode.outcomes) {
+    const outcomeText = currentNode.outcomes[result.outcome];
+    if (outcomeText) { showOutcomeThen(outcomeText, result.next); return; }
+  }
+
+  if (result.death) {
+    loadNode(result.deathNode || 'death_stranded');
+    return;
+  }
+
+  loadNode(result.next);
+}
+
+
+function showOutcomeThen(texts, nextNode) {
+  const sceneText = document.getElementById('scene-text');
+  const choicesSection = document.getElementById('choices-section');
+  choicesSection.classList.remove('visible');
+  document.getElementById('choices').innerHTML = '';
+
+  const hr = document.createElement('div');
+  hr.style.cssText = 'border-top:1px dashed #c8b99a;margin:12px 0;';
+  sceneText.appendChild(hr);
+
+  texts.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = 'scene-paragraph';
+    div.style.marginTop = '10px';
+    div.innerHTML = t;
+    sceneText.appendChild(div);
+    state.timeouts.push(setTimeout(() => div.classList.add('visible'), i * 500 + 100));
+  });
+
+  state.timeouts.push(setTimeout(() => {
+    const continueBtn = document.createElement('div');
+    continueBtn.style.cssText = 'padding:14px 18px 4px;';
+    continueBtn.innerHTML = `<button class="choice-btn neutral" style="width:100%" onclick="loadNode('${nextNode}')"><span class="choice-text">Continue</span><span class="choice-sub">Back on the road</span></button>`;
+    sceneText.appendChild(continueBtn);
+    document.getElementById('scene').scrollTop = document.getElementById('scene').scrollHeight;
+  }, texts.length * 500 + 500));
+}
+
+function showPaywall(nextNode) {
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'flex';
+  document.getElementById('main-screen').innerHTML = `
+    <div id="paywall-screen">
+      <div class="paywall-miles">Mile 180 of 675</div>
+      <div class="paywall-title">The road ahead is long.</div>
+      <div class="paywall-divider"></div>
+      <div class="paywall-body">You've made ${state.choices} choices.<br>The hard part is still out there.</div>
+      <div class="paywall-details">All 4 routes. Every ending.<br>One time. No subscription.</div>
+      <button class="paywall-btn" onclick="unlockGame('${nextNode}')">
+        Unlock the full journey — $4.99
+        <span class="paywall-btn-sub">(prototype — tap to continue free)</span>
+      </button>
+      <button class="paywall-skip" onclick="unlockGame('${nextNode}')">Continue — it's a prototype</button>
+    </div>
+  `;
+}
+
+function unlockGame(nextNode) {
+  state.paid = true;
+  document.getElementById('main-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'flex';
+  loadNode(nextNode);
+}
+
+function showVictory(node) {
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'flex';
+  const textArr = node.textFn ? node.textFn(state) : (node.text || []);
+
+  document.getElementById('main-screen').innerHTML = `
+    <div id="victory-screen">
+      <div class="victory-header">
+        <div class="victory-mile">Mile 675 — Albuquerque, NM</div>
+        <div class="victory-title">You made it.</div>
+        <div class="victory-sub">${state.playerName} — ${state.choices} choices</div>
+      </div>
+      <div class="victory-text" id="victory-text-container"></div>
+      <div class="victory-actions">
+        <button class="start-btn" onclick="restartFull()">
+          Drive another route
+          <span class="start-btn-sub">Three more roads. Different every time.</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  const container = document.getElementById('victory-text-container');
+  textArr.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'victory-paragraph';
+    div.innerHTML = p;
+    container.appendChild(div);
+    setTimeout(() => div.classList.add('visible'), i * 500 + 300);
+  });
+}
+
+function restartSameRoute() {
+  const archKey = state.archetype || selectedArchetype || 'drifter';
+  const arch = ARCHETYPES[archKey] || ARCHETYPES.drifter;
+  const name = state.playerName || arch.name;
+  const nextRun = (state.run || 1) + 1;
+
+  clearTimeouts();
+  selectedArchetype = archKey;
+  state = {
+    archetype: archKey,
+    playerName: name,
+    flags: {},
+    road: 0,
+    choices: 0,
+    run: nextRun,
+    paid: true, // prototype behavior: entitlement persists after first unlock
+    animating: false,
+    timeouts: [],
+    currentMile: 0,
+    currentNode: 'sw_001',
+    stats: JSON.parse(JSON.stringify(arch.stats)),
+    maxStats: JSON.parse(JSON.stringify(arch.max)),
+    lastEffects: [],
+    lastRoll: null,
+    pendingCheckStat: null,
+    debugRolls: true
+  };
+
+  document.getElementById('char-name').textContent = name;
+  document.getElementById('char-type').textContent = arch.type;
+  document.getElementById('footer-arch').textContent = arch.name.split(' ').pop();
+  document.getElementById('footer-choices').textContent = '0';
+  document.getElementById('footer-run').textContent = state.run;
+  document.getElementById('effects-log').style.display = 'none';
+  document.getElementById('main-screen').style.display = 'none';
+  document.getElementById('header').style.display = 'flex';
+  document.getElementById('odometer').style.display = 'flex';
+  document.getElementById('footer').style.display = 'flex';
+  document.getElementById('stats-panel').style.display = 'grid';
+  document.getElementById('game-screen').style.display = 'flex';
+  updateStatsUI();
+  loadNode('sw_001');
+}
+
+function chooseNewTraveler() {
+  location.reload();
+}
+
+function restartFull() {
+  state = { archetype: 'drifter', playerName: '', flags: {}, road: 0, choices: 0, run: state.run + 1, paid: false, animating: false, timeouts: [], currentMile: 0, currentNode: 'sw_001', stats: {}, maxStats: {}, lastEffects: [], pendingCheckStat: null, debugRolls: true };
+  location.reload();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('main-screen').style.display = 'flex';
+});
+</script>
+
+</body>
+</html>
