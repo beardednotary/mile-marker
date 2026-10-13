@@ -37,7 +37,29 @@ check('every walletMin gate equals what the choice charges', Object.keys(N).ever
 check('Flagstaff fill narrates (outcome prose exists)', !!(N.sw_0105b.outcomes && N.sw_0105b.outcomes.filled));
 st = fresh({ flags: { on_donut: true } });
 check('the donut still locks the push', locked(st, 'sw_0105', 'Push to the next exit'));
-check('the real tire sub says it keeps the grade open', choice(fresh(), 'sw_0095', 'Get a real tire').sub.includes('Keeps every road up the grade open'));
+check('the real tire sub says it keeps the grade open', choice(fresh(), 'sw_0095_tire', 'Get a real tire').sub.includes('Keeps every road up the grade open'));
+
+// ── the mile-350 slot ──
+const slot = N.sw_0095.oneOf;
+check('mile 350 is a slot, not a scene', Array.isArray(slot) && slot.length === 3 && !N.sw_0095.choices);
+check('every scene in the slot exists, sits at mile 350, and exits to the rest area', slot.every(id =>
+  N[id] && N[id].mile === N.sw_0095.mile &&
+  (N[id].choices || []).every(c => [c.next, c.success && c.success.next, c.failure && c.failure.next].filter(Boolean).every(x => x === 'sw_010'))));
+check('every outcome key in the slot has prose', slot.every(id => (N[id].choices || []).every(c =>
+  [c, c.success, c.failure].filter(Boolean).every(arm => !arm.outcome || (N[id].outcomes && N[id].outcomes[arm.outcome])))));
+check('the draw is stable inside a run and varies between runs', (() => {
+  const st = fresh(); X.setState(st);
+  st.seed = 12345; const a1 = X.resolveSlot('sw_0095'), a2 = X.resolveSlot('sw_0095');
+  const seen = new Set();
+  for (let i = 1; i < 400; i++) { st.seed = i * 2654435761 >>> 0; seen.add(X.resolveSlot('sw_0095')); }
+  return a1 === a2 && seen.size === 3;
+})());
+check('a leaking filler neck costs fuel for the rest of the run', (() => {
+  const st = fresh(); st.seed = 7; st.lastMile = 350; X.setState(st);
+  const dry = X.mileageCost('sw_010').tank;
+  st.flags.leaky_cap = true;
+  return X.mileageCost('sw_010').tank < dry;
+})());
 check('frontage: the card reader is locked for the Drifter', locked(fresh(), 'sw_0105c', 'Pay at the pump'));
 check('frontage: the lock reason is the dark window, not a number', /CASH INSIDE/.test(reason(fresh(), 'sw_0105c', 'Pay at the pump')));
 check('frontage: the Planner can pay at the pump', !locked(fresh({ archetype: 'planner' }), 'sw_0105c', 'Pay at the pump'));

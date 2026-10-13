@@ -22,6 +22,7 @@ function run(arch, policy) {
   let node = 'sw_001', steps = 0;
   while (steps++ < 120) {
     if (node === '__RESUME__') node = st.strandReturn || 'sw_011';
+    { const n0 = NODES[node]; if (n0 && n0.oneOf && n0.oneOf.length) { X.setState(st); node = n0.oneOf[Math.floor(X.runRand('slot:' + node) * n0.oneOf.length) % n0.oneOf.length]; } }
     st.currentNode = node;
     const n = NODES[node];
     if (!n) return { end: 'MISSING:' + node, st };
