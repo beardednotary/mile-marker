@@ -7,7 +7,8 @@ function run(arch, policy) {
   const a = ARCHETYPES[arch];
   const st = { archetype: arch, flags: {}, road: 0, choices: 0,
     stats: { ...a.stats }, maxStats: { ...a.max }, currentNode: 'sw_001',
-    lastRoll: null, strandings: 0, strandReturn: null, lastMile: 0, paid: true, run: 1 };
+    lastRoll: null, strandings: 0, strandReturn: null, lastMile: 0, paid: true, run: 1,
+    seed: (Math.floor(Math.random() * 0xffffffff) >>> 0) || 1 };
   X.setState(st);
 
   const strandOut = (ret) => {

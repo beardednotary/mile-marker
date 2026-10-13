@@ -9,6 +9,10 @@ if (process.env.TPM) src = src.replace(/const TANK_PER_MILE = [\d.]+;/, 'const T
 if (process.env.PW) src = src.replace('tank: 100, wallet: 44,', 'tank: 100, wallet: ' + process.env.PW + ',');
 if (process.env.DW) src = src.replace('tank: 30, wallet: 25,', 'tank: 30, wallet: ' + process.env.DW + ',');
 if (process.env.BW) src = src.replace('tank: 24, wallet: 22,', 'tank: 24, wallet: ' + process.env.BW + ',');
+// PT / DT / BT — starting tank.
+if (process.env.PT) src = src.replace(/tank: 100, wallet: (d+),/, 'tank: ' + process.env.PT + ', wallet: $1,');
+if (process.env.DT) src = src.replace(/tank: 30, wallet: (d+),/, 'tank: ' + process.env.DT + ', wallet: $1,');
+if (process.env.BT) src = src.replace(/tank: 24, wallet: (d+),/, 'tank: ' + process.env.BT + ', wallet: $1,');
 
 const stub = new Proxy({}, {
   get(t, p) {
