@@ -66,12 +66,16 @@ console.log('  · cross-route reads: ' + ([...new Set(carried)].join(', ') || '�
 console.log('\n4. Money and fuel');
 const rows = [];
 for (const id of Object.keys(N)) for (const c of (N[id].choices || [])) for (const a of arms(c)) {
-  const d = a.deltas || {}; const cost = -(d.wallet || 0), gain = d.tank || 0;
-  if (!cost && gain <= 0 && !(d.wallet > 0)) continue;
+  const d = a.deltas || {}; const cost = -(d.wallet || 0); const pump = a.pump || c.pump;
+  const gain = pump ? (pump.cap || 100) : (d.tank || 0);
+  if (!cost && gain <= 0 && !(d.wallet > 0) && !pump) continue;
   const gate = c.requires && typeof c.requires === 'object' ? c.requires.walletMin : null;
-  rows.push({ id, mile: N[id].mile, label: (typeof c.text === 'function' ? '(fn)' : c.text).slice(0, 30), gate, cost, gain, income: d.wallet > 0 ? d.wallet : 0, pump: !!(a.pump || c.pump) });
-  if (gate != null && cost > gate) bad('gate below price', id + ' "' + String(c.text).slice(0, 26) + '" gate $' + gate + ' charges $' + cost);
-  if (gain >= 100 && !/gas|tank|pump|fill|top|station/i.test(String(c.text))) bad('fuel bundled into a non-gas action', id + ' "' + String(c.text).slice(0, 26) + '"');
+  rows.push({ id, mile: N[id].mile, pump: !!pump, label: (typeof c.text === 'function' ? '(fn)' : c.text).slice(0, 30), gate, cost, gain, income: d.wallet > 0 ? d.wallet : 0, pump: !!(a.pump || c.pump) });
+  if (c.intentionalPrice) { /* the overshoot is the point; see the choice */ }
+  else if (gate != null && cost > gate) bad('gate below price', id + ' "' + String(c.text).slice(0, 26) + '" gate $' + gate + ' charges $' + cost);
+  // A `pump` choice is a gas purchase by construction. Only a raw tank grant can be
+  // fuel smuggled into something that isn't a pump — Route 1's room that sold gas.
+  if (!pump && (d.tank || 0) >= 100) bad('fuel bundled into a non-gas action', id + ' "' + String(c.text).slice(0, 26) + '"');
 }
 rows.sort((a, b) => a.mile - b.mile);
 console.log('  ' + rows.filter(r => r.income).length + ' income moment(s), ' + rows.filter(r => r.cost).length + ' spend(s), ' + rows.filter(r => r.gain > 0).length + ' fuel source(s)');

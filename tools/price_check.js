@@ -14,6 +14,7 @@ for (const id of Object.keys(N)) {
     for (const a of [c, c.success, c.failure].filter(Boolean)) {
       const cost = -((a.deltas || {}).wallet || 0);
       if (!cost) continue;
+      if (c.intentionalPrice) continue;
       if ((says != null && says !== cost) || (gate != null && gate !== cost)) {
         rows.push({ mile: N[id].mile, id, text: String(c.text).slice(0, 28), says, gate, cost });
       }

@@ -81,7 +81,7 @@ const DEEP_SOUTH = {
     choices: [
       { text: "Take the coffee and go", sub: "Free — she meant it. Small Gut.", type: "safe", next: "ds_002", deltas: { gut: +1 } },
       { text: "Buy a plate — whatever's under the lamp", sub: "Requires $6 — biscuits, something fried. Gut.", type: "neutral", requires: { walletMin: 6 }, next: "ds_002", deltas: { wallet: -6, gut: +2 } },
-      { text: "Fill up before you leave the city", sub: "Requires $8 — city prices. The next pump is Clarksdale.", type: "neutral", requires: { walletMin: 8 }, next: "ds_002", deltas: { wallet: -30, tank: +100 } },
+      { text: "Fill up before you leave the city", sub: (s) => pumpSub(s, { rate: 0.30 }, "City prices. The next pump is Clarksdale."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.30 }, next: "ds_002" },
       { text: "Ask about the pickup", sub: "Nerve check — it's none of your business. That's why you're asking.", type: "neutral", check: { stat: "nerve", difficulty: 5 }, road: +1,
         success: { next: "ds_002", outcome: "asked", deltas: { nerve: +1 }, flags: { asked_pickup: true } },
         failure: { next: "ds_002", outcome: "asked_bad", deltas: { nerve: -1 } } }
@@ -150,7 +150,7 @@ const DEEP_SOUTH = {
         success: { next: "ds_004", outcome: "heard", deltas: { nerve: +1 }, flags: { crossroads_talked: true } },
         failure: { next: "ds_004", outcome: "heard_badly", deltas: { nerve: -1, wallet: -5 } } },
       { text: "Buy a map and don't sit", sub: "Requires $5 — a photocopy with a road drawn on it.", type: "neutral", requires: { walletMin: 5 }, next: "ds_004", outcome: "map", deltas: { wallet: -5 }, flags: { bought_map: true } },
-      { text: "Fill up and leave him to it", sub: "Requires $8 — Delta prices. The pump's right there. He isn't.", type: "neutral", requires: { walletMin: 8 }, next: "ds_004", outcome: "left", deltas: { wallet: -24, tank: +100 } }
+      { text: "Fill up and leave him to it", sub: (s) => pumpSub(s, { rate: 0.24 }, "Delta prices. The pump's right there. He isn't."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.24 }, next: "ds_004", outcome: "left" }
     ],
     outcomes: {
       heard: [
@@ -225,7 +225,7 @@ const DEEP_SOUTH = {
       "'Most people come in from the west,' he says, to the crossword."
     ],
     choices: [
-      { text: "Buy gas", sub: "Requires $8 — the price isn't posted. He'll tell you after.", type: "neutral", requires: { walletMin: 8 }, next: "ds_004a3", deltas: { wallet: -22, tank: +100 } },
+      { text: "Buy gas", sub: (s) => pumpSub(s, { rate: 0.22 }, "The price isn't posted. He tells you after, and it is what he says it is."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.22 }, next: "ds_004a3" },
       { text: "Ask how far to 61", sub: "Nerve check — he'll answer. Whether it's an answer is another thing.", type: "neutral", check: { stat: "nerve", difficulty: 6 },
         success: { next: "ds_004a3", outcome: "told", deltas: { gut: +1, nerve: +1 }, flags: { store_directions: true } },
         failure: { next: "ds_004a3", outcome: "not_told", deltas: { nerve: -2 } } },
@@ -260,7 +260,7 @@ const DEEP_SOUTH = {
       return base;
     },
     choices: [
-      { text: "Gas at the gin", sub: "Requires $8 — Delta prices. One pump, a Coke machine, nobody.", type: "neutral", requires: { walletMin: 8 }, next: "ds_005", deltas: { wallet: -24, tank: +100 } },
+      { text: "Gas at the gin", sub: (s) => pumpSub(s, { rate: 0.24 }, "One pump, a Coke machine, nobody."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.24 }, next: "ds_005" },
       { text: "South on 61", sub: "Greenville. A meal. The river after that.", type: "neutral", next: "ds_005" }
     ]
   },
@@ -330,7 +330,7 @@ const DEEP_SOUTH = {
       "You did not save an hour. You're not sure anybody does."
     ],
     choices: [
-      { text: "Gas by the Sonic", sub: "Requires $8 — Delta prices. Kids in the lot in a truck, going nowhere.", type: "neutral", requires: { walletMin: 8 }, next: "ds_005", deltas: { wallet: -24, tank: +100 } },
+      { text: "Gas by the Sonic", sub: (s) => pumpSub(s, { rate: 0.24 }, "Kids in the lot in a truck, going nowhere."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.24 }, next: "ds_005" },
       { text: "South on 61", sub: "Greenville. A meal. The river after that.", type: "neutral", next: "ds_005" }
     ]
   },
@@ -390,7 +390,7 @@ const DEEP_SOUTH = {
       "Past it the road climbs, and past that is the river, and past that is the other state."
     ],
     choices: [
-      { text: "Fill up here", sub: "Requires $8 — last pump you know about for a while. The bluffs eat fuel.", type: "neutral", requires: { walletMin: 8 }, next: "ds_006", deltas: { wallet: -26, tank: +100 } },
+      { text: "Fill up here", sub: (s) => pumpSub(s, { rate: 0.26 }, "Last pump you know about for a while. The bluffs eat fuel."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.26 }, next: "ds_006" },
       { text: "Straight up to the bridge", sub: "Safe — costs nothing now. Might cost something later.", type: "safe", next: "ds_006" }
     ]
   },
@@ -601,7 +601,7 @@ const DEEP_SOUTH = {
       "There's a man on the bench out front with a dog. The dog looks at you. The man doesn't."
     ],
     choices: [
-      { text: "Gas", sub: "Requires $8 — chalk prices. Last pump before Hattiesburg that you can be sure of.", type: "neutral", requires: { walletMin: 8 }, next: "ds_008a3", deltas: { wallet: -24, tank: +100 } },
+      { text: "Gas", sub: (s) => pumpSub(s, { rate: 0.24 }, "Chalk prices. Last pump before Hattiesburg that you can be sure of."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.24 }, next: "ds_008a3" },
       { text: "Ask the man about the road ahead", sub: "Nerve check — he hasn't looked at you. The dog has.", type: "neutral", check: { stat: "nerve", difficulty: 5 }, road: +1,
         success: { next: "ds_008a3", outcome: "warned", deltas: { gut: +1 }, flags: { bude_warned: true } },
         failure: { next: "ds_008a3", outcome: "dog", deltas: { nerve: -1 } } },
@@ -736,7 +736,9 @@ const DEEP_SOUTH = {
       "There's a bill on it. Folded once. It wasn't there when the plate started down the row, and nobody's looking at it, and nobody's looking at you."
     ],
     choices: [
-      { text: "Put something in", sub: "Requires $5 — it'll be more than you meant.", type: "neutral", requires: { walletMin: 5 }, road: +1, next: "ds_010", outcome: "gave", deltas: { wallet: -10, gut: +1 }, flags: { gave_at_revival: true } },
+      // The overshoot is the joke: you reach for five and the plate takes ten.
+      // scaleToWallet caps it at what you have, and the receipt says so.
+      { text: "Put something in", sub: "Requires $5 — it'll be more than you meant.", type: "neutral", intentionalPrice: true, requires: { walletMin: 5 }, road: +1, next: "ds_010", outcome: "gave", deltas: { wallet: -10, gut: +1 }, flags: { gave_at_revival: true } },
       { text: "Pass it on", sub: "Costs Nerve — three hundred people and you're the one who passed it.", type: "safe", next: "ds_010", outcome: "passed_plate", deltas: { nerve: -1 } },
       { text: "Take what's on it", sub: "It was put there for somebody. Costs Gut to decide that's you.", type: "risky", road: -1, next: "ds_010", outcome: "took_it", deltas: { wallet: +15, gut: -1 }, flags: { took_from_plate: true } },
       { text: "Leave before it gets to you", sub: "Nerve check — the side of the tent is right there.", type: "neutral", check: { stat: "nerve", difficulty: 5 },
@@ -841,15 +843,15 @@ const DEEP_SOUTH = {
       return base;
     },
     choices: [
-      { text: "Tell him what you put in", sub: "You put in more than you say. He knows. He rings what you said.", type: "safe",
-        requires: (s) => (s.road || 0) >= 3, lockText: "He doesn't offer",
-        next: "ds_012", outcome: "rang_it_low", deltas: { wallet: -14, tank: +100, nerve: +1 }, flags: { loyce_kind: true } },
-      { text: "Fill up on three", sub: "Requires $8 — a pump. A price. The ordinary version.", type: "neutral",
-        requires: (s) => (s.road || 0) > 0 && (s.stats.wallet || 0) >= 8, lockText: "Card's declined, he says. He hasn't tried it.",
-        next: "ds_012", outcome: "ordinary", deltas: { wallet: -32, tank: +100 } },
-      { text: "Pay cash on three", sub: "Requires $10 — it's the same pump. It costs more today.", type: "neutral",
-        requires: (s) => (s.road || 0) <= 0 && (s.stats.wallet || 0) >= 10, lockText: "You don't need to",
-        next: "ds_012", outcome: "cash_only", deltas: { wallet: -38, tank: +100, nerve: -1 }, flags: { loyce_cold: true } },
+      { text: "Tell him what you put in", sub: (s) => pumpSub(s, { rate: 0.14 }, "You put in more than you say. He knows. He rings what you said."), type: "safe",
+        requires: (s) => (s.road || 0) >= 3 && pumpOpen(s), lockText: (s) => (s.road || 0) >= 3 ? pumpClosed(s) : "He doesn't offer",
+        pump: { rate: 0.14 }, next: "ds_012", outcome: "rang_it_low", deltas: { nerve: +1 }, flags: { loyce_kind: true } },
+      { text: "Fill up on three", sub: (s) => pumpSub(s, { rate: 0.32 }, "A pump. A price. The ordinary version."), type: "neutral",
+        requires: (s) => (s.road || 0) > 0 && pumpOpen(s), lockText: (s) => (s.road || 0) > 0 ? pumpClosed(s) : "Card's declined, he says. He hasn't tried it.",
+        pump: { rate: 0.32 }, next: "ds_012", outcome: "ordinary" },
+      { text: "Pay cash on three", sub: (s) => pumpSub(s, { rate: 0.38 }, "It's the same pump. It costs more today."), type: "neutral",
+        requires: (s) => (s.road || 0) <= 0 && pumpOpen(s), lockText: (s) => (s.road || 0) <= 0 ? pumpClosed(s) : "You don't need to",
+        pump: { rate: 0.38 }, next: "ds_012", outcome: "cash_only", deltas: { nerve: -1 }, flags: { loyce_cold: true } },
       { text: "Ask him if he remembers Greenville", sub: "Nerve check — you know he does. You want to hear him say it.", type: "risky", check: { stat: "nerve", difficulty: 7 },
         success: { next: "ds_012", outcome: "remembers", deltas: { nerve: +1, gut: +1 }, flags: { loyce_spoke: true } },
         failure: { next: "ds_012", outcome: "does_not", deltas: { nerve: -2 } } }
@@ -898,7 +900,7 @@ const DEEP_SOUTH = {
       return base;
     },
     choices: [
-      { text: "Top off", sub: "Requires $8 — the last pump you can count on.", type: "neutral", requires: { walletMin: 8 }, next: "ds_013", deltas: { wallet: -28, tank: +100 } },
+      { text: "Top off", sub: (s) => pumpSub(s, { rate: 0.28 }, "The last pump you can count on."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.28 }, next: "ds_013" },
       { text: "You've got enough. Go.", sub: "Gut check — fifty-seven miles. The needle says yes. The needle's said that before.", type: "neutral", requires: { ds_on_donut: false }, lockText: "Not on the donut. Not across seven miles of water.", check: { stat: "gut", difficulty: 6 },
         success: { next: "ds_013", deltas: { gut: +1 } },
         failure: { next: "ds_013", deltas: { tank: -18, gut: -1 } } },
