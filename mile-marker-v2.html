@@ -365,6 +365,9 @@ body[data-lit="off"] .radio-am { visibility: hidden; }
 
 </div>
 
+<!-- Route 2 content. Its own file so there is one source of truth; the engine
+     registers it only if it loaded, so the HTML still plays Route 1 alone. -->
+<script src="routes/deep-south.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
 // STATE — narrative flags + testable resource stats
@@ -390,6 +393,7 @@ const ROUTES = {
     to: 'Albuquerque, NM',
     destination: 'Albuquerque',
     blurb: 'Barstow → Albuquerque — 675 miles',
+    road: 'I-40 Eastbound',
     start: 'sw_001',
     strandFallback: 'sw_011',
     miles: 675,
@@ -397,9 +401,37 @@ const ROUTES = {
     keepsakes: 3
   }
 };
+// Registered from the content module's own meta, so the route's facts live with its
+// content. Absent module, absent route.
+if (typeof DEEP_SOUTH !== 'undefined' && DEEP_SOUTH && DEEP_SOUTH.nodes) {
+  ROUTES[DEEP_SOUTH.id] = {
+    id: DEEP_SOUTH.id,
+    name: DEEP_SOUTH.name,
+    shield: 'US 61 SOUTH',
+    from: 'Memphis, TN',
+    to: 'Mobile, AL',
+    destination: 'Mobile',
+    blurb: 'Memphis → Mobile — 547 miles',
+    road: 'US 61 South',
+    start: DEEP_SOUTH.start,
+    strandFallback: DEEP_SOUTH.strandReturnDefault,
+    miles: DEEP_SOUTH.miles,
+    tankPerMile: DEEP_SOUTH.tankPerMile,
+    radioBands: DEEP_SOUTH.radioBands,
+    radioSilent: DEEP_SOUTH.radioSilent,
+    endings: 3,
+    keepsakes: 1,
+    unfinished: true
+  };
+}
 const DEFAULT_ROUTE = 'southwest';
 // The route the player is on. Everything below asks this, not a literal.
 function R() { return ROUTES[(typeof state !== 'undefined' && state.route) || DEFAULT_ROUTE] || ROUTES[DEFAULT_ROUTE]; }
+// Until there is a route-select screen: ?route=south picks one.
+function routeFromUrl() {
+  const m = /[?&]route=([a-z0-9_]+)/i.exec((typeof location !== 'undefined' && location.search) || '');
+  return (m && ROUTES[m[1]]) ? m[1] : null;
+}
 
 const ARCHETYPES = {
   drifter: {
@@ -1988,6 +2020,10 @@ const NODES = {
 
 };
 
+// Route 2's scenes join the same node table. Same schema, same engine; the module
+// never touches mechanics.
+if (typeof DEEP_SOUTH !== 'undefined' && DEEP_SOUTH && DEEP_SOUTH.nodes) Object.assign(NODES, DEEP_SOUTH.nodes);
+
 // ═══════════════════════════════════════════════════════
 // ENGINE
 // ═══════════════════════════════════════════════════════
@@ -2101,9 +2137,9 @@ function radioResolve(entry, mile) {
 
 function radioLine(node, milesDriven) {
   if (!node || node.mile == null) return null;
-  if (RADIO_SILENT.indexOf(state.currentNode) !== -1) return null;
+  if ((R().radioSilent || RADIO_SILENT).indexOf(state.currentNode) !== -1) return null;
   if (milesDriven < 10) return null;               // it only plays while you're moving
-  const band = RADIO_BANDS.filter(b => node.mile >= b.from && node.mile < b.to)[0];
+  const band = (R().radioBands || RADIO_BANDS).filter(b => node.mile >= b.from && node.mile < b.to)[0];
   if (!band) return null;
   // Stable per node per run, so re-reading a scene doesn't reshuffle the dial.
   const seed = radioSeed(state.currentNode);
@@ -2162,7 +2198,8 @@ function mileageCost(nextNodeId) {
   const from = state.lastMile || 0;
   const miles = Math.max(0, dest.mile - from);
   const leak = state.flags && state.flags.leaky_cap ? 1.12 : 1;
-  return { tank: -Math.round(miles * TANK_PER_MILE * burnMod() * leak), miles };
+  const perMile = R().tankPerMile || TANK_PER_MILE;
+  return { tank: -Math.round(miles * perMile * burnMod() * leak), miles };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2571,7 +2608,7 @@ function startGame() {
   state.lastMile = 0;
   state.seed = newSeed();
   state.taken = 0;
-  state.route = state.route || DEFAULT_ROUTE;
+  state.route = routeFromUrl() || state.route || DEFAULT_ROUTE;
   state.heading = null;
   noteRunStarted();
 
@@ -2681,7 +2718,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-10-14.2';
+const BUILD = '2026-10-15.2';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;
@@ -2725,6 +2762,12 @@ function resolveSlot(id) {
 
 function loadNode(nodeId) {
   if (nodeId === '__RESUME__') nodeId = state.strandReturn || R().strandFallback;
+  // The stranding scenes are shared by every route. The shoulder is whichever road
+  // you were on when it stopped pulling.
+  if (/^strand_/.test(nodeId) && NODES[nodeId]) {
+    const road = R().road || 'the highway';
+    NODES[nodeId].location = nodeId === 'strand_resume' ? road : road + ' — Shoulder';
+  }
   nodeId = resolveSlot(nodeId);
   state.currentNode = nodeId;
   clearTimeouts();
@@ -3069,6 +3112,8 @@ function restartFull() {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('main-screen').style.display = 'flex';
   offerResume();
+  const urlRoute = routeFromUrl();
+  if (urlRoute) state.route = urlRoute;
   const blurb = document.getElementById('route-blurb');
   if (blurb) blurb.textContent = R().blurb;
   const rec = document.getElementById('record-slot');

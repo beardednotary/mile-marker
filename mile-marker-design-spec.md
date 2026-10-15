@@ -684,6 +684,60 @@ Rules agreed:
   shows KEPT) as a name rather than a score.
 - What Route 2's keepsake is.
 
+## Route 2 — wired in, and far too easy **[2026-10-15]**
+
+`routes/deep-south.js` is loaded by a script tag before the engine and registers itself
+from its own meta, so the HTML still plays Route 1 alone if the module is missing.
+`?route=south` selects it. 31 nodes, 102 in the table. Four engine facts stopped being
+Route 1's: the burn rate, the radio bands, the radio's silent list, and the road the
+stranding scenes happen on.
+
+### What the harness says
+
+| | careful | careless | always-safe | never-gamble |
+|---|---:|---:|---:|---:|
+| Drifter | 90% | 20% | 0% | 36% |
+| Planner | **100%** | 51% | **100%** | **100%** |
+| Broke Kid | 70% | 10% | 0% | 9% |
+| *Route 1* | *66 / 67 / 50* | *17 / 18 / 9* | *0 / 0 / 0* | *(Planner 73%)* |
+
+The Planner is completely solved: careful, always-safe and never-gamble all win every
+run, with **zero strandings**. Route 1's own rule — that picking the safe option every
+time loses every time — is false here.
+
+### The recommended fix does not work
+
+The content module's tuning notes propose a per-route starting wallet, Planner $30.
+Measured: dropping the Planner from $28 to $16 leaves him at **100%**. Cutting everyone
+to Route 1 levels and then to two-thirds of that barely moves him either. The wallet is
+not the lever on this route.
+
+### Why
+
+| | fuel the route needs | pump choices | income on the board | **non-fuel spending** |
+|---|---:|---:|---:|---:|
+| Route 1 | ~155 | 15 | $40 | **$188** |
+| Route 2 | ~164 | 11 | $45 | **$57** |
+
+Fuel demand is near identical. What Route 2 lacks is **anywhere to lose money that
+isn't a pump**. Route 1 bleeds you through rooms, a tyre, a tow, a drum of gas at 62c
+— $188 of ways to end up short. Route 2 has $57. So cash accumulates, gas is the only
+sink, and there is always enough for gas.
+
+The Planner is immune to the wallet because he starts with a full tank: 100 of the 164
+points the route needs are already in the car, leaving ~$17 of gas to buy on a route
+that hands out $45.
+
+### What would work
+
+Cash sinks, which the route's own fiction already wants — hospitality as a bill is the
+stated theme and the hooks are written but cheap. Raising burn was tested in the
+original session and moved the Planner two points while wrecking the Broke Kid, which
+matches: the problem is not the cost of the road, it is that nothing else costs anything.
+
+Not changed unilaterally — this is 31 nodes of someone else's content and the fix is a
+design call.
+
 ## Routes 2–4 — the standing plan **[RECOVERED 2026-10-13]**
 
 This is design intent from the 27 June 2026 planning conversation, recovered from the

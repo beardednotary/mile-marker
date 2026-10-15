@@ -3,25 +3,29 @@
 const X = require('./loader.js');
 const { NODES, ARCHETYPES } = X;
 
-function run(arch, policy) {
+// ROUTE=south picks the route to simulate; default is Route 1.
+const ROUTE_ID = process.env.ROUTE || 'southwest';
+
+function run(arch, policy, routeId) {
+  const RT = X.ROUTES[routeId || ROUTE_ID] || X.ROUTES.southwest;
   const a = ARCHETYPES[arch];
   const st = { archetype: arch, flags: {}, road: 0, choices: 0,
-    stats: { ...a.stats }, maxStats: { ...a.max }, currentNode: 'sw_001',
-    lastRoll: null, strandings: 0, strandReturn: null, lastMile: 0, paid: true, run: 1, route: 'southwest', taken: 0,
+    stats: { ...a.stats }, maxStats: { ...a.max }, currentNode: RT.start,
+    lastRoll: null, strandings: 0, strandReturn: null, lastMile: 0, paid: true, run: 1, route: RT.id, taken: 0,
     seed: (Math.floor(Math.random() * 0xffffffff) >>> 0) || 1 };
   X.setState(st);
 
   const strandOut = (ret) => {
-    st.strandReturn = ret || st.strandReturn || X.ROUTES.southwest.strandFallback;
+    st.strandReturn = ret || st.strandReturn || RT.strandFallback;
     st.strandings++;
     if (st.strandings >= 2) return 'strand_end';                                   // MAX_STRANDINGS
     if ((st.stats.wallet || 0) < 25 && (st.stats.nerve || 0) <= 2) return 'strand_end'; // nothing left to trade
     return 'strand_1';
   };
 
-  let node = X.ROUTES.southwest.start, steps = 0;
+  let node = RT.start, steps = 0;
   while (steps++ < 120) {
-    if (node === '__RESUME__') node = st.strandReturn || X.ROUTES.southwest.strandFallback;
+    if (node === '__RESUME__') node = st.strandReturn || RT.strandFallback;
     { const n0 = NODES[node]; if (n0 && n0.oneOf && n0.oneOf.length) { X.setState(st); node = n0.oneOf[Math.floor(X.runRand('slot:' + node) * n0.oneOf.length) % n0.oneOf.length]; } }
     st.currentNode = node;
     const n = NODES[node];
@@ -29,7 +33,7 @@ function run(arch, policy) {
     if (n.onLoad) n.onLoad(st);
     if (n.mile != null) st.lastMile = n.mile;
     if (node === 'strand_end') return { end: 'RUN_ENDED', st };
-    if (node === 'sw_012') return { end: 'VICTORY', st };
+    if (n.isVictory) return { end: 'VICTORY', st };
 
     const cs = (n.choices || []).filter(c => (!c.showIf || c.showIf(st)) && !X.isChoiceLocked(c));
     if (!cs.length) return { end: 'DEADEND:' + node, st };
@@ -86,4 +90,4 @@ const P = {
   }
 };
 
-module.exports = { run, P, NODES, ARCHETYPES, X };
+module.exports = { run, P, NODES, ARCHETYPES, X, ROUTE_ID };

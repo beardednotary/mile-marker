@@ -33,7 +33,19 @@ check('Flagstaff: $10 buys a partial fill, priced by the point', (() => { const 
 check('pump prices scale with how empty you are', X.fuelPrice({ stats: { tank: 80 }, maxStats: { tank: 100 } }, { rate: 0.32 }).cost < X.fuelPrice({ stats: { tank: 20 }, maxStats: { tank: 100 } }, { rate: 0.32 }).cost);
 check('the trading post drum cannot fill you', X.fuelPrice({ stats: { tank: 10 }, maxStats: { tank: 100 } }, { rate: 0.62, cap: 45 }).points === 45);
 check('a room no longer sells gas', !['sw_007a', 'sw_007_kingman'].some(id => (N[id].choices || []).some(c => /room/i.test(c.text) && ((c.deltas || {}).tank || 0) > 0)));
-check('every walletMin gate equals what the choice charges', Object.keys(N).every(id => (N[id].choices || []).every(c => !(c.requires && c.requires.walletMin) || c.pump || -((c.deltas || {}).wallet || 0) === c.requires.walletMin)));
+// A gate has to equal the price on every arm that actually charges — the cost often
+// sits on success while failure costs fuel instead, so the choice's own deltas are not
+// the whole story. `intentionalPrice` opts out where the overshoot is the point: the
+// revival plate in Route 2 asks for five and takes ten, and says so.
+check('every walletMin gate equals what the choice charges', Object.keys(N).every(id => (N[id].choices || []).every(c => {
+  const gate = c.requires && c.requires.walletMin;
+  if (!gate || c.pump || c.intentionalPrice) return true;
+  return [c, c.success, c.failure].filter(Boolean).every(a => {
+    if (a.pump) return true;
+    const cost = -((a.deltas || {}).wallet || 0);
+    return cost === 0 || cost === gate;
+  });
+})));
 check('Flagstaff fill narrates (outcome prose exists)', !!(N.sw_0105b.outcomes && N.sw_0105b.outcomes.filled));
 st = fresh({ flags: { on_donut: true } });
 check('the donut still locks the push', locked(st, 'sw_0105', 'Push to the next exit'));

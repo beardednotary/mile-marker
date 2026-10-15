@@ -1,18 +1,28 @@
-// Read-only harness: loads the game script out of the live HTML into a sandbox.
+// Read-only harness: loads the game script out of the live HTML into a sandbox,
+// with the Route 2 content module in front of it the way the browser loads it.
 // Never writes to the HTML.
-const fs = require('fs'), vm = require('vm');
-const html = fs.readFileSync(require('path').join(__dirname, '..', 'mile-marker-v2.html'), "utf8");
+const fs = require('fs'), vm = require('vm'), path = require('path');
+const html = fs.readFileSync(path.join(__dirname, '..', 'mile-marker-v2.html'), 'utf8');
+
+// Route 2 lives in its own file and is loaded by a script tag before the engine.
+// Strip its CommonJS tail so it behaves here exactly as it does in a browser.
+let DS = '';
+try {
+  DS = fs.readFileSync(path.join(__dirname, '..', 'routes', 'deep-south.js'), 'utf8')
+         .replace(/if \(typeof module[\s\S]*$/, '');
+} catch (e) { /* Route 1 alone, which is a state the engine supports */ }
+
 let src = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).pop();
-// Experiment hook: TPM=0.24 node bal.js — overrides TANK_PER_MILE without touching the file.
+
+// Experiment hooks — override without touching the file.
+// TPM=0.24 burn per mile · PW/DW/BW starting wallet · PT/DT/BT starting tank
 if (process.env.TPM) src = src.replace(/const TANK_PER_MILE = [\d.]+;/, 'const TANK_PER_MILE = ' + process.env.TPM + ';');
-// PW=36 — the Planner's starting wallet. DW / BW for the Drifter and Broke Kid.
-if (process.env.PW) src = src.replace('tank: 100, wallet: 44,', 'tank: 100, wallet: ' + process.env.PW + ',');
-if (process.env.DW) src = src.replace('tank: 30, wallet: 25,', 'tank: 30, wallet: ' + process.env.DW + ',');
-if (process.env.BW) src = src.replace('tank: 24, wallet: 22,', 'tank: 24, wallet: ' + process.env.BW + ',');
-// PT / DT / BT — starting tank.
-if (process.env.PT) src = src.replace(/tank: 100, wallet: (d+),/, 'tank: ' + process.env.PT + ', wallet: $1,');
-if (process.env.DT) src = src.replace(/tank: 30, wallet: (d+),/, 'tank: ' + process.env.DT + ', wallet: $1,');
-if (process.env.BT) src = src.replace(/tank: 24, wallet: (d+),/, 'tank: ' + process.env.BT + ', wallet: $1,');
+if (process.env.PW) src = src.replace(/tank: 100, wallet: \d+,/, 'tank: 100, wallet: ' + process.env.PW + ',');
+if (process.env.DW) src = src.replace(/tank: 30, wallet: \d+,/, 'tank: 30, wallet: ' + process.env.DW + ',');
+if (process.env.BW) src = src.replace(/tank: 24, wallet: \d+,/, 'tank: 24, wallet: ' + process.env.BW + ',');
+if (process.env.PT) src = src.replace(/tank: 100, wallet: (\d+),/, 'tank: ' + process.env.PT + ', wallet: $1,');
+if (process.env.DT) src = src.replace(/tank: 30, wallet: (\d+),/, 'tank: ' + process.env.DT + ', wallet: $1,');
+if (process.env.BT) src = src.replace(/tank: 24, wallet: (\d+),/, 'tank: ' + process.env.BT + ', wallet: $1,');
 
 const stub = new Proxy({}, {
   get(t, p) {
@@ -36,9 +46,10 @@ const sandbox = {
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
 
-const EXPORT = ";globalThis.__X={NODES:NODES,ARCHETYPES:ARCHETYPES,ROUTES:ROUTES,rollCheck:rollCheck," +
-  "isChoiceLocked:isChoiceLocked,applyDeltas:applyDeltas,mileageCost:mileageCost," +
-  "radioLine:radioLine,keepsakeFor:keepsakeFor,fuelPrice:fuelPrice,runRand:runRand,resolveSlot:resolveSlot,pumpDeltas:pumpDeltas,getLockReason:getLockReason,setState:function(s){state=s}};";
-vm.runInContext(src + "\n" + EXPORT, sandbox);
+const EXPORT = ';globalThis.__X={NODES:NODES,ARCHETYPES:ARCHETYPES,ROUTES:ROUTES,rollCheck:rollCheck,' +
+  'isChoiceLocked:isChoiceLocked,applyDeltas:applyDeltas,mileageCost:mileageCost,' +
+  'radioLine:radioLine,keepsakeFor:keepsakeFor,fuelPrice:fuelPrice,runRand:runRand,resolveSlot:resolveSlot,' +
+  'pumpDeltas:pumpDeltas,getLockReason:getLockReason,setState:function(s){state=s}};';
+vm.runInContext(DS + '\n' + src + '\n' + EXPORT, sandbox);
 
 module.exports = sandbox.__X;
