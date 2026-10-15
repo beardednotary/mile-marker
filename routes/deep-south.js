@@ -574,9 +574,9 @@ const DEEP_SOUTH = {
       "Forty miles of this. There's nothing to stop for because there is nothing."
     ],
     choices: [
-      { text: "Hold the line", sub: "Safe — costs Nerve and a little Fuel. Brake, accelerate, brake. Every truck.", type: "safe", next: "ds_008a2", deltas: { nerve: -1, tank: -4 } },
+      { text: "Hold the line", sub: "Safe — costs Nerve and a little Fuel. Brake, accelerate, brake. Every truck.", type: "safe", next: "ds_008a1", deltas: { nerve: -1, tank: -4 } },
       { text: "Tuck in behind a log truck going your way", sub: "Gut check — let him break the wind. If you pick the right one.", type: "neutral", check: { stat: "gut", difficulty: 6 },
-        success: { next: "ds_008a2", outcome: "drafted", deltas: { tank: +6, gut: +1 } },
+        success: { next: "ds_008a1", outcome: "drafted", deltas: { tank: +6, gut: +1 } },
         failure: { next: "ds_008a2", outcome: "bark", deltas: { tank: -4, nerve: -2 } } }
     ],
     outcomes: {
@@ -758,6 +758,71 @@ const DEEP_SOUTH = {
         "The long way is forty miles and most of what's left of the light, and it runs you past the same church twice.",
         "The man on the tractor is still sitting there when you go back past. He raises his hand. You raise yours.",
         "Neither of you pretends it was anything else."
+      ]
+    }
+  },
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 08a1 — THE BURN. Smoke across 98 at night.
+  //
+  // The mirror of the low place, and for the same reason: the safe line on this branch
+  // had no price. Here the safe thing is the expensive thing — a room — because that is
+  // what safe costs on a road with no shoulder. Prescribed burns are everywhere in the
+  // Piney Woods and the pile-ups are in the paper every autumn. You cannot tell from
+  // inside a car what is standing in smoke, which is the same problem as the water.
+  // ═════════════════════════════════════════════════════════════════════════
+  ds_008a1: {
+    location: "US-98 East — the Burn",
+    tags: ["tension","money","night"],
+    mile: 345,
+    paywall: false,
+    textFn: (s) => {
+      const base = [
+        "You smell it a mile before you're in it. Not woodsmoke — green smoke, wet and resinous, the smell of something burning that did not want to.",
+        "Then the headlights stop working the way headlights work. The beams go solid about thirty feet out and sit there, two white cones with nothing on the end of them.",
+        "They've been burning the understory. Somewhere off to the south there's an orange seam low in the trees that comes and goes.",
+        "The smoke lies across both lanes in bands. It thins and you can see a hundred yards and then it closes and you cannot see the line."
+      ];
+      if (s.flags.turned_back_pines)
+        base.push("Second time tonight the road has told you it would rather you didn't.");
+      base.push(
+        "A pickup is stopped on the pavement ahead of you with its flashers going because there is nowhere to pull off. You come up on it at twenty and still too fast.",
+        "There's a sign back at the county line for a motel in Lumberton. Eleven miles. On the other side of this."
+      );
+      return base;
+    },
+    choices: [
+      // The safe option is the one that costs money. That is the whole point of it.
+      { text: "Turn back for the motel in Lumberton", sub: "Requires $22 — eleven miles the wrong way, a bed, and the smoke will have lifted by six.", type: "safe", requires: { walletMin: 22 }, next: "ds_008a2", outcome: "motel", deltas: { wallet: -22, nerve: +1, tank: -6 }, flags: { lumberton_motel: true } },
+      { text: "Pull in behind him and wait it out", sub: "Free, and it costs most of a tank — you are not sitting in that with the windows down.", type: "neutral", next: "ds_008a2", outcome: "waited", deltas: { tank: -20, gut: -1 }, flags: { waited_the_burn: true } },
+      { text: "Go through it", sub: "Nerve check — twenty miles an hour, hazards on, and whatever is stopped in there is stopped in there.", type: "risky", check: { stat: "nerve", difficulty: 7 }, road: -1,
+        success: { next: "ds_008a2", outcome: "through", deltas: { nerve: +2, gut: +1 } },
+        failure: { next: "ds_008a2", outcome: "hit_it", deltas: { nerve: -3, gut: -2 }, strand: true, strandReturn: "ds_008a2" } }
+    ],
+    outcomes: {
+      motel: [
+        "You turn around in a logging cut and go back the eleven miles with the smoke behind you, which is worse, because now it's in the mirror and you keep checking it.",
+        "The motel in Lumberton has eight rooms and four cars and a man who takes cash and does not ask where you're going.",
+        "You sleep badly and the room smells faintly of the burn by morning anyway, because the whole county does.",
+        "At six the road is clear and ordinary and there is nothing on it to show for any of it except a black margin either side of the pavement and the smell."
+      ],
+      waited: [
+        "You pull in behind the pickup and put your flashers on and that is the entire plan.",
+        "You run the engine because the alternative is sitting in it with the windows down, and you watch the gauge do what the gauge does.",
+        "Nobody gets out of the pickup. For two hours nobody gets out of the pickup.",
+        "When it finally lifts enough to move, he goes first, and he does not wave, and you follow his lights for nine miles without either of you going above thirty."
+      ],
+      through: [
+        "You go in at twenty with the hazards on and both hands on the wheel and your window cracked an inch, because the smell tells you more than the light does.",
+        "Twice something comes up out of it that turns out to be a reflector on a post.",
+        "Once it is not a post. It is the back of a trailer, stopped, no lights, and you have time and you do not have much of it.",
+        "You come out the far side into clean black air and the relief arrives about a mile later, all at once, and you have to slow down because of it."
+      ],
+      hit_it: [
+        "The thing in the smoke is stopped and it is not a post.",
+        "You get most of the way onto the margin before you reach it, which is the difference between this and the other version of tonight.",
+        "The noise is small. That's what you won't get over — how small a noise it is.",
+        "You are off the pavement with the pines right there and something underneath is dragging, and the man whose trailer it is comes back along the verge with a flashlight and says, before anything else, 'You all right?'"
       ]
     }
   },

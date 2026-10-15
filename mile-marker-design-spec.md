@@ -710,6 +710,34 @@ out and find the bottom (Gut), drive it (Nerve), or back out and lose 24 fuel an
 light. Both checks strand you on failure. Nothing supernatural, per the rule. It fires in
 about half of careful runs now that the fork is explored.
 
+### The mirror, and where it landed
+
+`ds_008a1` — **the burn** (mile 345, US-98) is the low place's twin on the other branch.
+Smoke across a two-lane at night from a prescribed burn: the headlights stop working the
+way headlights work, and you cannot tell from inside the car what is standing in it. A
+pickup is already stopped on the pavement because there is nowhere to pull off.
+
+The safe option is the expensive one, deliberately: turn back eleven miles for the motel
+in Lumberton, $22. Waiting it out behind the pickup is free and costs most of a tank to
+the engine you are not going to switch off. Going through is a Nerve check that can end
+the run. That shape — safe means *costly*, not *free* — is what Route 1 does with a room,
+and it is what the always-safe line had no answer to.
+
+**One hazard or the other now fires in essentially every run**, because the two sit on
+opposite sides of the same fork.
+
+| Route 2 careful | before | after | always-safe |
+|---|---:|---:|---:|
+| Drifter | 88% | **85%** | 0% |
+| Planner | 82% | **69%** | 100% → **57%** |
+| Broke Kid | 69% | **63%** | 0% |
+
+Route 1 for comparison, unchanged by any of this: 71 / 65 / 55, always-safe 0 / 1 / 0.
+
+The solved line is gone. What remains is that Route 2 is still the easier road — the
+Drifter at 85% against 71%, and the Planner's always-safe line at 57% against 1% — and
+both of those are now ordinary tuning rather than a structural hole.
+
 ### What is still wrong, precisely
 
 | Route 2 | careful | always-safe |
