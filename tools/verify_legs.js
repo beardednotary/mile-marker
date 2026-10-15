@@ -100,5 +100,31 @@ st = fresh({ flags: { owes_the_road: true } }); take(st, 'sw_011', 'Check if you
 check('in debt but never passed a pump -> no accusation at the arrival', !text(st, 'sw_012').includes('You drove past the next one'));
 check('every outcome key in the new scenes has prose', ['sw_0105b', 'sw_0105c', 'sw_011a', 'sw_011b'].every(id => (N[id].choices || []).every(c => !c.outcome || (N[id].outcomes && N[id].outcomes[c.outcome]))));
 
+
+console.log('\nThe night takes what it finds');
+{
+  const nightArm = (startsWith) => {
+    const c = (N.sw_008.choices || []).find(c => { const t = typeof c.text === 'function' ? c.text({ flags: {} }) : c.text; return t.startsWith(startsWith); });
+    return c;
+  };
+  const answer = nightArm('Answer the door') || nightArm('Crack');
+  const wait = nightArm("Don't move") || nightArm('Stay perfectly');
+  check('the theft is a take, not a purchase', answer.failure.take === 12 && !(answer.failure.deltas || {}).wallet);
+  check('waiting it out is a take too', wait.take === 12 && !(wait.deltas || {}).wallet);
+  check('passing the check still costs nothing', !answer.success.take && !(answer.success.deltas || {}).wallet);
+  const morning = (taken, wallet) => { const st = fresh(); st.flags.lost_in_the_night = true; st.taken = taken; st.stats.wallet = wallet; return text(st, 'sw_009'); };
+  check('took nothing -> nothing in it to take', morning(0, 0).includes('nothing in it to take'));
+  check('took the lot -> twelve dollars lighter', morning(12, 20).includes('twelve dollars lighter'));
+  check('took part -> neither of the other two lines', (() => { const t = morning(7, 0); return t.includes('open and empty') && !t.includes('twelve dollars') && !t.includes('nothing in it to take'); })());
+  check('a shortfall with no fuel does not mention a pump', (() => {
+    const st = fresh(); st.stats.wallet = 5; X.setState(st); X.applyDeltas({ wallet: -12 });
+    return !JSON.stringify(st.lastEffects).includes('pump clicked off');
+  })());
+  check('a short fill still mentions the pump', (() => {
+    const st = fresh(); st.stats.wallet = 5; X.setState(st); X.applyDeltas({ wallet: -30, tank: +60 });
+    return JSON.stringify(st.lastEffects).includes('pump clicked off');
+  })());
+}
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exitCode = fail ? 1 : 0;

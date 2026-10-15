@@ -47,6 +47,7 @@ function run(arch, policy) {
 
     // Mirrors handleChoice: a pump prices itself against the tank you're holding.
     // Copy the arm — it belongs to NODES, and writing a price onto it would stick.
+    if (r.take) { st.taken = Math.min(r.take, st.stats.wallet || 0); r = Object.assign({}, r, { deltas: Object.assign({}, r.deltas, { wallet: -st.taken }) }); }
     const pump = r.pump || (r.next && c.pump);
     if (pump) r = Object.assign({}, r, { deltas: Object.assign({}, r.deltas, X.pumpDeltas(st, pump)) });
 
