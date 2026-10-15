@@ -2493,6 +2493,8 @@ function applyDeltas(rawDeltas = {}, milesDriven = 0) {
   });
   // Only a fill can click off early. Any other shortfall is a different sentence.
   if (short) effects.push({ stat: 'short', delta: 0, text: (deltas.tank || 0) > 0 ? 'pump clicked off early' : 'that was everything you had' });
+  // Outcome prose can ask what actually happened, rather than assuming it went cleanly.
+  state.lastShort = short;
   clampStats();
   state.lastEffects = effects;
   updateStatsUI(effects);
@@ -2718,7 +2720,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-10-15.2';
+const BUILD = '2026-10-15.3';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;
@@ -2943,7 +2945,8 @@ function handleChoice(choice) {
   const currentNode = NODES[state.currentNode];
   if (result.outcome && currentNode && currentNode.outcomes && currentNode.outcomes[result.outcome]) {
     saveGame(result.next);   // closing the app mid-outcome resumes after the choice, not before it
-    showOutcomeThen(currentNode.outcomes[result.outcome], result.next);
+    const prose = currentNode.outcomes[result.outcome];
+    showOutcomeThen(typeof prose === 'function' ? prose(state) : prose, result.next);
     return;
   }
   loadNode(result.next);

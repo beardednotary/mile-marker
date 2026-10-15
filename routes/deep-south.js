@@ -829,13 +829,22 @@ const DEEP_SOUTH = {
     textFn: (s) => {
       const base = [
         "Hattiesburg is a real city, the first since Memphis, and you feel it — lanes, lights, a Waffle House, people who don't look at you because there are too many of you.",
-        "Gas on the strip. You pull in.",
-        "The man at the register is in a short-sleeved dress shirt and a tie, and it's the tie you know before you know the face."
+        "Gas on the strip. You pull in."
       ];
+      // Greenville is on every road, so you passed him. Only one of the three choices
+      // there had you look at him, and this is worth that much and no more.
+      if (s.flags.thanked_him)
+        base.push("The man at the register is in a short-sleeved dress shirt and a tie, and it's the tie you know before you know the face. You stood in a lot in Greenville and shook this man's hand.");
+      else if (s.flags.check_refused)
+        base.push("The man at the register is in a short-sleeved dress shirt and a tie. You put nine dollars on a counter in Greenville rather than let him buy your lunch. You didn't look at him properly then either.");
+      else
+        base.push("The man at the register is in a short-sleeved dress shirt and a tie. You have never seen him before in your life.");
       if (s.flags.thanked_him) base.push("He knows you too. 'Made it,' he says. Not a question.");
       else if (s.flags.check_refused) base.push("He looks at you the way you'd look at a bill somebody wouldn't let you pay.");
-      else base.push("He looks at you the way you'd look at a bill you'd already paid.");
-      base.push("His name tag says LOYCE. It didn't, in Greenville. He wasn't wearing one.");
+      else base.push("He looks at you the way you'd look at a bill you'd already paid.", "He knows you. You are certain of that and of nothing else about him.");
+      base.push(s.flags.thanked_him || s.flags.check_refused
+        ? "His name tag says LOYCE. It didn't, in Greenville. He wasn't wearing one."
+        : "His name tag says LOYCE, which is a name you have never heard, and he wears it like a man who has been here for years.");
       const r = s.road || 0;
       if (r >= 3) base.push("'Reader on three's bad,' he says. 'Just tell me what you put in.'");
       else if (r <= 0) base.push("'Card's declined,' he says, before you've handed it to him. He's looking at the reader. 'Cash only on three.'", "There's nothing wrong with three.");
@@ -857,17 +866,23 @@ const DEEP_SOUTH = {
         failure: { next: "ds_012", outcome: "does_not", deltas: { nerve: -2 } } }
     ],
     outcomes: {
-      rang_it_low: [
-        "You say a number that's about half. He rings it. He doesn't look at the pump.",
-        "'Long way yet,' he says. 'Not as long as it was.'"
-      ],
-      ordinary: [
-        "You pump. You pay. He gives you the receipt and the change and nothing else, and it's exactly what it should be, and you stand there a second longer than a person does."
-      ],
-      cash_only: [
-        "You count it out. He counts it again.",
-        "'Have a good one,' he says, to the register."
-      ],
+      rang_it_low: (s) => s.lastShort
+        ? ["You tell him what you have, and it is not a number either of you pretends is enough.",
+           "He rings about half of it and waves the rest off, and doesn't look at the pump, and doesn't look at you while he does it.",
+           "'Long way yet,' he says. 'Not as long as it was.'"]
+        : ["You say a number that's about half. He rings it. He doesn't look at the pump.",
+           "'Long way yet,' he says. 'Not as long as it was.'"],
+      ordinary: (s) => s.lastShort
+        ? ["You put in what you have, which the pump works out before you do and stops on its own.",
+           "He takes it without counting it and there is no change to give you.",
+           "'That'll get you some of the way,' he says, and goes back to the reader that isn't broken."]
+        : ["You pump. You pay. He gives you the receipt and the change and nothing else, and it's exactly what it should be, and you stand there a second longer than a person does."],
+      cash_only: (s) => s.lastShort
+        ? ["You count it out on the counter and it does not take long.",
+           "He counts it again anyway, which is either courtesy or arithmetic, and sets the pump to stop where the money stops.",
+           "'Have a good one,' he says, to the register."]
+        : ["You count it out. He counts it again.",
+           "'Have a good one,' he says, to the register."],
       remembers: [
         "He looks at you a long time.",
         "'I remember everybody I buy lunch for,' he says. 'Ain't that many.' Then: 'Gulf's ninety miles. Fill it here. There's nothing you'd want to stop at.'",
