@@ -56,10 +56,12 @@ for (const m of src.matchAll(/needs:\s*'([A-Za-z_]\w*)'/g)) reads.add(m[1]);
 for (const m of src.matchAll(/requires:\s*\{([^}]*)\}/g)) for (const k of m[1].matchAll(/"?'?([A-Za-z_]\w*)'?"?\s*:/g)) if (!/Min$/.test(k[1])) reads.add(k[1]);
 const readNeverSet = [...reads].filter(f => !sets.has(f)).sort();
 const setNeverRead = [...sets].filter(f => !reads.has(f)).sort();
+// Flags the ENGINE sets, not any node: a route may read them and never set them.
+const ENGINE_SET = ['bought_gas', 'saw_the_last_car', 'stranded_once', 'lost_in_the_night'];
 // carried.* are cross-route reads, set by Route 1, legitimately absent here
 const carried = [...src.matchAll(/carried\?\.\s*([A-Za-z_]\w*)/g)].map(m => m[1]);
-const trulyUnset = readNeverSet.filter(f => carried.indexOf(f) === -1);
-trulyUnset.length ? bad('read but never set', trulyUnset.join(', ')) : ok('nothing read-but-never-set (cross-route reads excluded)');
+const trulyUnset = readNeverSet.filter(f => carried.indexOf(f) === -1 && ENGINE_SET.indexOf(f) === -1);
+trulyUnset.length ? bad('read but never set', trulyUnset.join(', ')) : ok('nothing read-but-never-set (cross-route and engine-set flags excluded)');
 console.log('  · set but never read: ' + (setNeverRead.join(', ') || '—'));
 console.log('  · cross-route reads: ' + ([...new Set(carried)].join(', ') || '—'));
 

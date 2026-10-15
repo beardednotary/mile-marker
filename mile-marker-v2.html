@@ -393,6 +393,7 @@ const ROUTES = {
     to: 'Albuquerque, NM',
     destination: 'Albuquerque',
     blurb: 'Barstow → Albuquerque — 675 miles',
+    label: 'Route 1',
     road: 'I-40 Eastbound',
     start: 'sw_001',
     strandFallback: 'sw_011',
@@ -412,7 +413,10 @@ if (typeof DEEP_SOUTH !== 'undefined' && DEEP_SOUTH && DEEP_SOUTH.nodes) {
     to: 'Mobile, AL',
     destination: 'Mobile',
     blurb: 'Memphis → Mobile — 547 miles',
+    label: 'Route 2',
     road: 'US 61 South',
+    // The objects are the route's, not Route 1's.
+    keepsakeFor: DEEP_SOUTH.keepsakeFor,
     start: DEEP_SOUTH.start,
     strandFallback: DEEP_SOUTH.strandReturnDefault,
     miles: DEEP_SOUTH.miles,
@@ -420,7 +424,7 @@ if (typeof DEEP_SOUTH !== 'undefined' && DEEP_SOUTH && DEEP_SOUTH.nodes) {
     radioBands: DEEP_SOUTH.radioBands,
     radioSilent: DEEP_SOUTH.radioSilent,
     endings: 3,
-    keepsakes: 1,
+    keepsakes: 3,
     unfinished: true
   };
 }
@@ -2312,11 +2316,11 @@ function recordLine() {
     const e = Object.keys(r.endings).length;
     const endings = R().endings, keepsakes = R().keepsakes;
     parts.push(e >= endings
-      ? 'You have seen all ' + endings + ' of the ways it ends.'
+      ? (endings === 1 ? 'You have seen the only way it ends.' : 'You have seen all ' + endings + ' of the ways it ends.')
       : 'You have seen ' + e + ' of the ' + endings + ' ways it ends.');
     const k = Object.keys(r.kept).length;
     if (k) parts.push(k >= keepsakes
-      ? 'You have brought back all ' + keepsakes + ' of the things there are to bring back.'
+      ? (keepsakes === 1 ? 'You have brought back the one thing there is to bring back.' : 'You have brought back all ' + keepsakes + ' of the things there are to bring back.')
       : 'You have brought back ' + k + ' of the ' + keepsakes + ' things there are to bring back.');
   }
   return parts.join(' ');
@@ -2350,6 +2354,9 @@ function lastCarLine(node) {
 }
 
 function keepsakeFor(s) {
+  // A route's own object list wins. Route 1's is the fallback, and the default.
+  const own = R().keepsakeFor;
+  if (own) return own(s);
   if (s.flags.found_note) return {
     id: 'note', label: 'A note on motel stationery',
     line: "The note is still in your shirt pocket. A highway number and a time, on a sheet torn off a motel notepad. You've unfolded it enough times now that it's gone soft at the crease, and you still don't know what highway, or what the time is for."
@@ -2558,7 +2565,8 @@ function updateStatsUI(effects = []) {
   const keptEl = document.getElementById('stat-kept-val');
   if (keptEl) {
     const k = state.flags ? keepsakeFor(state) : null;
-    keptEl.textContent = k ? ({ note: 'NOTE', room_key: 'KEY', receipt: 'RCPT' })[k.id] || '•' : '—';
+    // A route's own object supplies its own short label; Route 1's three are the fallback.
+    keptEl.textContent = k ? (k.tag || ({ note: 'NOTE', room_key: 'KEY', receipt: 'RCPT' })[k.id] || '•') : '—';
     const keptLine = document.querySelector('.stat-kept');
     if (keptLine && keptLine.classList) keptLine.classList.toggle('empty', !k);
   }
@@ -2720,7 +2728,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-10-15.3';
+const BUILD = '2026-10-16.1';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;
@@ -3122,7 +3130,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const rec = document.getElementById('record-slot');
   if (rec) rec.textContent = recordLine();
   const stamp = document.getElementById('build-stamp');
-  if (stamp) stamp.textContent = 'Route 1 · build ' + BUILD + (motionReduced() ? ' · reduce motion on' : '');
+  if (stamp) stamp.textContent = (R().label || R().name) + ' · build ' + BUILD + (motionReduced() ? ' · reduce motion on' : '');
 });
 </script>
 
