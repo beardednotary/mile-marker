@@ -36,7 +36,7 @@ const sandbox = {
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
 
-const EXPORT = ";globalThis.__X={NODES:NODES,ARCHETYPES:ARCHETYPES,rollCheck:rollCheck," +
+const EXPORT = ";globalThis.__X={NODES:NODES,ARCHETYPES:ARCHETYPES,ROUTES:ROUTES,rollCheck:rollCheck," +
   "isChoiceLocked:isChoiceLocked,applyDeltas:applyDeltas,mileageCost:mileageCost," +
   "radioLine:radioLine,keepsakeFor:keepsakeFor,fuelPrice:fuelPrice,runRand:runRand,resolveSlot:resolveSlot,pumpDeltas:pumpDeltas,getLockReason:getLockReason,setState:function(s){state=s}};";
 vm.runInContext(src + "\n" + EXPORT, sandbox);
