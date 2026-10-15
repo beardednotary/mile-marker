@@ -684,6 +684,57 @@ Rules agreed:
   shows KEPT) as a name rather than a score.
 - What Route 2's keepsake is.
 
+## Route 2 — the tuning pass **[2026-10-15]**
+
+### A harness bug that had been hiding forks on both routes
+
+`smart` scored every choice and took the best. Where two choices cost the same fuel and
+money the scores tied, and a stable sort always returned the first in the array — so
+**any fork whose sides differ only in story was never once explored**, and read as 0% in
+every reach report. Ties are now broken at random.
+
+Route 1's numbers move with it: **71 / 64 / 55** careful (was 66 / 67 / 50). The
+hitchhiker fork now splits about evenly instead of being taken one way every time. The
+detour fork is still taken 100% — that one is a real preference, it carries fuel.
+
+### Route 2 had no failure states at all
+
+Route 1 has four choices that can strand you. Route 2 had none, so the only way to fail
+was tank ≤ 0, and with a pump every 42 miles and a longest dry stretch of 101 miles
+(30 fuel against a 100 tank) that is unreachable for anyone who buys gas.
+
+**`ds_008c` — the low place** (mile 345, the county route) is the first. Water over the
+road: forty yards of it, flat and brown and still, and the depth unreadable from a car,
+which is true and is why it kills people every year. Pay the man on the tractor $20, wade
+out and find the bottom (Gut), drive it (Nerve), or back out and lose 24 fuel and the
+light. Both checks strand you on failure. Nothing supernatural, per the rule. It fires in
+about half of careful runs now that the fork is explored.
+
+### What is still wrong, precisely
+
+| Route 2 | careful | always-safe |
+|---|---:|---:|
+| Drifter | 88% | 0% |
+| Planner | 82% | **100%** |
+| Broke Kid | 69% | 0% |
+
+Careful play is close to Route 1 now. **The Planner's always-safe line still wins every
+run**, where on Route 1 it wins 1%. Traced: he never gambles, buys at every pump he
+passes, and arrives with 70 fuel and **$0**.
+
+That last figure is the whole answer. The safe line is already spending every dollar it
+has, so roughly **$20 of unavoidable cost anywhere on the US-98 side** closes it — the
+low place already does exactly this on the county side, which is why that branch is no
+longer free. One scene, not a tuning knob.
+
+### Note on what the bot can and cannot see
+
+`smart` maximises fuel and money. It does not model conduct, and it treats a possible
+stranding as a mild penalty rather than a lost run. Route 2's economy partly runs on
+conduct — Loyce sells at 14c, 32c or 38c a point depending on `road` — so the bot
+systematically under-values being decent. `safest` has no such blind spot, which is why
+its 100% is the number that matters.
+
 ## Route 2 — wired in, and far too easy **[2026-10-15]**
 
 `routes/deep-south.js` is loaded by a script tag before the engine and registers itself

@@ -86,7 +86,10 @@ const P = {
       if (c.check) sc -= Math.max(0, c.check.difficulty - (st.stats[c.check.stat] || 5)) / 4;
       return sc;
     };
-    return cs.map(c => ({ c, s: val(c) })).sort((a, b) => b.s - a.s)[0].c;
+    // Break ties at random. Without this a stable sort always returns the first choice
+    // in the array, so any fork whose sides cost the same fuel and money — the detour,
+    // the pines — was never once explored, and read as 0% in every reach report.
+    return cs.map(c => ({ c, s: val(c) + Math.random() * 1e-6 })).sort((a, b) => b.s - a.s)[0].c;
   }
 };
 
