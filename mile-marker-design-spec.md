@@ -738,6 +738,28 @@ The solved line is gone. What remains is that Route 2 is still the easier road �
 Drifter at 85% against 71%, and the Planner's always-safe line at 57% against 1% — and
 both of those are now ordinary tuning rather than a structural hole.
 
+### The dead flags, paid off
+
+Eighteen flags were set and never read — every one a decision the route recorded and
+then never mentioned. The hooks were laid deliberately; the payoffs hadn't been written.
+All eighteen now land, distributed the way Route 1 distributes them:
+
+- **The arrival's cost block** takes what the road took: the room in Natchez you slept
+  outside of, the lunch in Greenville you let stand and never found out why, the money
+  you put on a plate for reasons you couldn't explain, the twenty to the man on the
+  tractor, the smoke you stopped for when some people didn't.
+- **The next scene with somebody in it** takes who saw you. Cord reads the red dust up
+  your sills and knows you took the crossroads man's road. The boy at the revival gate
+  looks at the water line on your car. Loyce's price follows you to Lucedale.
+- **The radio** takes the two that should never resolve, behind `needs`: an abandoned
+  vehicle advisory for a pickup on Lamar Avenue, and a sheriff's department saying the
+  matter on the county line is closed without saying what the matter was.
+- **The two that are an absence** — you stayed on the numbered road, you went around the
+  thing at the crossroads — get a line each, because nothing happening is the point:
+  *you will never know what was down it, and that is the correct amount to know.*
+
+Route 2's set-never-read list is now empty. Route 1 still keeps two.
+
 ### What is still wrong, precisely
 
 | Route 2 | careful | always-safe |

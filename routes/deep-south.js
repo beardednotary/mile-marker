@@ -47,13 +47,18 @@ const DEEP_SOUTH = {
       "A preacher, mid-sermon, on how far a man can travel before he's actually gone anywhere. You've heard it. You can't place where. He doesn't finish it.",
       "The hog report. Barrows and gilts. A long pause with the mic open — you can hear a fan going in the room — and then the same numbers again.",
       "A weather report for Shelby County, Tennessee. Where you started. Highs in the nineties. It's night and you're four hundred miles south of there.",
-      "A woman reads a list of names. First and last. No reason given. Eleven of them, and then a hymn."
+      "A woman reads a list of names. First and last. No reason given. Eleven of them, and then a hymn.",
+      // Pays off asking the clerk in Memphis about the pickup with the door open.
+      // Never confirmed as that truck. Nothing follows it up.
+      { text: "An abandoned vehicle advisory. A pickup, make and colour, left at a pump on Lamar Avenue in Memphis. Owner is asked to contact. He reads the plate twice because he misreads it the first time.", needs: 'asked_pickup' }
     ]},
     { from: 430, to: 600, lines: [
       "The tide table for Mobile Bay. Tonight. High at 11:40, he says, and you look at the clock, and you're going to be on the causeway around then.",
       "Road closures. One of them is 98 at the bay. He says it's been closed since Tuesday. You're on 98.",
       "Livestock prices. Feeder cattle, slaughter cows. The numbers are the same numbers. You couldn't say what you mean by that.",
-      "A swap meet. Saturday, eight to two. He gives the town, and it's a town you drove through this morning, and it's behind you."
+      "A swap meet. Saturday, eight to two. He gives the town, and it's a town you drove through this morning, and it's behind you.",
+      // Pays off calling it in at the crossroads on 49W.
+      { text: "A sheriff's department thanks the public for its cooperation and says the matter on the county line is closed. He does not say what the matter was. The next thing is a feed store.", needs: 'called_checkpoint' }
     ]}
   ],
 
@@ -411,6 +416,11 @@ const DEEP_SOUTH = {
         "The old bridge and the new one run side by side. You take the one you're allowed to.",
         "At the far end there's a pull-off. A historical marker. One car in it."
       ];
+      // took_his_road / stayed_numbered, set at Clarksdale 150 miles back. He never
+      // comments on where you have been, so this is the waitress's trick instead: an
+      // observation that is only about the road.
+      if (s.flags.took_his_road) base.push("There's red dust up the sills of your car that there wasn't in Clarksdale. Whatever that road was, it was not on the map the way he drew it.");
+      else if (s.flags.stayed_numbered) base.push("You came in on the numbered roads the whole way, which cost you two hours and bought you nothing you can name, and you would do it again.");
       if (s.carried?.knows_cord_name) base.push("You know the shape of him before you know the car.");
       else base.push("An El Camino. Dark. Dusty in a way that doesn't match the weather here.");
       base.push("He's sitting on the hood with his back to the river, looking at the road you're on.");
@@ -843,6 +853,13 @@ const DEEP_SOUTH = {
         "There's a boy at the gate with a flashlight, waving cars in."
       ];
       if (s.flags.bude_warned) base.push("Don't stop, the man said. The dog agreed.");
+      // Fork B rejoins here, so this is where the two roads can be told apart.
+      if (s.flags.cut_pines && s.flags.paid_the_tractor) base.push("Your doors are wet to the handles and there is a chain mark on the frame you will find later. The boy with the flashlight looks at the water line on your car and then at you, and waves you in anyway.");
+      else if (s.flags.went_the_long_way) base.push("You came the long way round and the long way round took the light with it. Every car in that field got here before you did.");
+      else if (s.flags.cut_pines) base.push("There is pine straw in your wipers and a smell of standing water coming off the car that you have stopped noticing.");
+      else if (s.flags.lumberton_motel) base.push("You slept eleven miles back the wrong way and you are still earlier than you would have been.");
+      else if (s.flags.waited_the_burn) base.push("Two hours behind a stranger's flashers and you can still taste it. The singing is the first clean thing since the county line.");
+      if (s.flags.drove_the_lot) base.push("You think about the church with the gravel lot and the cars in it at that hour, and this is the second one tonight, and this one has a boy at the gate who is glad to see you.");
       base.push("It's a revival. That's all it is. There are a hundred of these a summer down here.");
       return base;
     },
@@ -1047,6 +1064,8 @@ const DEEP_SOUTH = {
         "Lucedale. A pump. A sign that says MOBILE 57."
       ];
       if (s.flags.loyce_spoke) base.push("Fill it here, Loyce said. There's nothing you'd want to stop at. This is here.");
+      else if (s.flags.loyce_kind) base.push("He rang it at about half and didn't look at the pump. You have been doing the arithmetic on that for sixty miles and it keeps coming out the same, which is that he decided something about you and didn't say what.");
+      else if (s.flags.loyce_cold) base.push("Cash only on three, he said, with the reader working fine. You have been carrying that for sixty miles and it has not got any lighter.");
       base.push("Your tank is what it is. Your wallet is what it is. Fifty-seven miles, and a bay at the end of it with a bridge across.");
       return base;
     },
@@ -1128,6 +1147,19 @@ const DEEP_SOUTH = {
         base.push("You stopped trusting your read on people somewhere around Natchez. Down here that's a thing you need. It comes back, probably.");
       if (s.flags.ds_on_donut)
         base.push("You came the last hundred miles on a donut with a nail in your pocket. You take the nail out and look at it. It's a nail.");
+      // The cost block, Route 1's sw_012 pattern: what the road took, named plainly.
+      if (s.flags.slept_car_natchez)
+        base.push("A woman made up a room for you in Natchez and you slept in the car outside her house. You have not decided yet whether that was the sensible thing. You keep arriving at sensible and then going round again.");
+      if (s.flags.check_accepted && !s.flags.thanked_him)
+        base.push("Somebody bought your lunch in Greenville and you let it stand and never found out why. It is four hundred miles back and it is still the thing you cannot put down.");
+      if (s.flags.gave_at_revival)
+        base.push("You put money on a plate in a tent in a field for reasons you could not explain at the time and cannot now, and you have thought about it more than you have thought about the money.");
+      else if (s.flags.revival_passed)
+        base.push("The singing followed you about a mile past the field. Sound does that over flat ground at night. You know that, and you checked the mirror anyway.");
+      if (s.flags.paid_the_tractor)
+        base.push("Twenty dollars to a man on a tractor to be pulled through forty yards of water. Cheapest thing you bought all week, and you knew it while you were handing it over.");
+      if (s.flags.lumberton_motel || s.flags.waited_the_burn)
+        base.push("You stopped for the smoke. Some people didn't. You read about one of them in the paper on the counter in Lucedale and you did not pick it up.");
       if (s.flags.took_from_plate)
         base.push("There's fifteen dollars in your pocket off a collection plate in a tent past Columbia. You've spent some of it. It spent like money.");
       if (s.flags.took_photograph)
@@ -1138,6 +1170,14 @@ const DEEP_SOUTH = {
         base.push("You never once stood on a shoulder with your hazards going. Down here, in this, that's a thing. You don't know yet that it's worth saying.");
 
       // ── Who you met. ──
+      // The two that are the absence of a decision rather than a decision. Route 1 keeps
+      // a couple of these too; they are worth a line each precisely because nothing happened.
+      if (s.flags.stayed_98)
+        base.push("You stayed on the numbered road the whole way through the pines. There was a county route that went south when south was wrong, and you will never know what was down it, and that is the correct amount to know.");
+      if (s.flags.went_around)
+        base.push("You went around the thing at the crossroads on 49W without slowing and without being stopped, and nothing about it was ever explained, and nothing about it ever needed to be.");
+      if (s.flags.asked_pickup)
+        base.push("The pickup on Lamar Avenue with the door standing open. Nobody ever came back for it while you were there. The radio said so too, eventually, in a voice that had read a hundred of them.");
       if (s.flags.loyce_spoke)
         base.push("Loyce. Ain't that many, he said. You wonder how many, and whether they all got here, and whether he'd tell you.");
       else if (s.flags.thanked_him)
