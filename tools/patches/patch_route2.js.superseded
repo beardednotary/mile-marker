@@ -1,0 +1,336 @@
+// Route 2 — Deep South Backroads. The spine's first 75 miles, and the mechanic that
+// makes it a different game from Route 1.
+//
+// Standing is what people have heard about you. Debts are specific — a person and a
+// thing — and are discharged forward, to whoever needs it next, never back to the
+// person who helped you. That is the only way an obligation can follow somebody who is
+// passing through: the collector is the road, not the creditor.
+//
+// Memphis → Clarksdale → Greenville → Natchez → Columbia → Mobile, 547 miles, verified
+// by Ray. The route does not tell you how far it is; the sign names the next town.
+const fs = require('fs'), path = require('path'), crypto = require('crypto');
+const FILE = path.join(__dirname, '..', '..', 'mile-marker-v2.html');
+let src = fs.readFileSync(FILE, 'utf8');
+const NL = src.includes('\r\n') ? '\r\n' : '\n';
+const edits = [];
+const E = (name, from, to) => edits.push({ name, from: from.replace(/\n/g, NL), to: to.replace(/\n/g, NL) });
+
+// ── the route ─────────────────────────────────────────────────────────────
+E('ROUTES: the Deep South',
+`};
+const DEFAULT_ROUTE = 'southwest';`,
+`  deepsouth: {
+    id: 'deepsouth',
+    name: 'Deep South Backroads',
+    shield: 'US 61 SOUTH',
+    from: 'Memphis, TN',
+    to: 'the water',
+    destination: 'Clarksdale',
+    blurb: 'Memphis → the water — the road does not say how far',
+    start: 'ds_001',
+    strandFallback: 'ds_004',
+    // The road does not tell you how far it is. The mile post counts up, the distance
+    // remaining stays blank, and each node signs the next town. 547 miles to Mobile;
+    // the other two waters are their own distances and the player never learns any of them.
+    miles: null,
+    tracksStanding: true,
+    endings: 3,
+    keepsakes: 3,
+    unfinished: true
+  }
+};
+const DEFAULT_ROUTE = 'southwest';`);
+
+E('a route can be picked off the URL while there is no route screen',
+`function R() { return ROUTES[(typeof state !== 'undefined' && state.route) || DEFAULT_ROUTE] || ROUTES[DEFAULT_ROUTE]; }`,
+`function R() { return ROUTES[(typeof state !== 'undefined' && state.route) || DEFAULT_ROUTE] || ROUTES[DEFAULT_ROUTE]; }
+// No route-select screen yet: ?route=deepsouth picks one.
+function routeFromUrl() {
+  const m = /[?&]route=([a-z0-9_]+)/i.exec((typeof location !== 'undefined' && location.search) || '');
+  return m && ROUTES[m[1]] ? m[1] : null;
+}`);
+
+// ── standing and debts ────────────────────────────────────────────────────
+E('engine: standing, and debts paid forward',
+`function keepsakeFor(s) {`,
+`// ═══════════════════════════════════════════════════════════════════════════
+// STANDING AND DEBTS  (Route 2)
+//
+// Two different numbers, and the gap between them is the route.
+//   conduct (state.road)   — what you DID. Hidden. Route 1 already has it.
+//   standing (state.standing) — what people HEARD. Word travels faster than you do.
+//
+// They come apart: a decent thing nobody witnessed moves conduct and not standing; a
+// rumour moves standing and not conduct.
+//
+// A debt is a person and a thing, not a number, and it is discharged FORWARD — to
+// whoever needs something next — because the person who helped you at mile 40 will
+// never see you again. An offense is not dischargeable at all; it simply arrives
+// before you do.
+// ═══════════════════════════════════════════════════════════════════════════
+function oweSomeone(who, what) {
+  state.debts = state.debts || [];
+  state.debts.push({ who: who, what: what });
+}
+// Pay it forward. Returns the debt that was settled, so the scene can name it.
+function payItForward() {
+  state.debts = state.debts || [];
+  return state.debts.length ? state.debts.shift() : null;
+}
+function owedCount() { return (state.debts || []).length; }
+
+function keepsakeFor(s) {`);
+
+E('handleChoice: standing, owing and repaying',
+`  applyFlags(result.flags);`,
+`  applyFlags(result.flags);
+
+  // Route 2's currency. Standing is on the choice, like conduct — what you chose to do,
+  // never how the dice landed.
+  if (choice.standing) state.standing = Math.max(-8, Math.min(8, (state.standing || 0) + choice.standing));
+  if (result.standing) state.standing = Math.max(-8, Math.min(8, (state.standing || 0) + result.standing));
+  if (choice.owe) oweSomeone(choice.owe.who, choice.owe.what);
+  if (result.owe) oweSomeone(result.owe.who, result.owe.what);
+  if (choice.repay || result.repay) state.settled = payItForward();`);
+
+E('the fifth sign square: what you are carrying, or what you owe',
+`  const keptEl = document.getElementById('stat-kept-val');
+  if (keptEl) {
+    const k = state.flags ? keepsakeFor(state) : null;
+    keptEl.textContent = k ? ({ note: 'NOTE', room_key: 'KEY', receipt: 'RCPT' })[k.id] || '•' : '—';
+    const keptLine = document.querySelector('.stat-kept');
+    if (keptLine && keptLine.classList) keptLine.classList.toggle('empty', !k);
+  }`,
+`  const keptEl = document.getElementById('stat-kept-val');
+  if (keptEl) {
+    // On a route that tracks standing the square carries what you owe instead of what
+    // you kept — a count of people, not a score. [OPEN: Ray to confirm this is visible.]
+    const standingRoute = R().tracksStanding;
+    const n = owedCount();
+    const k = (!standingRoute && state.flags) ? keepsakeFor(state) : null;
+    const label = document.querySelector('.stat-kept .stat-name');
+    if (label) label.textContent = standingRoute ? 'Owed' : 'Kept';
+    keptEl.textContent = standingRoute ? (n ? String(n) : '—')
+      : (k ? ({ note: 'NOTE', room_key: 'KEY', receipt: 'RCPT' })[k.id] || '•' : '—');
+    const keptLine = document.querySelector('.stat-kept');
+    if (keptLine && keptLine.classList) keptLine.classList.toggle('empty', standingRoute ? !n : !k);
+  }`);
+
+E('a run resets standing and debts', `  state.route = state.route || DEFAULT_ROUTE;
+  state.heading = null;`,
+`  state.route = routeFromUrl() || state.route || DEFAULT_ROUTE;
+  state.heading = null;
+  state.standing = 0;
+  state.debts = [];
+  state.settled = null;`);
+
+E('state: standing has a home', `  route: DEFAULT_ROUTE,
+  debugRolls: DEBUG_ROLLS
+};`, `  route: DEFAULT_ROUTE,
+  standing: 0,
+  debts: [],
+  settled: null,
+  debugRolls: DEBUG_ROLLS
+};`);
+
+E('a retry keeps standing clean', `    route: state.route || DEFAULT_ROUTE,
+    heading: null,`, `    route: state.route || DEFAULT_ROUTE,
+    heading: null,
+    standing: 0,
+    debts: [],
+    settled: null,`);
+
+E('the character screen offers the route in the URL', `  const blurb = document.getElementById('route-blurb');`,
+`  const urlRoute = routeFromUrl();
+  if (urlRoute) state.route = urlRoute;
+  const blurb = document.getElementById('route-blurb');`);
+
+// ── content ───────────────────────────────────────────────────────────────
+E('Route 2: Memphis to Clarksdale',
+`      { text: "Keep going", sub: "There's still road left.", type: "neutral", next: "__RESUME__" }
+    ]
+  }`,
+`      { text: "Keep going", sub: "There's still road left.", type: "neutral", next: "__RESUME__" }
+    ]
+  },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ROUTE 2 — DEEP SOUTH BACKROADS
+  // Memphis → Clarksdale → Greenville → Natchez → Columbia → the water.
+  // 547 miles to Mobile. The route never tells you how far; each node signs the
+  // next town. Built so far: mile 0 to mile 75.
+  // ══════════════════════════════════════════════════════════════════════
+
+  ds_001: {
+    location: "Memphis, TN — Behind the House on Carnes",
+    tags: ["money","character"],
+    mile: 0,
+    heading: "Clarksdale",
+    paywall: false,
+    text: [
+      "The car has been running for ten minutes because he wanted to hear it run.",
+      "Quarter to six. The only other thing awake on this street is a dog two yards over that has been barking at nothing since you came outside.",
+      "He put a water pump in it Saturday and most of Sunday and he will not tell you what the part cost.",
+      "'It'll get you there,' he says.",
+      "You haven't told him where there is. You don't know yet. He hasn't asked, which is its own kind of kindness.",
+      "Then he takes his hand out of his pocket and there's a folded twenty in it, and he holds it out the way you hold something that isn't anything."
+    ],
+    choices: [
+      { text: "Take it", sub: "Twenty dollars, and a debt you will never be able to pay to him. Those are the terms down here.", type: "neutral", next: "ds_002", outcome: "took_money", deltas: { wallet: +20 }, owe: { who: "the man who fixed your car", what: "twenty dollars" } },
+      { text: "Take the name instead", sub: "Not money. Somebody down the road who owes him — which makes it yours to collect, and his to have given.", type: "neutral", next: "ds_002", outcome: "took_name", flags: { knows_hollis: true }, owe: { who: "the man who fixed your car", what: "a name in Greenville" } },
+      { text: "Tell him you're fine", sub: "You're not. He knows you're not. Saying it anyway is the part he'll remember.", type: "safe", next: "ds_002", outcome: "refused", standing: -1 }
+    ],
+    outcomes: {
+      took_money: [
+        "He puts it in your hand and closes your fingers over it, which is worse than handing it to you, and steps back and slaps the roof twice.",
+        "'Go on.'",
+        "In the mirror he is still standing in the same place when you turn at the end of the street."
+      ],
+      took_name: [
+        "'Hollis,' he says. 'Greenville. He's at the yard off Reed Road most days.'",
+        "You ask what Hollis does.",
+        "'He owes me,' he says, the way another man would say *he's a electrician*, and down here that may be the same kind of answer.",
+        "He slaps the roof twice. 'Go on.'"
+      ],
+      refused: [
+        "He looks at the twenty. Then at you. Then he puts it back in his pocket, and the putting-back takes longer than the taking-out did.",
+        "'All right,' he says.",
+        "He doesn't slap the roof.",
+        "You pull out and he's gone inside before you reach the corner, and the porch light goes off while you are still in sight of it."
+      ]
+    }
+  },
+
+  ds_002: {
+    location: "US 61 South — Below Southaven",
+    tags: ["travel"],
+    mile: 35,
+    heading: "Clarksdale",
+    paywall: false,
+    text: [
+      "Sixty-one goes south out of the city and then stops being a city road all at once, about four miles in, the way they do here.",
+      "The land flattens past Southaven and keeps flattening. You keep waiting for it to be finished flattening and it is not finished.",
+      "Fields on both sides with nothing up in them yet, and the rows run away from the road at an angle that pulls your eyes down them whether you want to go or not.",
+      "A sign for Tunica. A sign for a casino with a face on it. A sign outside a church with a message board where somebody has run out of the letter E.",
+      "It is not seven in the morning and nothing has passed you going the other way in eleven minutes."
+    ],
+    choices: [
+      { text: "Stop at the store in Tunica", sub: "Costs $3. Coffee, a biscuit in paper, and somebody to say good morning to.", type: "safe", requires: { walletMin: 3 }, next: "ds_003", outcome: "store", deltas: { wallet: -3, gut: +1 } },
+      { text: "Keep driving", sub: "You've got a full day of this and no reason to break it up yet.", type: "neutral", next: "ds_003" }
+    ],
+    outcomes: {
+      store: [
+        "The woman at the register asks how you are and waits for the answer, which is not how that question works where you learned it.",
+        "The coffee is better than it has any business being. The biscuit comes in a square of wax paper with the corners folded under.",
+        "A man at the end of the counter is telling somebody about water in his field. Neither of them looks up.",
+        "You are back on the road inside six minutes and you feel better for an hour."
+      ]
+    }
+  },
+
+  ds_003: {
+    location: "US 61 South — Shoulder North of Clarksdale",
+    tags: ["character","tension"],
+    mile: 55,
+    heading: "Clarksdale",
+    paywall: false,
+    textFn: (s) => {
+      const base = [
+        "A van on the shoulder with its hood up and its flashers going.",
+        "Fifteen-passenger, white, MOUNT ZION M.B. CHURCH on the side in vinyl letters that have started to lift at the edges.",
+        "Five or six people standing in the thin shade it throws. Church clothes. Two of the women are holding their shoes.",
+        "A man is looking at the engine the way you look at an engine when looking is all you can do.",
+        "Nobody is waving you down. That is the part that gets you — they have stopped expecting it and gone back to waiting."
+      ];
+      if (s.debts && s.debts.length)
+        base.push("You have twenty dollars of somebody else's in your pocket, or the name of a man who owes him, and either way it is the same twenty dollars.");
+      return base;
+    },
+    choices: [
+      { text: "Pull over", sub: "Costs you most of an hour and some fuel. It is also the only way a debt like yours gets paid.", type: "safe", next: "ds_004", outcome: "stopped", standing: +2, repay: true, road: +1, deltas: { tank: -5, nerve: +1 } },
+      { text: "Keep going", sub: "You don't know anything about engines. That is true, and it is not the reason.", type: "neutral", next: "ds_004", outcome: "drove_on", flags: { passed_the_van: true } }
+    ],
+    outcomes: {
+      stopped: [
+        "It is the belt. You know it is the belt because the man tells you it is the belt about four seconds after you get your hood up too, and because there is most of one lying under the van.",
+        "You do not have a belt. What you have is a car that runs and a road that goes to Clarksdale, so you take the man and one of the women in and bring them back forty minutes later with a belt and a socket set borrowed from the parts counter.",
+        "Nobody makes a thing of it. Somebody puts a bottle of water in your cupholder while you are not looking at your car.",
+        "The woman holding her shoes asks your name and you tell her, and she says it back to you once, the way people do when they intend to keep it."
+      ],
+      drove_on: [
+        "You are past them before you have finished deciding, which is how that decision usually gets made.",
+        "In the mirror nobody turns to watch you go. They were not expecting you. They are not disappointed.",
+        "It stays with you for about four miles and then it mostly doesn't."
+      ]
+    }
+  },
+
+  ds_004: {
+    location: "Clarksdale, MS — 61 and 49",
+    tags: ["character","tension"],
+    mile: 75,
+    heading: "Cleveland",
+    paywall: false,
+    textFn: (s) => {
+      const base = [
+        "Clarksdale is where 61 crosses 49, and there is a sign that says so, and a sculpture of three blue guitars on a pole in case the sign was too subtle.",
+        "This is the crossroads. The one out of the story — a man came here at midnight and sold something and got exactly what he asked for, and the bill came later.",
+        "It is a four-way stop with a gas station on it.",
+        "You go in for a drink because you are going to be in the car for another eight hours. A woman behind the counter is doing a word search in a magazine."
+      ];
+      if (s.flags.passed_the_van) {
+        base.push(
+          "She looks up when you put the bottle down, and keeps looking about a second past where looking usually stops.",
+          "'You come down 61 this morning?'",
+          "You say you did.",
+          "'Mm,' she says.",
+          "She rings you up and goes back to the word search and does not say the other thing, and the other thing sits there on the counter between you the whole time it takes her to count out your change."
+        );
+      } else if (s.standing > 0) {
+        base.push(
+          "She looks up when you put the bottle down. Looks a second longer than the bottle needs.",
+          "'You the one stopped for the Mount Zion van.'",
+          "It is not a question and you have been in this county for forty minutes.",
+          "She does not charge you for the drink. When you start to say something about that she is already looking at the word search again."
+        );
+      } else {
+        base.push(
+          "She rings you up without looking at you properly, which is the most ordinary thing that has happened all morning.",
+          "Outside, a man photographs the guitars from four angles and gets back in a rental car."
+        );
+      }
+      base.push("Nothing happens at the crossroads. That is what the crossroads is like.");
+      return base;
+    },
+    choices: [
+      { text: "South toward Cleveland", sub: "Greenville after that, and the river.", type: "neutral", next: "ds_stub" }
+    ]
+  },
+
+  // End of what is built. Not a victory, and it does not pretend to be one.
+  ds_stub: {
+    location: "US 61 South — Below Clarksdale",
+    tags: ["travel"],
+    mile: 110,
+    heading: "Cleveland",
+    paywall: false,
+    text: [
+      "The Delta goes on south the way it has been going on since Memphis.",
+      "Cleveland. Then Greenville and the river. Then a long way after that.",
+      "The road keeps going.",
+      "You don't. Not yet."
+    ],
+    choices: [
+      { text: "Pull up here", sub: "Mile 110 of 547. This is as far as Route 2 is built.", type: "neutral", action: "newTraveler" }
+    ]
+  }`);
+
+E('build stamp', `const BUILD = '2026-10-14.2';`, `const BUILD = '2026-10-15.1';`);
+
+for (const e of edits) {
+  const c = src.split(e.from).length - 1;
+  if (c !== 1) { console.error('ANCHOR ' + (c === 0 ? 'MISSING' : 'x' + c) + ': ' + e.name); process.exit(1); }
+}
+for (const e of edits) { src = src.replace(e.from, () => e.to); console.log('  ok  ' + e.name); }
+fs.writeFileSync(FILE, src);
+console.log('md5 ' + crypto.createHash('md5').update(src).digest('hex'));
