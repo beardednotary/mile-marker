@@ -761,13 +761,34 @@ whose whole appeal is the water.
 CA-1 does not continue north of Leggett. The coast highway *ends* there, which means
 that driving south, **Leggett is the first place the coast is offered back to you.**
 
-| | Road | mi | Character |
-|---|---|---:|---|
-| Inland | US-101 — Laytonville, Willits, Ukiah, Cloverdale, Santa Rosa | **182** *(verified)* | Fast, wide, dull, wine country at the end |
-| Coast | CA-1 — Westport, Fort Bragg, Mendocino, Albion, Point Arena, Jenner, Bodega Bay, Point Reyes | **~230** *(needs measuring)* | Slow, twisty, the thing you came for |
+| | Road | mi | Time | Character |
+|---|---|---:|---:|---|
+| Inland | US-101 — Laytonville, Willits, Ukiah, Cloverdale, Santa Rosa | **182** | **3h22** | Fast, wide, dull, wine country at the end |
+| Coast | CA-1 — Westport, Fort Bragg, Mendocino, Albion, Point Arena, Jenner, Bodega Bay, Point Reyes | **~225** | **~6h** | Slow, twisty, the thing you came for |
 
-Roughly **fifty extra miles**, which at Route 2's burn is about fifteen fuel points, and
-the player chooses it with their eyes open and still does not feel charged.
+Measured by Ray 2026-10-16: Westport to Point Reyes Station on CA-1 is **155 miles and
+4h03**, and Laytonville to Santa Rosa on 101 is **107 miles and 2h04**, which brackets
+the 182 and confirms it. The two ends of the coast arm — Leggett to Westport over the
+hill, and Point Reyes Station in to the city — are still estimated at about 30 and 40.
+
+### The coast road is not paid for in fuel
+
+**+43 miles. +2h40.** The coast arm is 24% longer and **78% slower**, and the second
+number is the interesting one. Forty-three miles is thirteen fuel points — a cost, but
+not a decision. Two hours and forty minutes is a different kind of day.
+
+So the coast road should be paid for in **darkness**. You chose six hours of a road that
+takes six hours, so you come into San Francisco in the dark, and the player who stayed
+inland arrives while there is still light on it.
+
+**This needs no engine work.** `isNightNode()` reads `node.time` and the `night` tag:
+time in this game is *authored, not simulated*, and there is no clock to add. The coast
+nodes south of Point Arena are simply written as night and the inland nodes as late
+afternoon. The mechanic is already finished.
+
+It also does the ending work for free. Both roads end in San Francisco, and the arrival
+reads as a different scene depending on which one you drove, with no branch in the
+ending at all — only the light changing.
 
 The temptation is *earned by the two hundred miles that came before it*. This answers
 Ray's own question about the coastal towns — "enchanting places I feel could be a pull,
@@ -838,13 +859,12 @@ the content**, and the balance pass runs on every leg as it lands.
 
 ### Open
 
-- Measure CA-1 Leggett → San Francisco, to replace the ~230 estimate.
+- Measure CA-1 Leggett → Westport, and Point Reyes Station → San Francisco
+  — the two ends of the coast arm that are still estimated.
 - Measure the Three Capes Loop against the 101 it leaves.
 - Where Cord is, given he is an observer here and *maybe not in the El Camino*.
-- Whether the paywall sits at the California line (leg 5, mile 339–449), which is the
-  structural equivalent of Kingman: a border, a stop, and a question about going on.
-- Whether Shelter Cove is reachable before the paywall or after. It is the best scene in
-  the route and the free act currently ends 130 miles short of it.
+- `wearFor()` bands sit at 200 / 400 / 550, cut for a 675-mile route. On 721 miles the
+  signs reach their most weathered state 170 miles before the end. Retune per route.
 
 ## The Hattiesburg fork — Route 2 ends in three places **[BUILT 2026-10-15]**
 
@@ -1581,6 +1601,12 @@ needs replacing it gets replaced, not flagged.
 ---
 
 ## Paywall **[CHANGED 2026-10-08 — moved from mile 180 to Kingman]**
+
+**There is exactly one paywall in the game and it is in Route 1.** $2.99 finishes Route
+1; $7.99 is all four roads. Routes 2, 3 and 4 are *bought, not gated* — once a player
+has them they play them end to end with no wall anywhere. Do not design a mid-route stop
+into any of them. (Stated by Ray 2026-10-16, after this spec briefly proposed a
+California-line paywall for Route 3.)
 
 **Trigger:** the first node after the motel decision, on every path: `sw_008` (you took a room, or
 slept in the car), `sw_0105` and `death_night` (you drove on through the night). Mile 300 of 675.
