@@ -940,6 +940,87 @@ not a threshold anybody can creep under.
 One destination, three readings — Route 1's shape. Route 1's three are earned by
 **conduct**, Route 2's by **information**, Route 3's by **which roads you took**.
 
+### Built so far **[2026-10-16 — build 2026-10-16.9]**
+
+`routes/pacific-coast.js` registers itself the way Route 2 does and is selected with
+**`?route=coast`**. Mile 0 to 88 (113 by the loop): Astoria, the Column, Cannon Beach,
+Tillamook, both arms of the Three Capes fork, Cloverdale. Ten nodes, one of them a stub
+terminus so the graph closes and the harness can walk it.
+
+#### One engine addition: `addMiles`
+
+Route 2's fork did not need this — each water was a different ending with its own mile
+values and its own total, so `miles` was enough. **Route 3's detours rejoin**, and the
+node they rejoin at has one `mile` on it for everybody.
+
+So a choice may carry `addMiles: N`, which accumulates into `state.extra` and is added
+to the leg being driven, to the odometer, to the distance remaining and to sign wear.
+Node `mile` stays in spine terms; the detour pays the difference. Put it on **each leg**
+of a loop rather than all at the entrance and the odometer reads true the whole way
+round. Routes 1 and 2 never set it, so `extra` stays 0 and nothing moves.
+
+Verified in the browser, Astoria to Cloverdale by the Column and all three capes:
+
+| At | Node mile | + extra | Odometer | Remaining |
+|---|---:|---:|---:|---:|
+| Astoria | 0 | 0 | 0 | 721 |
+| The Column | 0 | 2 | **2** | 721 |
+| Cannon Beach | 25 | 4 | **29** | 696 |
+| Tillamook | 66 | 4 | **70** | 655 |
+| Cape Meares | 70 | 9 | **79** | 651 |
+| Cape Lookout | 76 | 14 | **90** | 645 |
+| Cape Kiwanda | 82 | 20 | **102** | 639 |
+| Cloverdale | 88 | 25 | **113** | **633** |
+
+113 against the 92 the highway would have done, on a measured 43.1-mile loop. The
+arithmetic closes.
+
+#### The pumps, which are the whole mechanic
+
+Astoria 0.26 · Cannon Beach **0.34** · Tillamook 0.28 · Cloverdale 0.27. **Nothing on
+the loop**, which is true to the ground: Oceanside, Netarts and Pacific City have no
+highway fuel worth the name. Tune scarcity here, never `tankPerMile`.
+
+Cannon Beach is a third more than everything around it because Cannon Beach is a third
+more than everything around it. Nobody in the fiction hides this; it is the arrangement.
+
+#### Cape Meares does the route's arguing for it
+
+The loop road to the lighthouse is **actually closed**, by landslide, and has been for
+years — which Ray's own routing surfaced ("avoids road closure on Bayshore Dr"). The
+county stopped repairing it and then put barriers in front of it, and the difference
+between those two things is the scene. A road built for looking at something, which lost
+its argument with the hillside, six hundred miles before Shelter Cove makes the same
+point expensively.
+
+A radio line sets `heard_road_closed`, which is the only check-free, conduct-free way to
+know before committing to the turn.
+
+#### A harness finding worth keeping
+
+**`smart` refuses every detour on this route, and it is right to.** A fuel-and-money
+maximiser correctly declines a choice that costs fuel and returns nothing it values, so
+the optimising policy cannot measure what is down any of these roads — the same blind
+spot that once made a whole Route 2 ending read as 0%.
+
+`P.tourist` was added for this: it takes the scenic option when offered and is otherwise
+competent. It is the player this route is written for.
+
+But the finding behind it is a design problem, not a harness one. **Route 3's detours
+are mechanically dominated choices**, which means the optimal line is a straight one and
+the best strategy is to see nothing. That is backwards for a game about a road trip, and
+the fix is already in the design: **Cord is down the dead end.** He is the one thing on
+an optional road that pays off in the currency the route runs on, and the player who
+optimises never meets him. Nothing else needs to reward detouring; he is enough, and he
+only works if he stays the only one.
+
+#### Still to write
+
+Six hundred and twenty miles. Lincoln City, Newport, the dunes, Coos Bay, the Rogue,
+Brookings, the California line, Crescent City, Eureka, **Shelter Cove**, the Avenue,
+Leggett and both arms below it. No failure states yet — every archetype wins 100% of
+the written slice, which is expected at 88 miles and is the next thing to go wrong.
+
 ### Cord is at the end of the dead-end road **[AGREED 2026-10-16]**
 
 Ray: *"I think maybe he's in one of the detours. Somewhere the traveler might be feeling

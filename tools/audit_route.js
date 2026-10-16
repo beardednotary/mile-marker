@@ -88,8 +88,11 @@ rows.sort((a, b) => a.mile - b.mile);
 console.log('  ' + rows.filter(r => r.income).length + ' income moment(s), ' + rows.filter(r => r.cost).length + ' spend(s), ' + rows.filter(r => r.gain > 0).length + ' fuel source(s)');
 const pumps = rows.filter(r => r.gain > 0).map(r => r.mile);
 console.log('  fuel available at miles: ' + pumps.join(', '));
+const written = Math.max(...Object.keys(N).map(id => N[id].mile).filter(m => m != null));
+const partial = written < M.miles * 0.9;
+if (partial) console.log('  · route is written to mile ' + written + ' of ' + M.miles + ' — measuring the gap to there, not to the end');
 let gapMax = 0, gapAt = 0, prev = 0;
-for (const m of pumps.concat([M.miles])) { if (m - prev > gapMax) { gapMax = m - prev; gapAt = prev; } prev = m; }
+for (const m of pumps.concat([partial ? written : M.miles])) { if (m - prev > gapMax) { gapMax = m - prev; gapAt = prev; } prev = m; }
 console.log('  longest stretch with no fuel: ' + gapMax + ' mi (from mile ' + gapAt + ') = ' + Math.round(gapMax * M.tankPerMile) + ' fuel at ' + M.tankPerMile + '/mi');
 if (gapMax * M.tankPerMile > 100) bad('a tank cannot cover the longest dry stretch', Math.round(gapMax * M.tankPerMile) + ' > 100');
 else ok('the longest dry stretch fits inside one tank');
@@ -98,7 +101,8 @@ console.log('\n5. Mileage');
 const miles = Object.keys(N).map(id => N[id].mile).filter(m => m != null);
 const over = Object.keys(N).filter(id => N[id].mile > M.miles);
 over.length ? bad('node(s) past the end of the route', over.join(' ')) : ok('no node sits past mile ' + M.miles);
-console.log('  · mile range ' + Math.min(...miles) + '–' + Math.max(...miles) + ', victory at ' + N[M.victory].mile);
+const wins = Object.keys(N).filter(id => N[id].isVictory).map(id => N[id].mile);
+console.log('  · mile range ' + Math.min(...miles) + '–' + Math.max(...miles) + ', victory at ' + (wins.length ? wins.join(' / ') : 'nowhere'));
 
 console.log('\n' + (problems ? problems + ' problem(s)' : 'clean') + '\n');
 process.exitCode = problems ? 1 : 0;

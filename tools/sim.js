@@ -11,7 +11,7 @@ function run(arch, policy, routeId) {
   const a = ARCHETYPES[arch];
   const st = { archetype: arch, flags: {}, road: 0, choices: 0,
     stats: { ...a.stats }, maxStats: { ...a.max }, currentNode: RT.start,
-    lastRoll: null, strandings: 0, strandReturn: null, lastMile: 0, paid: true, run: 1, route: RT.id, taken: 0,
+    lastRoll: null, strandings: 0, strandReturn: null, lastMile: 0, paid: true, run: 1, route: RT.id, taken: 0, extra: 0,
     seed: (Math.floor(Math.random() * 0xffffffff) >>> 0) || 1 };
   X.setState(st);
 
@@ -50,7 +50,7 @@ function run(arch, policy, routeId) {
 
     let r = c.check
       ? (X.rollCheck(c.check.stat, c.check.difficulty) ? c.success : c.failure)
-      : { next: c.next, deltas: c.deltas, strand: c.strand, strandReturn: c.strandReturn };
+      : { next: c.next, outcome: c.outcome, deltas: c.deltas, strand: c.strand, strandReturn: c.strandReturn };
     r = r || {};
     Object.assign(st.flags, r.flags || {});
 
@@ -61,7 +61,8 @@ function run(arch, policy, routeId) {
     if (pump) r = Object.assign({}, r, { deltas: Object.assign({}, r.deltas, X.pumpDeltas(st, pump)) });
 
     X.applyDeltas(r.deltas || {});
-    const trip = X.mileageCost(r.next);
+    if (c.addMiles) st.extra = (st.extra || 0) + c.addMiles;
+    const trip = X.mileageCost(r.next, c.addMiles);
     if (trip.tank) X.applyDeltas({ tank: trip.tank }, trip.miles);
 
     const dry = st.stats.tank <= 0;
@@ -89,6 +90,8 @@ const P = {
       let sc = usable / 10 - Math.min(cost, st.stats.wallet) / 12;
       if (c.failure) sc += ((c.failure.deltas || {}).tank || 0) / 20;
       if (c.check) sc -= Math.max(0, c.check.difficulty - (st.stats[c.check.stat] || 5)) / 4;
+      // A detour burns fuel the deltas never mention.
+      if (c.addMiles) sc -= (c.addMiles * (X.ROUTES[st.route] || {}).tankPerMile || 0) / 10;
       return sc;
     };
     // Break ties at random. Without this a stable sort always returns the first choice
@@ -96,6 +99,15 @@ const P = {
     // the pines — was never once explored, and read as 0% in every reach report.
     return cs.map(c => ({ c, s: val(c) + Math.random() * 1e-6 })).sort((a, b) => b.s - a.s)[0].c;
   }
+};
+
+// Route 3's detours are, mechanically, strictly dominated: they cost fuel and return
+// nothing a resource-maximiser values, so `smart` correctly refuses every one of them
+// and cannot be used to measure what is down them. `tourist` goes and looks, and is
+// otherwise competent. It is the player this route is actually written for.
+P.tourist = (cs, st) => {
+  const scenic = cs.filter(c => c.addMiles);
+  return scenic.length ? scenic[Math.floor(Math.random() * scenic.length)] : P.smart(cs, st);
 };
 
 module.exports = { run, P, NODES, ARCHETYPES, X, ROUTE_ID };

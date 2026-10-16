@@ -4,13 +4,16 @@
 const fs = require('fs'), vm = require('vm'), path = require('path');
 const html = fs.readFileSync(path.join(__dirname, '..', 'mile-marker-v2.html'), 'utf8');
 
-// Route 2 lives in its own file and is loaded by a script tag before the engine.
-// Strip its CommonJS tail so it behaves here exactly as it does in a browser.
-let DS = '';
-try {
-  DS = fs.readFileSync(path.join(__dirname, '..', 'routes', 'deep-south.js'), 'utf8')
-         .replace(/if \(typeof module[\s\S]*$/, '');
-} catch (e) { /* Route 1 alone, which is a state the engine supports */ }
+// Routes 2 and 3 live in their own files and are loaded by script tags before the
+// engine. Strip their CommonJS tails so they behave here exactly as they do in a
+// browser. A missing module is a state the engine supports, so a failed read is fine.
+const mod = (f) => {
+  try {
+    return fs.readFileSync(path.join(__dirname, '..', 'routes', f), 'utf8')
+             .replace(/if \(typeof module[\s\S]*$/, '');
+  } catch (e) { return ''; }
+};
+const DS = [mod('deep-south.js'), mod('pacific-coast.js')].join(String.fromCharCode(59, 10));
 
 let src = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).pop();
 
