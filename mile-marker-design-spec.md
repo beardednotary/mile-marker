@@ -830,6 +830,58 @@ asks which way you go, a dead end asks whether seeing a thing is worth the going
 Full possible drain: 15 + 42 + 50 ≈ **107 extra miles on a 721-mile route**, about 15%,
 or a third of a tank at Route 2's burn. Target, not a measurement.
 
+### The road asks twice, and only one player hears the second question
+
+**[AGREED 2026-10-16]** CA-1 does not stop at Point Reyes Station. It keeps going south
+through Stinson Beach and Muir Beach on the Shoreline Highway, and no mapping service
+offers it because it is slow — which is exactly why none of Ray's three routings showed
+it. Ray on the stretch: *"stinson beach and muir beach are awesome."*
+
+The important thing about it is structural. **The inland arm never reaches Point Reyes
+Station** — 101 runs Laytonville, Willits, Ukiah, Cloverdale, Santa Rosa, Novato and
+into the city, nowhere near the coast. So this is not a third parallel temptation. It is
+a *second* temptation **nested inside the first**, and only the player who took the coast
+at Leggett is ever offered it.
+
+Which is better than a parallel, because the second ask is the harder one. You are nine
+hours out of Astoria, it is dark because you chose six hours of coast road, the tank is
+what the tank is, and the road says *more?* **The reward for curiosity is more
+curiosity, offered at a worse moment.** That is the route's thesis arriving as a
+question instead of a lesson.
+
+| From Point Reyes Station | mi | Time |
+|---|---:|---:|
+| Inland — Sir Francis Drake to 101 | **38** | 1h06 |
+| Shoreline — CA-1 by Stinson and Muir Beach | **~51** | ~1h20 |
+
+Web-sourced and soft; the sources disagree by several miles and this wants Ray's map the
+way the other legs got it. **+13 miles, +20 minutes.**
+
+And a modest twenty minutes is not where the cost actually lands. **There is no fuel on
+that road.** A pump at Point Reyes Station and then essentially nothing until Mill
+Valley: fifty-one miles with no pump, at the end of a 773-mile route, in the dark, on one
+lane each way with no shoulder and a cliff on the ocean side. That is the Lost Coast
+lesson repeated in the last hour — the cost is not the distance, it is that the distance
+happens where nothing can be bought.
+
+### Three lengths, and therefore three endings
+
+| Ending | Road taken | Total mi | Arrives |
+|---|---|---:|---|
+| 1 | 101 inland from Leggett | **721** | in daylight |
+| 2 | Coast to Point Reyes Station, then inland | **760** | after dark |
+| 3 | Coast the whole way, Stinson and Muir | **773** | late |
+
+One destination, three readings, exactly Route 1's shape — but where Route 1's three are
+**conduct** and Route 2's three are **information**, Route 3's three are **distance**.
+Each route's endings are earned by the thing that route is about. Nobody is being graded;
+the player simply arrives at the hour their own choices put them at.
+
+**None of this needs engine work.** `miles` re-sets the distance remaining at each ask,
+`node.time` and the `night` tag already author the light, and `wearFor()` now stretches
+to whichever of the three lengths this run turned out to be. The structure is finished
+before a scene is written.
+
 ### The Golden Gate is the ending, and it takes no cash
 
 Both arms cross the Golden Gate Bridge, so this is not a fork cost — it is the arrival,
@@ -888,11 +940,10 @@ the content**, and the balance pass runs on every leg as it lands.
 
 ### Open
 
-- Measure the Three Capes Loop against the 101 it leaves. Last unmeasured number.
+- Measure the Three Capes Loop against the 101 it leaves.
+- Measure Point Reyes Station → San Francisco on CA-1 by Stinson and Muir Beach. The
+  ~51 is web-sourced and the sources disagree.
 - Where Cord is, given he is an observer here and *maybe not in the El Camino*.
-- Whether CA-1 continues past Point Reyes Station as a *third* temptation — Stinson
-  Beach and Muir Beach on the Shoreline Highway, which no mapping service will offer
-  because it is slow. The last chance to take the long way, thirty miles from the end.
 
 **Closed 2026-10-16:** the leg mileages (Ray), the coast arm (Ray), the paywall question
 (there isn't one outside Route 1), and `wearFor()`, which now ages by fraction of the
