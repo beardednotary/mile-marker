@@ -764,18 +764,21 @@ that driving south, **Leggett is the first place the coast is offered back to yo
 | | Road | mi | Time | Character |
 |---|---|---:|---:|---|
 | Inland | US-101 — Laytonville, Willits, Ukiah, Cloverdale, Santa Rosa | **182** | **3h22** | Fast, wide, dull, wine country at the end |
-| Coast | CA-1 — Westport, Fort Bragg, Mendocino, Albion, Point Arena, Jenner, Bodega Bay, Point Reyes | **~225** | **~6h** | Slow, twisty, the thing you came for |
+| Coast | CA-1 — Westport, Fort Bragg, Mendocino, Albion, Point Arena, Jenner, Bodega Bay, Point Reyes | **221** | **~6h** | Slow, twisty, the thing you came for |
 
-Measured by Ray 2026-10-16: Westport to Point Reyes Station on CA-1 is **155 miles and
-4h03**, and Laytonville to Santa Rosa on 101 is **107 miles and 2h04**, which brackets
-the 182 and confirms it. The two ends of the coast arm — Leggett to Westport over the
-hill, and Point Reyes Station in to the city — are still estimated at about 30 and 40.
+Fully measured by Ray 2026-10-16. The coast arm is **28 + 155 + 38 = 221**: Leggett to
+Westport over the hill is 28, Westport to Point Reyes Station on CA-1 is 155 and 4h03,
+and Point Reyes Station in to the city is 38 by Sir Francis Drake (42 by 101 or Lucas
+Valley, same hour and six either way). Laytonville to Santa Rosa on 101 is 107 and 2h04,
+which brackets the inland 182 and confirms it.
+
+So the route has **two lengths**: 721 miles inland, **760 by the coast**.
 
 ### The coast road is not paid for in fuel
 
-**+43 miles. +2h40.** The coast arm is 24% longer and **78% slower**, and the second
-number is the interesting one. Forty-three miles is thirteen fuel points — a cost, but
-not a decision. Two hours and forty minutes is a different kind of day.
+**+39 miles. +2h38.** The coast arm is 21% longer and **78% slower**, and the second
+number is the interesting one. Thirty-nine miles is twelve fuel points — a cost, but
+not a decision. Two hours and thirty-eight minutes is a different kind of day.
 
 So the coast road should be paid for in **darkness**. You chose six hours of a road that
 takes six hours, so you come into San Francisco in the dark, and the player who stayed
@@ -827,6 +830,32 @@ asks which way you go, a dead end asks whether seeing a thing is worth the going
 Full possible drain: 15 + 42 + 50 ≈ **107 extra miles on a 721-mile route**, about 15%,
 or a third of a tank at Route 2's burn. Target, not a measurement.
 
+### The Golden Gate is the ending, and it takes no cash
+
+Both arms cross the Golden Gate Bridge, so this is not a fork cost — it is the arrival,
+on every path. Three facts about that bridge, all verified at goldengate.org, 2026-10-16:
+
+1. **Cash is no longer collected at the Bridge.** All-electronic since 2013.
+2. **The toll is southbound only** — charged going *into* San Francisco. This route runs
+   north to south, so the toll is not a thing on the road. It is the last thing that
+   happens.
+3. **With nothing set up you are photographed and invoiced**, and the invoice is mailed
+   *to the registered owner of the vehicle*. 2026 rates: $10.25 FasTrak, $10.50 license
+   plate or one-time, **$11.25 by invoice**.
+
+This game's entire economy is a wallet with cash in it. Seven hundred and sixty miles of
+counting dollars at pumps, and **the last gate on the road will not take the money** —
+not because the player is short, but because the bridge does not want it. There is no
+check to pass and nothing to decide. A camera photographs the plate and a bill goes out
+to whoever the car belongs to.
+
+Which is the better question, and the game has never answered it. The glovebox has
+somebody else's things in it. The last traveller's car is a mechanic already in the
+build. Route 3 ends by addressing an envelope and not knowing the name on it.
+
+Do not make this a choice, a check or a cost. It happens to the player, once, in the
+last scene, and the route is over.
+
 ### The reveal needs a scene
 
 "Feels like the easiest route until the player realizes they have been bleeding
@@ -859,12 +888,17 @@ the content**, and the balance pass runs on every leg as it lands.
 
 ### Open
 
-- Measure CA-1 Leggett → Westport, and Point Reyes Station → San Francisco
-  — the two ends of the coast arm that are still estimated.
-- Measure the Three Capes Loop against the 101 it leaves.
+- Measure the Three Capes Loop against the 101 it leaves. Last unmeasured number.
 - Where Cord is, given he is an observer here and *maybe not in the El Camino*.
-- `wearFor()` bands sit at 200 / 400 / 550, cut for a 675-mile route. On 721 miles the
-  signs reach their most weathered state 170 miles before the end. Retune per route.
+- Whether CA-1 continues past Point Reyes Station as a *third* temptation — Stinson
+  Beach and Muir Beach on the Shoreline Highway, which no mapping service will offer
+  because it is slow. The last chance to take the long way, thirty miles from the end.
+
+**Closed 2026-10-16:** the leg mileages (Ray), the coast arm (Ray), the paywall question
+(there isn't one outside Route 1), and `wearFor()`, which now ages by fraction of the
+run rather than absolute mile — Route 1 still bands at 200 / 400 / 550 exactly, Route 2
+at 162 / 324 / 446, Route 3 at 213 / 428 / 588 inland and 225 / 451 / 619 by the coast.
+Shipped in build 2026-10-16.6.
 
 ## The Hattiesburg fork — Route 2 ends in three places **[BUILT 2026-10-15]**
 
