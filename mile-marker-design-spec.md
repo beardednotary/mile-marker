@@ -867,16 +867,16 @@ The full set, with Three Capes measured by Ray 2026-10-16:
 
 | Detour | Distance cost | Time cost |
 |---|---:|---:|
-| Three Capes Loop | **+18 mi** *(43.1 against ~25 on 101)* | ~+50 min |
+| Three Capes Loop | **+21.4 mi** *(43.1 against 21.7 on 101)* | ~+50 min |
 | Avenue of the Giants | +2 to 3 mi | ~+1h |
 | Shelter Cove | **+42 mi** | +1h30 |
 | The Leggett fork | **+39 mi** | +2h38 |
 | Stinson and Muir Beach | +1.1 mi | +13 min |
 
 **So the correction above was itself an overcorrection.** Three of the five do cost real
-distance — ninety-nine miles between them — and two cost none. The route runs **721 to
-about 823 miles** depending on what the player cannot resist, a swing of 14%. Miles are
-not the whole spine, but they were never nothing.
+distance — a hundred and two miles between them — and two cost none. The route runs
+**721 to about 826 miles** depending on what the player cannot resist, a swing of 15%.
+Miles are not the whole spine, but they were never nothing.
 
 ### The drain is fuel, reached two different ways
 
@@ -939,6 +939,67 @@ not a threshold anybody can creep under.
 
 One destination, three readings — Route 1's shape. Route 1's three are earned by
 **conduct**, Route 2's by **information**, Route 3's by **which roads you took**.
+
+### Cord is at the end of the dead-end road **[AGREED 2026-10-16]**
+
+Ray: *"I think maybe he's in one of the detours. Somewhere the traveler might be feeling
+some economy heat. Or a scenic overlook, or a stop along the Albion-PRS route. Maybe one
+hint about a gas station or something."*
+
+Three things fall out of that, and they are all right.
+
+**1. He is optional, because the detours are.** On Route 1 Cord is first contact and
+unavoidable. Here the player who hurries never meets him *and never learns that they
+didn't*. That is the correct escalation for an observer, and it costs the route nothing:
+nobody is told what they missed.
+
+**2. A gas hint makes him the most valuable person in the game.** Route 3's drain is the
+pumps you drove past, so a man who tells you where the next one is **is the answer to the
+route's own mechanic**. Route 1 already built the machinery for this — his tip there pays
+off as a posted price, and there is a check for it in `verify_legs`.
+
+**3. It inverts Route 1, which is the whole reason it works.** On Route 1 Cord offers a
+shortcut and the question is whether to trust him. On Route 3 he tells you where the
+fuel is **and he is simply right**. No check, no roll, no catch. A player who learned
+suspicion on Route 1 will stand there weighing it, and the weighing is what costs them.
+The game never confirms or denies anything. The pump is just where he said.
+
+#### Where, precisely: Shelter Cove
+
+Of Ray's three candidates — a detour under economy heat, a scenic overlook, a stop on the
+Albion to Point Reyes Station stretch — the dead end wins, for reasons the other two
+cannot match:
+
+- **The heat is real there, and self-inflicted.** Twenty-one miles down, twenty-one back,
+  no services at the bottom. It is the worst fuel position on the route and the player
+  put themselves in it on purpose an hour ago.
+- **"Out-of-place observer" is literally true.** The Lost Coast has one road in and the
+  same road out. Anybody standing there drove it on purpose. A man at a scenic overlook
+  is just a man at a scenic overlook; a man at the end of a dead end is a question.
+- **"Maybe not in the El Camino" lands hardest where there is nowhere to have come
+  from.** If the car is not in the lot, *how did he get here* has no available answer,
+  and the route does not owe one.
+- **The mercy is proportionate.** You made the most expensive optional choice on the
+  route, and the only thing down there is the one person who can tell you how to survive
+  it.
+
+#### A second sighting, conditional
+
+Ray's Albion-to-Point-Reyes-Station stretch is the right second place, and it is also the
+part of the route he knows personally and can vet. But he should be there **only if the
+player did not find him at Shelter Cove.** Never twice in one run.
+
+This keeps the plan's own rule — *"the road should feel larger than Cord"* — and stops
+him becoming a collectible. Same function either way, different scope: found at Shelter
+Cove he tells you how to get back out, found on the coast arm he tells you how to make
+the city.
+
+#### What he must not do
+
+No offer, no favour, no debt, no shortcut. Route 1 is the ambiguous helper and Route 2 is
+local rumour; **Route 3 is the observer.** He watches, he answers one question, and the
+answer is true. If he ever asks for something, he has become Route 1's Cord again and the
+escalation is lost.
 
 ### What survives the correction
 
@@ -1011,10 +1072,18 @@ the content**, and the balance pass runs on every leg as it lands.
 
 ### Open
 
-- Confirm plain Tillamook → Cloverdale on US-101. The ~25 is inferred and it is the
-  baseline the Three Capes +18 rests on.
-- Where Cord is, given he is an observer here and *maybe not in the El Camino*. The last
-  design question before content.
+Nothing structural. Every mileage is measured and every design question is answered;
+the route is ready for content.
+
+**Closed 2026-10-16:** Tillamook → Cloverdale on 101 is **21.7** (Ray), which puts Three
+Capes at +21.4. Cord is at the end of the Shelter Cove road, optional, with a second
+conditional sighting on the Albion to Point Reyes Station stretch.
+
+Still open, and only as writing problems rather than design ones:
+
+- The **reveal scene** still has to be written. See above — it is the one scene this
+  route cannot ship without.
+- Oregon has **no local check**. 580 of the 721 miles are north of anywhere Ray has been.
 
 **Free detail, from Ray's own map:** Cape Meares Loop Road is **closed** — the routing
 flags "avoids road closure on Bayshore Dr" and the map draws a closure marker at the
