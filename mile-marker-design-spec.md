@@ -684,6 +684,117 @@ Rules agreed:
   shows KEPT) as a name rather than a score.
 - What Route 2's keepsake is.
 
+## Route 3 — Pacific Coast, the design **[PROPOSED 2026-10-15]**
+
+Astoria, OR to San Francisco, CA, on US-101 and CA-1. Ray picked the stretch; the
+recovered plan gives the route its identity in one line:
+
+> Route 3 *"should feel like the easiest route until the player realizes they have been
+> bleeding resources."*
+
+Structure is **optional detours + hidden resource drain**. Cord is an *out-of-place
+observer / maybe not in the El Camino*.
+
+### The mechanic, and why Route 2 taught us what it is
+
+Route 3's premise is the bug from Route 2 with the sign flipped. Route 2 was solved
+because it had **nowhere to lose money that was not a pump** — $57 of non-fuel spending
+against Route 1's $188. Route 3 is supposed to bleed you, so it needs what Route 2
+lacked. But Route 1's version will not do either, because **Route 1's sinks are
+visible**: you see the tyre, the tow, the room. You watch the number leave. A drain you
+watch is not a drain, it is a price.
+
+Three candidates, in increasing order of rightness:
+
+1. **Coastal pricing.** Pumps cost more per point, climbing as you go south. No engine
+   work — `pump: { rate, cap }` already does it. But it is a tax, not a temptation. The
+   player feels nickel-and-dimed rather than seduced. Background, not spine.
+2. **The comfort tax.** Every genuinely safe option costs a little. Worth having because
+   it *inverts* Route 1's rule (safe = you lose) into (safe = you pay) rather than
+   repeating it. Not enough to carry a route.
+3. **Miles as the hidden cost.** The spine. A detour that is pleasant, that you take
+   because you want to, and that adds forty miles you never counted — twelve points of
+   fuel, gone, with nothing on screen ever saying so.
+
+Three works because the Hattiesburg fork already built it. **`miles` is the field that
+lets a node re-set the distance remaining**, and it makes "a detour that costs you
+distance" a first-class mechanic. Routes 1 and 2 both have a fixed length. Route 3 is
+the first route where *how far you drove* is something you did to yourself.
+
+### The spine
+
+Mileages are reconstructed leg by leg and **need Ray's verification** the way 547 got
+it. Only one is authoritative: Oregon's Pacific Coast Scenic Byway, Astoria to
+Brookings, is **363 miles** by the state's own figure.
+
+| # | Leg | ~mi | Cumulative | The temptation |
+|---|---|---:|---:|---|
+| 1 | Astoria to Tillamook | 90 | 90 | Fog. The first harmless comfort purchase. **Free act, before the paywall.** |
+| 2 | Tillamook to Newport | 75 | 165 | **Three Capes Loop** — an optional scenic parallel off 101. First instance of the mechanic. |
+| 3 | Newport to Coos Bay | 115 | 280 | The dunes. Longest Oregon stretch, thinnest services. |
+| 4 | Coos Bay to Brookings | 85 | 365 | Port Orford, Gold Beach. **End of the byway at the verified 363.** |
+| 5 | Brookings to Eureka | 112 | 477 | The California line, and the agricultural inspection station. |
+| 6 | Eureka to Leggett | 105 | 582 | **Avenue of the Giants** — a real 31-mile scenic road that parallels 101 and rejoins it. |
+| 7 | Leggett to San Francisco | 180–200 | **760–780** | **The fork.** |
+
+That puts Route 3 at roughly **760 miles**, the longest of the three, which suits both
+the 150% sizing and a route whose whole subject is fuel.
+
+### The Avenue of the Giants is the route in one object
+
+Thirty-one miles of old US-101 alignment through Humboldt Redwoods, strictly optional,
+genuinely worth seeing, and thirty-one miles longer than not doing it. If the route only
+ever taught the player one thing, this is the scene that teaches it.
+
+### The fork at Leggett is not Hattiesburg
+
+Leggett is where CA-1 ends and meets US-101 — the coast road and the inland road
+separate there and do not meet again until San Francisco. **Both end in the same city.**
+
+This is deliberately *not* Route 2's three-endpoints structure. Route 2 forks on
+**where you arrive**; Route 3 forks on **how much road is left**, which is the only
+fork that is on-theme for a route about distance. CA-1 is slower, twistier and longer;
+101 through Laytonville, Willits, Ukiah and Cloverdale is shorter and duller. The
+player chooses between the road they want and the road they can afford, and the sign
+tells them the cost the moment they commit, because `miles` re-sets on arrival.
+
+Endings are therefore Route 1's shape — one destination, three readings — not Route 2's.
+
+### The reveal needs a scene
+
+"Feels like the easiest route until the player realizes they have been bleeding
+resources" is a promise about a *moment*, and the moment has to be built. The
+realization cannot be left to the player noticing a stat.
+
+The reveal should be **the odometer itself**: somewhere late, somebody asks how far you
+have come, or a receipt prints the number, or a sign gives a distance that does not
+match the one in your head — and the figure is a couple of hundred miles more than the
+trip was supposed to be. Route 1's equivalent beat is the Kingman paywall. This is the
+one scene Route 3 cannot ship without.
+
+### Forced drain, so curiosity is not the only thing punished
+
+Fog and landslide reroutes are in the original plan and they matter mechanically: a
+closure on CA-1 that adds miles you did not choose means the player cannot read the
+route as "you were punished for looking at trees." Highway 1 closures north of San
+Francisco are real and frequent, so the fiction is free.
+
+### Measure from day one
+
+Route 2 was wired in and measured afterwards, and it arrived solved — the Planner won
+100% of always-safe runs where Route 1 wins 1%. Route 3's targets go in the harness
+**before the content**, and the balance pass runs on every leg as it lands rather than
+at the end.
+
+### Open
+
+- Ray to verify the leg mileages, as he did for Route 2.
+- Whether the Three Capes Loop and the Avenue are both detours of the same kind, or
+  whether one of them should cost money instead of distance.
+- Where Cord is, given he is an observer here and *maybe not in the El Camino*.
+- Whether the paywall sits at the California line (leg 5), which is the structural
+  equivalent of Kingman: a border, a stop, and a question about whether to go on.
+
 ## The Hattiesburg fork — Route 2 ends in three places **[BUILT 2026-10-15]**
 
 Route 1 has three endings that are three readings of one arrival: you always reach
