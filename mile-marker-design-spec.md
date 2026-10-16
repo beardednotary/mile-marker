@@ -862,70 +862,83 @@ Measured by Ray 2026-10-16. **+1.1 miles. +13 minutes.**
 mile, and Ray caught why: routing *via* Stinson and Muir is **shorter** than going around
 on 101. The beautiful road is not the longer road.
 
-That is the third measurement in a row saying the same thing, and the earlier two were
-each written off as a one-off:
+That is the second measurement saying so, and the first was written off as a one-off.
+The full set, with Three Capes measured by Ray 2026-10-16:
 
 | Detour | Distance cost | Time cost |
 |---|---:|---:|
+| Three Capes Loop | **+18 mi** *(43.1 against ~25 on 101)* | ~+50 min |
 | Avenue of the Giants | +2 to 3 mi | ~+1h |
-| Stinson and Muir Beach | **+1.1 mi** | +13 min |
-| The Leggett fork | +39 mi | **+2h38** |
-| Shelter Cove | +42 mi | +1h30 |
+| Shelter Cove | **+42 mi** | +1h30 |
+| The Leggett fork | **+39 mi** | +2h38 |
+| Stinson and Muir Beach | +1.1 mi | +13 min |
 
-Two of the four cost essentially no distance at all. On this coast, CA-1 hugs the
-shoreline while the inland route detours around terrain, so the scenic road is routinely
-the *shorter* one. **Only the dead end and the Leggett fork move the odometer.** Every
-one of them moves the clock.
+**So the correction above was itself an overcorrection.** Three of the five do cost real
+distance — ninety-nine miles between them — and two cost none. The route runs **721 to
+about 823 miles** depending on what the player cannot resist, a swing of 14%. Miles are
+not the whole spine, but they were never nothing.
 
-So the spine mechanic is not miles. **The resource Route 3 drains is daylight.**
+### The drain is fuel, reached two different ways
 
-Which is a better answer than the one it replaces, and it completes a set:
+What the five have in common is not distance. It is that **every one of them puts the
+player on a road with fewer pumps on it.**
 
-| Route | Drains |
-|---|---|
-| 1 — Southwest | **fuel** |
-| 2 — Deep South | **money** |
-| 3 — Pacific Coast | **daylight** |
+- **Extra miles, normal services.** Three Capes, Shelter Cove, the Leggett fork. The tank
+  empties further because the road is longer.
+- **No extra miles, no pumps.** The Avenue of the Giants, Stinson and Muir. The tank
+  empties at exactly the normal rate and there is nowhere to put anything back.
 
-And it is invisible for the right reason. Nobody watches a clock on a road trip. They
-watch the fuel gauge, which on this route will look fine all the way to the end.
+Both drain fuel. Neither reads as a charge. And the second kind is the more invisible of
+the two, because **absence is invisible** — nobody notices the filling stations that are
+not there until they need one. This is Route 2's audit metric, *longest stretch with no
+fuel*, promoted from a check into a design principle.
 
-### What a clock would cost to build **[NEEDS RAY'S CALL]**
+Which means **pump placement is the entire lever on this route**, and the engine already
+has it. No new mechanic. `pump: { rate, cap }` on fewer nodes, further apart, on every
+road worth taking.
 
-Time in this game is currently *authored*: `isNightNode()` reads `node.time` and the
-`night` tag, and that is the whole model. Making daylight a resource means a small,
-additive clock:
+The set it completes:
 
-- `state.hours`, starting at whatever hour the route begins.
-- An `hours` cost on nodes and on the choices that detour, advancing it.
-- `isNightNode()` consults the clock **only as a fallback**, when a node has not
-  declared its own time.
+| Route | Drains | By |
+|---|---|---|
+| 1 — Southwest | fuel | distance, visibly |
+| 2 — Deep South | money | things that cost money |
+| 3 — Pacific Coast | fuel | **the pumps you drove past** |
 
-Routes 1 and 2 never set `hours`, so the clock stays null and authored time keeps ruling
-them. Nothing regresses. And it is far cheaper to put in before Route 3's forty nodes
-exist than to retrofit through them.
+### No clock **[DECIDED 2026-10-16 — Ray]**
 
-**The player never sees a clock, a number or a sunset bar.** They see the light in the
-prose, and the signage system already renders it: `data-time` dims the whole screen.
+A clock was proposed and rejected, and the reason is better than the proposal. Ray:
+*"the darkened screen already reads well as nightfall, and knowing you have more to go
+perhaps increases anxiety."*
 
-### Then the endings are thresholds, not branches
+A number would make the pressure **legible, and legible pressure gets optimised.** This
+game's standing rule is that the player *feels* state and never reads it: the record is
+hidden, conduct is hidden, `burnMod()` is never shown as a figure, and the stat system
+had to be rebuilt once already for being readable in the wrong way. A clock would have
+been the one dial on the dashboard, and players manage dials.
 
-| Ending | Arrives |
-|---|---|
-| 1 | in daylight |
-| 2 | after dark |
-| 3 | late |
+The two signals already in the build do the same work and cannot be played against:
+**`data-time` dims the entire screen**, and the green sign is already counting down the
+distance still to go. Dark plus *a hundred and eighty to go* is the anxiety. A clock
+would only have told the player how worried to be.
 
-One destination, three readings — Route 1's shape. But where Route 1's three are earned
-by **conduct** and Route 2's by **information**, Route 3's are earned by **daylight
-spent**, which is a number and not a road. A player who takes the coast at Leggett but
-skips Shelter Cove and the Avenue can still arrive in the light. **The endings become
-emergent rather than assigned**, which is what three thresholds on one accumulating
-quantity gives you and three hard-coded roads never would.
+So **night stays authored.** `node.time` and the `night` tag, exactly as Routes 1 and 2
+do it. No engine work at all.
 
-It also means the route cannot be solved by learning which road is "the good ending."
-There isn't one. There is only how much of the day you spent, and nobody is graded for
-spending it.
+### Which makes the endings authored arrivals, not thresholds
+
+| Ending | Road taken | Total mi | Arrives |
+|---|---|---:|---|
+| 1 | 101 inland from Leggett | **721** | in daylight |
+| 2 | Coast, then inland at Point Reyes | **760** | after dark |
+| 3 | Coast the whole way, Stinson and Muir | **761** | late |
+
+Endings 2 and 3 are one mile apart and that no longer matters, because the light is
+written rather than computed. Six hours of coast road means you arrive at night. It is
+not a threshold anybody can creep under.
+
+One destination, three readings — Route 1's shape. Route 1's three are earned by
+**conduct**, Route 2's by **information**, Route 3's by **which roads you took**.
 
 ### What survives the correction
 
@@ -933,8 +946,8 @@ The structural findings hold; only the currency changed.
 
 - **The road asks twice and only the coast player hears the second question.** Unaffected.
 - **There is no fuel between Point Reyes Station and Mill Valley** — forty miles with no
-  pump, in the dark, one lane each way with a cliff on the ocean side. This is now the
-  *only* non-time cost on the second ask, which makes it more important, not less.
+  pump, in the dark, one lane each way with a cliff on the ocean side. Not an aside: this
+  is the **model for the whole route**, arriving in its last hour.
 - **Shelter Cove is still the signature.** It is one of the two things on the whole route
   that genuinely moves the odometer, and the only dead end.
 - **`miles` still earns its keep** at Leggett and Shelter Cove. It is simply not the
@@ -998,13 +1011,16 @@ the content**, and the balance pass runs on every leg as it lands.
 
 ### Open
 
-- **Does the clock get built?** See *What a clock would cost to build* above. This is the
-  one decision the route cannot start content without.
-- Measure the Three Capes Loop against the 101 it leaves. Waypoints: Tillamook → Cape
-  Meares → Oceanside → Netarts → Cape Lookout State Park → Pacific City →
-  Cloverdale OR, against plain Tillamook → Cloverdale on US-101. Expect the loop to be
-  the shorter road too, on the evidence so far.
-- Where Cord is, given he is an observer here and *maybe not in the El Camino*.
+- Confirm plain Tillamook → Cloverdale on US-101. The ~25 is inferred and it is the
+  baseline the Three Capes +18 rests on.
+- Where Cord is, given he is an observer here and *maybe not in the El Camino*. The last
+  design question before content.
+
+**Free detail, from Ray's own map:** Cape Meares Loop Road is **closed** — the routing
+flags "avoids road closure on Bayshore Dr" and the map draws a closure marker at the
+cape. The first scenic detour on the route is already partly broken in real life, which
+is the Lost Coast idea in miniature and 600 miles earlier: a road that was built for
+looking at something and then lost the argument with the hillside.
 
 **Closed 2026-10-16:** the leg mileages (Ray), the coast arm (Ray), the paywall question
 (there isn't one outside Route 1), and `wearFor()`, which now ages by fraction of the
