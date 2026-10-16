@@ -31,7 +31,12 @@ function run(arch, policy, routeId) {
     const n = NODES[node];
     if (!n) return { end: 'MISSING:' + node, st };
     if (n.onLoad) n.onLoad(st);
+    // The radio runs in loadNode in the browser, and some of its lines set flags that
+    // later scenes read. Without this the harness cannot see any of them — which is how
+    // a whole Route 2 ending measured at 0%.
+    const drove = n.mile != null ? Math.max(0, n.mile - (st.lastMile || 0)) : 0;
     if (n.mile != null) st.lastMile = n.mile;
+    X.setState(st); X.radioLine(n, drove);
     if (node === 'strand_end') return { end: 'RUN_ENDED', st };
     if (n.isVictory) return { end: 'VICTORY', st };
 

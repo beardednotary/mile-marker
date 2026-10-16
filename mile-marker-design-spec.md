@@ -684,6 +684,58 @@ Rules agreed:
   shows KEPT) as a name rather than a score.
 - What Route 2's keepsake is.
 
+## The Hattiesburg fork — Route 2 ends in three places **[BUILT 2026-10-15]**
+
+Route 1 has three endings that are three readings of one arrival: you always reach
+Albuquerque, and what changed is you. Route 2 does the literal version. At **mile 435,
+Hattiesburg**, the signs stop agreeing and the road ends somewhere else depending on
+which one you take.
+
+### The three waters
+
+| Ending | Road out | Ends at | `ending` | Share of wins |
+|---|---|---|---|---:|
+| Mobile | 98 EAST | Mobile, AL — mile 547 | `mobile` | 42% |
+| Pascagoula | 63 SOUTH | a public landing, mile 528 | `pascagoula` | 38% |
+| The Pass | 49 SOUTH, then west | a seawall at Bay St. Louis, mile 522 | `pass` | 18–21% |
+
+Mobile is always open — it is the road you have been on since Natchez without deciding
+to be. The other two have to be **earned with information, not with conduct**:
+
+- **63 south** needs `loyce_spoke || bude_warned || loyce_kind || heard_of_the_river` —
+  somebody told you about the Singing River. A radio line can tell you, so it is
+  reachable without meeting anybody.
+- **49 southwest** needs `stayed_natchez` — the photocopied map with a biro line on it,
+  and the line does not go to Mobile.
+
+This is deliberate. A gate on conduct would make an ending read as a punishment for how
+you behaved. A gate on information makes it read as *a thing you happened to learn*,
+which is what a road trip actually is. No ending is the good one.
+
+### Engine support
+
+Three node-level fields, all optional, all inherited by Routes 3–4:
+
+- **`miles`** — re-sets how far the road is from here. The green sign counts down to
+  Mobile 112 at the fork; commit to 63 and the same sign says Pascagoula 50. The reveal
+  is the countdown changing, not a line of prose.
+- **`shield`** — the road you are on *now*. Route 2 leaves US-61 at Natchez; the sign
+  said US 61 SOUTH for a hundred and fifty miles after that. It now flips to US 98 EAST
+  at mile 400, MS 63 SOUTH or US 49 SOUTH out of the fork, US 90 WEST on the beach.
+- **`arrival`** — the place named on the arrival card. The card was hardcoded `Mile 675
+  — Albuquerque, NM` and said so at a seawall in Mississippi.
+
+`state.miles` and `state.shield` reset on a new run and on a retry. The odometer, the
+distance remaining and the paywall all read `state.miles || R().miles`.
+
+### What the harness could not see
+
+Both the stale shield and the wrong arrival card survived every headless check — 34
+verify, 54 leg checks, a clean route audit, three-ending reach measurement — and were
+obvious within thirty seconds of opening the page. **Content correctness and screen
+correctness are different audits.** The harness proves the graph; only the browser
+proves the sign.
+
 ## Route 2 — the tuning pass **[2026-10-15]**
 
 ### A harness bug that had been hiding forks on both routes

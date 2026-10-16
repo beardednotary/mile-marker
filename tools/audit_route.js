@@ -27,9 +27,14 @@ const seen = new Set([M.start]), q = [M.start];
 while (q.length) for (const t of targets(q.shift()) ) if (N[t] && !seen.has(t)) { seen.add(t); q.push(t); }
 const orphans = Object.keys(N).filter(id => !seen.has(id));
 orphans.length ? bad(orphans.length + ' unreachable node(s)', orphans.join(' ')) : ok('every node reachable from ' + M.start);
-seen.has(M.victory) ? ok('victory ' + M.victory + ' is reachable') : bad('victory unreachable', M.victory);
+// A route may end in more than one place. Every isVictory node is a terminus.
+const victories = Object.keys(N).filter(id => N[id].isVictory);
+if (!victories.length) bad('no victory node at all');
+const unreachableWins = victories.filter(id => !seen.has(id));
+unreachableWins.length ? bad('unreachable ending(s)', unreachableWins.join(' '))
+  : ok(victories.length === 1 ? 'the ending is reachable' : 'all ' + victories.length + ' endings are reachable: ' + victories.join(' '));
 
-const dead = Object.keys(N).filter(id => id !== M.victory && !(N[id].choices || []).length && !N[id].oneOf);
+const dead = Object.keys(N).filter(id => !N[id].isVictory && !(N[id].choices || []).length && !N[id].oneOf);
 dead.length ? bad('dead end(s)', dead.join(' ')) : ok('no dead ends');
 
 console.log('\n2. Narration debt');
