@@ -1103,10 +1103,65 @@ doing its job, which is to make the player stop worrying. The $40 dune ride is l
 almost everybody — only a Planner who did the crab pots can reach it — and that is
 deliberate: a visible want, out of reach, is the comfort tax at its most honest.
 
+#### Leg 4 — Bandon to Crescent City: the turn **[BUILT 2026-10-20 — build 2026-10-20.5]**
+
+Mile 256 to 366. Bandon, Port Orford, Gold Beach, the Boardman corridor, Brookings, the
+California line at Smith River, Crescent City, and two morning stubs.
+
+**Evening into night.** By the prose's own clock the player reaches Bandon at half past
+seven, so this leg is the last of the light. Oregon gives away its best twelve miles —
+the Boardman corridor, turnout after free turnout — on the way out of the door, while it
+is nearly too dark to see them. Nodes from Brookings on are authored `time: 'night'`.
+
+**Then California starts charging.** The CDFA inspection station on 101 is real and is
+open in daylight only (verified 2026-10-20); it waves the player through as its last
+booth light goes off. Nobody comes to the window any more — Oregon has an attendant at
+every pump and California does not — and fuel jumps from about 0.30 to **0.38**. The
+girl at the last Oregon pump says so, unasked, because she has said it four hundred times.
+
+**The night.** Astoria to San Francisco is two days, and Crescent City (mile 365) is the
+route's one night:
+
+| | Costs | Risk |
+|---|---|---|
+| A room | $40 | none |
+| The car at the harbour | nothing | Gut 5: fail and it is a $25 parking ticket, as a `take` |
+| Drive on into the redwoods | nothing | Gut 6: elk on the road in the dark; fail costs fuel and nerve, not money |
+
+The room was first priced at $58, which measured as **impossible for every archetype under
+every policy** — the most anyone can have at that point is about $52. A choice nobody can
+ever take is a dead button, not a temptation. At $40 (Route 1's rooms are $24—30, and
+California runs a third over) it is a real trade: a Planner who lets the tank run low gets
+it 25—37% of the time, and one who fills up to be safe never does. Bed or fuel.
+
+**A promise the prose makes, which binds every later leg.** At Brookings: *'Drive safe,' she
+says. Everybody in this state has said it to you today... nobody is going to say it
+again.* **Nobody in California may say "drive safe" to the player.**
+
+**A seed for the bridge.** The harbour ticket mentions *a letter to whoever this car is
+registered to*. That is the Golden Gate invoice, four hundred miles early. Never explain it.
+
+#### Free looks change nothing **[BALANCE, 2026-10-20]**
+
+Every free stop on legs 1—4 gave +1 or +2 Gut, and this route is mostly free stops. A player
+who stopped to look maxed Gut by mid-Oregon 92—100% of the time, and **a maxed Gut cannot
+fail a difficulty-5 check** (`rollCheck`: target = value — (difficulty — 5), roll 0—10). The
+sand trap and the harbour ticket measured 0% for exactly the player the route is written for.
+
+It also contradicted leg 2's own thesis — the free things return nothing the road can use —
+while quietly paying out a stat. Fourteen free looks now change nothing; only what costs money,
+miles or risk changes you. The Planner (Gut 4) now maxes 64% of the time instead of 100%,
+and gets ticketed and stuck.
+
+The Drifter (Gut 9) and Broke Kid (Gut 7) still max, and that is the archetypes, not the
+detours: Gut is what the Drifter *is*. **Rule for the California legs: the danger must not
+be Gut checks alone.** Nerve and money have to carry some of it, or the Drifter drives the
+whole route on instinct.
+
 #### Still to write
 
-Four hundred and sixty-five miles. The Rogue, Gold Beach, Brookings, the California line,
-Crescent City, Eureka, **Shelter Cove**, the Avenue, Leggett and both arms below it.
+Three hundred and fifty-five miles. The redwoods, Klamath, Orick, Trinidad, Eureka, **Shelter
+Cove**, the Avenue, Leggett and both arms below it.
 
 ### Cord is at the end of the dead-end road **[AGREED 2026-10-16]**
 
