@@ -1052,11 +1052,61 @@ loses — holds here too.
   one line per climate: the desert keeps it, the Delta's air *was never cool to begin
   with*, and on the coast the windows fog from the inside the minute the fan stops.
 
+#### Leg 3 — Florence to Bandon, by the dunes and Cape Arago **[BUILT 2026-10-20 — build 2026-10-20.4]**
+
+Mile 184 to 256. Florence, the Oregon Dunes, a stuck-in-the-sand node, Reedsport, Coos
+Bay, Charleston, Cape Arago, and a stub terminus at Bandon.
+
+**Cape Arago is the middle rung of the ladder** — the route's first dead end. Fourteen
+miles out from Coos Bay to a road that ends in a loop above a reef covered in sea lions
+and elephant seals, and fourteen back the way you came. The ladder now reads **Column
+4 — Capes 21 — Arago 28 (dead end) — Shelter Cove 42 (dead end, no fuel at the
+bottom)**: the same lesson, louder each time.
+
+**The beach access road is the Cloverdale card paying off.** An ordinary car on sand is a
+Gut check. Failing it costs $20 to a man with a tow strap, or a dig; failing the dig
+costs fuel and nothing else, because he will not watch you do that all afternoon.
+Nobody on this route leaves you there.
+
+#### One engine addition: `owed`
+
+Walking the dead end in the browser showed the green sign lying. At the cape it said San
+Francisco 489 when it was really 503: the fourteen miles back only entered the arithmetic
+on the way out. A node may now carry **`owed: N`** — the miles you will have to drive
+just to get back to the road you left. It is added to the distance remaining while you
+are there and never charged; the choice that leaves pays it with `addMiles`.
+
+| At | Odometer | Sign |
+|---|---:|---:|
+| Coos Bay | 232 | 489 |
+| Charleston | 241 | **498** |
+| Cape Arago | 246 | **503** |
+| Bandon | 284 | 465 |
+
+**Driving out to the end of a dead end, the number on the sign goes up.** That is the
+bill, delivered by the one thing in the game that never lies, with no prose required.
+It is also the reveal scene's mechanic in miniature — the odometer itself saying what
+you spent — and Shelter Cove will use it at full volume.
+
+#### Measurements wanted
+
+- **Coos Bay → Cape Arago**, set at 14 (9 to Charleston, 5 to the cape) from general
+  knowledge. Also whether **Seven Devils Road** from Charleston to 101 near Bandon is a
+  real back way out — if it is, the cape is a dead end but the Charleston turn is not,
+  and the prose should say so.
+- **Coos Bay → Bandon** on 101, set at 24.
+
+#### Where the money is, after three legs
+
+The tourist line arrives at Bandon 63 miles long and with 71—75% in the tank. Oregon is
+doing its job, which is to make the player stop worrying. The $40 dune ride is locked for
+almost everybody — only a Planner who did the crab pots can reach it — and that is
+deliberate: a visible want, out of reach, is the comfort tax at its most honest.
+
 #### Still to write
 
-Five hundred and forty miles. The dunes, Reedsport, Coos Bay, the Rogue, Brookings, the
-California line, Crescent City, Eureka, **Shelter Cove**, the Avenue, Leggett and both
-arms below it.
+Four hundred and sixty-five miles. The Rogue, Gold Beach, Brookings, the California line,
+Crescent City, Eureka, **Shelter Cove**, the Avenue, Leggett and both arms below it.
 
 ### Cord is at the end of the dead-end road **[AGREED 2026-10-16]**
 
