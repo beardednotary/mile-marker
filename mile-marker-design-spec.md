@@ -1155,13 +1155,51 @@ and gets ticketed and stuck.
 
 The Drifter (Gut 9) and Broke Kid (Gut 7) still max, and that is the archetypes, not the
 detours: Gut is what the Drifter *is*. **Rule for the California legs: the danger must not
-be Gut checks alone.** Nerve and money have to carry some of it, or the Drifter drives the
-whole route on instinct.
+be Gut checks alone.**
+
+*Corrected after leg 5 was measured:* the first statement of this rule said Nerve checks
+would stop the Drifter coasting. They do not — the Drifter starts at Nerve 8 as well, and
+the bull at Elk Prairie charges the Planner 21—24% of the time and the Drifter 5—7%. **The
+Drifter's weakness is money and fuel** ($25 and a third of a tank), and that is what the
+California scarcity is now catching. Checks catch the Planner; scarcity catches the Drifter.
+
+#### Leg 5 — Crescent City to Eureka: the redwoods **[BUILT 2026-10-20 — build 2026-10-20.6]**
+
+Mile 366 to 449. Crescent City in the morning, a second morning in the trees for the player
+who drove on in the dark, Klamath, Prairie Creek and the Drury Parkway with Elk Prairie on it,
+Orick, Trinidad, and a stub terminus at Eureka.
+
+**The first leg built to the California rule.** Its dangers are Nerve checks: the tide at
+Battery Point (offered only to a player carrying the tide table from Pacific City, which
+says when low water is — the keepsake from leg 1 paying off two hundred and eighty miles
+later), and the bull at Elk Prairie. **Klamath to Trinidad is forty-one miles with no pump
+in it** — the route's first real scarcity — and the man inside the forty-nine-foot statue at
+the Trees of Mystery will tell you so if you can bring yourself to talk to it. Income: a
+redwood burl table at Orick, $20 or $8.
+
+The Drury Parkway is the Avenue of the Giants in miniature: the old road through the park,
+a parallel that costs almost no distance. It holds the elk meadow, so the danger is on the
+beautiful road, not the bypass.
+
+| After leg 5 | Drifter | Planner | Broke Kid |
+|---|---:|---:|---:|
+| Stops for everything, never works | 67% | 100% | **25%** |
+| Random play | 70% | 96% | 48% |
+| Optimiser | 100% | 100% | 100% |
+
+The route has started to bite, and it bites the sightseer who never took the paid work.
+The optimiser still wins everything; Shelter Cove and the coast arm are still to come.
+
+**A bug class worth naming.** The tide outcome sets `walked_battery` on both the pass and
+the fail, and Eureka read it as if it meant you got back dry — *"Your shoes are dry"* to a
+player who had waded back thigh-deep. Fixed, and every other two-armed flag on the route
+checked: each is now either read with a line true on both arms or checked after the failure
+flag. **A flag set on both arms means you were there, not that it went well.**
 
 #### Still to write
 
-Three hundred and fifty-five miles. The redwoods, Klamath, Orick, Trinidad, Eureka, **Shelter
-Cove**, the Avenue, Leggett and both arms below it.
+Two hundred and seventy-two miles. Fortuna, Garberville, **Shelter Cove**, the Avenue of
+the Giants, Leggett, and both arms below it to San Francisco.
 
 ### Cord is at the end of the dead-end road **[AGREED 2026-10-16]**
 
