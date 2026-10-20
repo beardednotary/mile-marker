@@ -1014,12 +1014,49 @@ an optional road that pays off in the currency the route runs on, and the player
 optimises never meets him. Nothing else needs to reward detouring; he is enough, and he
 only works if he stays the only one.
 
+#### Leg 2 — Cloverdale to Florence **[BUILT 2026-10-20 — build 2026-10-20.2]**
+
+Mile 88 to 184. Lincoln City, Depoe Bay, Newport (two nodes), Cape Perpetua, Heceta
+Head, and a stub terminus at Florence.
+
+**Leg 1 taught distance; leg 2 teaches money.** Every stop has something that costs a
+little and returns nothing the road can use: a whale boat with no promise on the board
+($25), a plate of cod ($12), an elevator two hundred feet down into a sea cave ($14).
+Fuel is everywhere on this stretch, and that is the trick of it — the player stops
+watching the needle exactly where the wallet starts going.
+
+**First income.** The crab pots at Newport, $24 on a pass or $10 on a fail. Route 3 had
+no income before this, and the Broke Kid cannot reach California without some.
+
+**First danger.** Thor's Well, below Cape Perpetua: the sea fills a hole in the rock from
+below and drains it again, and it looks like it has no bottom — this route's mechanic
+as an image. Going out on the shelf for the good view is a Nerve check; failing it is a
+sneaker wave and `take: 12`. The outcome reads `state.taken`, so it says *twelve
+dollars*, *a few dollars*, or that there was nothing in the pocket to lose. **This
+route's harm is meant to be a bill, not a cliff.**
+
+**First stranding.** The always-safe Broke Kid now runs dry every run before Florence,
+and random play wins 88—94%. Route 1's founding rule — the safe option every time
+loses — holds here too.
+
+#### Two corrections made on the way
+
+- **The Oregon coast is not scarce.** The Cloverdale card claimed thirty-two miles to the
+  next pump; Lincoln City is twenty-two and has fuel its whole length, and there is gas
+  every twenty miles or so from Astoria to Brookings. The card now reads *NEXT GAS
+  LINCOLN CITY 22 MI — NOTHING ON THE BEACH ROADS — WE ARE NOT KIDDING*, and the
+  warning points at what is actually dry: the roads off the highway. **The real scarcity
+  on this route is California.** Oregon's job is to make the player stop worrying.
+- **The shared stranding scene had desert weather in it.** *"The vents keep moving air
+  that stopped being cold a while ago"* is air conditioning losing to heat. It is now
+  one line per climate: the desert keeps it, the Delta's air *was never cool to begin
+  with*, and on the coast the windows fog from the inside the minute the fan stops.
+
 #### Still to write
 
-Six hundred and twenty miles. Lincoln City, Newport, the dunes, Coos Bay, the Rogue,
-Brookings, the California line, Crescent City, Eureka, **Shelter Cove**, the Avenue,
-Leggett and both arms below it. No failure states yet — every archetype wins 100% of
-the written slice, which is expected at 88 miles and is the next thing to go wrong.
+Five hundred and forty miles. The dunes, Reedsport, Coos Bay, the Rogue, Brookings, the
+California line, Crescent City, Eureka, **Shelter Cove**, the Avenue, Leggett and both
+arms below it.
 
 ### Cord is at the end of the dead-end road **[AGREED 2026-10-16]**
 
