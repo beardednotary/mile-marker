@@ -1248,13 +1248,110 @@ said would hand the name to players who never earned it.
 fuel sales at the boat launch; fuel directories put the nearest stations at Redway. The scene
 works either way, but the pump at the bottom is an assumption Ray should check if he can.
 
-#### Still to write
+#### Leg 7 — Leggett to San Francisco: the ending **[BUILT 2026-10-20 — build 2026-10-20.9]**
 
-Leg 7: the fork at Leggett, and both arms below it. CA-1 down the coast — Westport, Fort
-Bragg, Mendocino, Albion, Point Arena, Jenner, Bodega Bay, Point Reyes, and the second ask at
-Point Reyes Station, Stinson and Muir — or 101 inland through Willits, Ukiah and Santa Rosa.
-Cord's second, conditional sighting on the Albion—Point Reyes stretch, only if he was not met
-at the cove. The reveal scene. The Golden Gate.
+**Route 3 is complete.** Astoria to the Golden Gate, seven legs, ~75 nodes.
+
+**The fork at Leggett.** 101 inland — Willits (the highway goes round it now; the arch over
+its main street is Reno's old *Biggest Little City* arch, reworked in 1995), Ukiah, Santa Rosa —
+is **the road of towns**, the newest layer. CA-1 down the coast is where **the older layer
+shows through** and the towns sit on it like something recent (Ray, 2026-10-20: *"these places
+are much older than the towns that are there now"*):
+
+| Coast stop | What is older than the town |
+|---|---|
+| Westport | The sea, given back after 140 miles behind mountains |
+| Glass Beach, Fort Bragg | The town's own rubbish (to 1967), worn to pebbles, nearly gone; collecting prohibited — **a conduct choice**, the inverse of the Cannon Beach stone |
+| Jug Handle staircase | Terraces each ~100,000 years older than the one below; a pygmy forest to your waist |
+| Mendocino & Albion | A New England town three thousand miles from New England; the last wooden bridge on CA-1 (1944, wartime timber, to be replaced) |
+| Fort Ross | A Russian stockade of 1812, on Kashaya Pomo land called Metini. The name on your map is the newest one |
+| Bodega Bay | Abalone shells on a porch rail; the fishery shut 2017, now to 2036. **The shell is given** — *"There's no more coming"* — and replaces the penny as a keepsake |
+| Point Reyes Station | A town on one plate of the earth looking across a fault at another, which moved 24 feet in 1906 |
+
+**Keepsakes are given; souvenirs are sold.** (Ray, 2026-10-20.) The shell is something the road
+gives you. The gift shop sells things. The two never overlap.
+
+#### Three endings, replacing the old three
+
+The earlier design's endings were *daylight / after dark / late*, and the last two were a mile
+apart. The lighthouse fixed it: **the stairs at Point Reyes open only by day**, and on the coast
+the player arrives at ten at night — so the coast got a second night.
+
+| Ending | Road | Arrives |
+|---|---|---|
+| `daylight` | 101 inland | the same evening, in the light |
+| `dark` | the coast, driven straight through | after dark, the bridge lit in fog |
+| `morning` | the coast, a night at Point Reyes Station, the lighthouse | the next morning, out of the fog halfway across |
+
+From Point Reyes Station, either way, the second ask: Stinson and Muir (one more mile, no pumps,
+the cliff road — a Nerve 6 check in the dark, scenery in the day) or inland on Sir Francis Drake.
+
+#### The lighthouse, and the wind
+
+Twenty miles out past the lettered ranches (`owed: 20`), 308 steps down. **The wind is a seeded
+slot** (`pc_k10`): open two runs in three, shut one in three — measured 66% / 34% over 3,000
+runs. Ray: *"chance seems important here."*
+
+**Cord's second sighting is at Fort Ross at dusk**, only for a player who missed him at the cove.
+Asked about the lighthouse, he says either *"Stay the night. Go down in the morning. It'll be
+calm"* or *"Not tomorrow. Wind"* — with the air on the bluff perfectly still. He reads the
+seeded slot through `pcWindOpen()`, so **he is never wrong**: zero mismatches in 3,000 runs.
+He always knows where you are going; here, he knows tomorrow's weather there.
+
+#### The reveal
+
+The one scene the route could not ship without, now built in three voices:
+
+- **The stairs open:** at the bottom, a visitors' book with a pen on a string — *Ohio, Japan,
+  Sacramento, HERE AGAIN* — and a column for miles. The player writes the odometer. *Astoria to
+  San Francisco is seven hundred and twenty-one miles... It does not say seven hundred and
+  twenty-one.* Then a board about the rock: it came from far to the south and is still moving
+  north, a couple of inches a year. *It is not there yet either.*
+- **The stairs shut:** a ranger at the gate with a clipboard and a counter asks how far, writes it
+  down, and **reads the number back out loud over the wind**. *"Long way round."*
+- **Inland and night arrivals** get it on the bridge: *the first sign said 721; the odometer
+  says* N. Inland with fewer than ten extra miles: *You went where you were going. You did not
+  go anywhere you were not going.* No judgement either way.
+
+In the browser a full sightseer wrote **805** in the book and crossed the bridge at **864**.
+
+#### The bridge
+
+Every ending crosses southbound: a rainbow-mouthed tunnel, then the bridge, then a gantry —
+*TOLL — NO CASH* — and a camera, and an envelope to whoever the car is registered to. *You
+have counted every dollar since Astoria. The last gate on the road did not want any of them.*
+The Crescent City harbour ticket, if there was one, *will have company*. Not a choice, not a
+check. It happens once and the route ends: *You made it. That's the whole thing* — the same
+last line as Route 2.
+
+#### Engine and harness, for the record
+
+- The arrival card read the node's planned mile; it now reads the odometer (`node.mile +
+  state.extra`). Routes 1 and 2 have no `extra` and are unchanged.
+- `audit_route.js` knew one length per route. A fork whose arms differ declares the longer with
+  `miles` on the committing node, and the audit now allows nodes to the longest arm.
+
+#### Route 3, measured end to end
+
+| Policy | Drifter | Planner | Broke Kid | Endings (day / dark / morning) |
+|---|---:|---:|---:|---|
+| Always safe | 0% | 0% | 0% | — |
+| Optimiser | 99% | 100% | 95% | ~50 / 25 / 25 |
+| Competent, every detour | 95% | 94% | 78% | ~47 / 42 / 0 (the bot never stays the night) |
+| Random | 20% | 35% | 10% | — |
+| Coast, stay, lighthouse (Planner) | — | 94% | — | 100% morning |
+
+Always-safe loses every run, as on Route 1. A competent sightseer drives ~111 extra miles and
+mostly gets there, but the Broke Kid strands at least once 47% of the time. Random play is
+about as hard as Route 1's careless line.
+
+#### Open
+
+- **Ray should play it.** Every measurement above is a bot. Route 3 has never been driven by a
+  person end to end.
+- Whether Shelter Cove sells car fuel (see leg 6).
+- Coos Bay → Cape Arago and Coos Bay → Bandon are still estimates (see leg 3).
+- The `unfinished: true` label on the Route 2 and 3 registrations is read by nothing; harmless.
 
 ### Cord is at the end of the dead-end road **[AGREED 2026-10-16]**
 

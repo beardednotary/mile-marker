@@ -99,8 +99,11 @@ else ok('the longest dry stretch fits inside one tank');
 
 console.log('\n5. Mileage');
 const miles = Object.keys(N).map(id => N[id].mile).filter(m => m != null);
-const over = Object.keys(N).filter(id => N[id].mile > M.miles);
-over.length ? bad('node(s) past the end of the route', over.join(' ')) : ok('no node sits past mile ' + M.miles);
+// A route with more than one length (a fork whose arms differ) declares the longer one
+// with `miles` on the node that commits to it. Nodes may run to the longest of them.
+const longest = Math.max(M.miles, ...Object.keys(N).map(id => N[id].miles || 0));
+const over = Object.keys(N).filter(id => N[id].mile > longest);
+over.length ? bad('node(s) past the end of the route', over.join(' ')) : ok('no node sits past mile ' + longest + (longest > M.miles ? ' (the longest arm; the route is ' + M.miles + ' by its shortest)' : ''));
 const wins = Object.keys(N).filter(id => N[id].isVictory).map(id => N[id].mile);
 console.log('  · mile range ' + Math.min(...miles) + '–' + Math.max(...miles) + ', victory at ' + (wins.length ? wins.join(' / ') : 'nowhere'));
 
