@@ -1196,10 +1196,65 @@ player who had waded back thigh-deep. Fixed, and every other two-armed flag on t
 checked: each is now either read with a line true on both arms or checked after the failure
 flag. **A flag set on both arms means you were there, not that it went well.**
 
+#### Leg 6 — Eureka to Leggett, by the Avenue and Shelter Cove **[BUILT 2026-10-20 — build 2026-10-20.7]**
+
+Mile 449 to 539. Eureka, the Avenue of the Giants, Garberville and Redway, Shelter Cove
+(four nodes: the cove, the bench, the store, the pump), Redway again, and a stub at Leggett.
+
+**The Avenue** is the parallel: thirty-one miles of old highway under the oldest trees on
+earth against twenty-nine of freeway beside them, with a $10 drive-through tree in it.
+
+**Shelter Cove** is the top rung of the ladder. Twenty-one miles over the King Range to the
+only town on the Lost Coast, `owed: 21` so the green sign **climbs** the whole way down —
+Redway 208, the cove 229, Redway again 208, verified in the browser — and twenty-one
+back. A full sightseer arrives at Leggett having driven 110 extra miles.
+
+#### Cord, without the El Camino **[DECIDED 2026-10-20]**
+
+Ray: *"I don't see why he wouldn't be, but am open to him not being. Seeing an El Camino
+would instantly trigger something for players, but some random, David Carradine in Kung
+Fu-esque character down this dead end road would be something."*
+
+He is on the bench by the lighthouse, and **there is no car.** The player looks at the car
+park before they know they are doing it — three pickups, a van, their own car — then at
+the airstrip, where one small plane is tied down under a cover. The El Camino would have
+answered the question. Its absence asks it. The words "El Camino" never appear in the cove.
+
+This was always the design: the Route 1 notes say players who know his name *recognise him
+before they see the car*. He is drawn the way Route 1 draws him — arms crossed, looking at
+nothing in particular, not surprised, looking at you *like you sitting down was one of several
+possibilities he had already thought about.* **Never impossible, only improbable:** the plane
+is there, and the game never says whose. (Shelter Cove's airstrip is real — 3,400 feet,
+beside a golf course — and so is the lighthouse, flown in by helicopter from Cape
+Mendocino in 1998 when its cliff began falling into the sea. A thing that was carried here
+from somewhere it could no longer stand, next to a man nobody saw arrive.)
+
+By his rules he never starts the conversation. Ask him about gas and he gives one piece of
+information, **decided by the gauge at the moment you ask, and always right**: *"Redway. Not
+here. You'll make it"* with 8 or more in the tank, *"Here. You won't make the top"* below
+it. Twenty-one miles of climbing costs at most about six points even on a bad day with a
+leaking cap, so 8 is the honest line. The pump at the bottom is **0.52**, the most on the
+route. A player who learned on Route 1 to doubt him, and fills up anyway, pays for the doubt —
+*He said Redway. You heard him say it. You are filling it here anyway.* In the browser that
+fill took the Planner's last $30.
+
+Ask him how he got here and he says *"Good question,"* and does not answer it.
+
+**The name.** Ask the woman in the store who he is: *"That's Cord. He's here sometimes... Never
+seen what he drives."* That sets `knows_cord_name` — the stranger the Route 1 spec always
+said would hand the name to players who never earned it.
+
+**Unverified, and flagged:** whether Shelter Cove sells car fuel. A state parks listing shows
+fuel sales at the boat launch; fuel directories put the nearest stations at Redway. The scene
+works either way, but the pump at the bottom is an assumption Ray should check if he can.
+
 #### Still to write
 
-Two hundred and seventy-two miles. Fortuna, Garberville, **Shelter Cove**, the Avenue of
-the Giants, Leggett, and both arms below it to San Francisco.
+Leg 7: the fork at Leggett, and both arms below it. CA-1 down the coast — Westport, Fort
+Bragg, Mendocino, Albion, Point Arena, Jenner, Bodega Bay, Point Reyes, and the second ask at
+Point Reyes Station, Stinson and Muir — or 101 inland through Willits, Ukiah and Santa Rosa.
+Cord's second, conditional sighting on the Albion—Point Reyes stretch, only if he was not met
+at the cove. The reveal scene. The Golden Gate.
 
 ### Cord is at the end of the dead-end road **[AGREED 2026-10-16]**
 
