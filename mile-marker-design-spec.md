@@ -2154,6 +2154,59 @@ $7.99 for all four. No consumables, ever: a jerry can for sale on the shoulder t
 system into a funnel. No ads. The paywall moved to Kingman on 2026-10-08 — see *Paywall* below. Measured before the move:
 every policy reached mile 180 in ~10 choices, and random play stranded before it 16–23% of the time.
 
+### Drawn signs — pictures only where the character is looking at one **[BUILT 2026-10-22 — build 2026-10-22.1]**
+
+Ray asked whether there were quiet ways to bring images into a text game without taking from it.
+**The rule: show a picture only where the character would be looking at a picture.** Never
+illustrate a place — the reader's imagination is the medium, and a photograph of Cape Arago is
+worse than the sentence about it. But the character does look at signs, a card in a door, a
+chalkboard, a page of a book. Those can be drawn, because in the story they *are* images.
+
+In practice: **only where the prose already sets a sign on a line of its own** — in capitals,
+which is how the narrator shows you a sign — can that line become the sign. The narration
+around it never changes. And **only what the text says**: the mockup's chalkboard had a
+rubbed-out earlier boat time the prose never mentions, and it came out.
+
+Ray, on the mockups: *"I love generally how these break up huge blocks of text. It feels like
+you're there."*
+
+**Built on Route 3** (`PC_SIGN` helpers at the top of `routes/pacific-coast.js`):
+
+| Where | What | Kind |
+|---|---|---|
+| Tillamook | Three Capes Scenic Loop, three capes, arrow | road sign (brown) |
+| Cloverdale | the index card in the door, the last line in another pen | object |
+| Depoe Bay | the whale-boat chalkboard | object |
+| Coos Bay | Charleston 9 / Shore Acres 13 / Cape Arago 14 | road sign (brown) |
+| Garberville | Shelter Cove 21 | road sign (brown) |
+| Point Reyes | the visitors' book, the player's own line last | object |
+| The Golden Gate (all three endings) | the toll gantry: TOLL over NO CASH | road sign |
+
+**Road signs are built on `.sign`**, so they wear with the miles, glow in the headlights at
+night, and go dark outside the car, exactly like the sign at the top of the screen — nobody
+has to remember to make them. (At mile 733 the bridge's NO CASH is the chalky late-route green,
+because that is the rule.) **Objects** — the card, the board, the book — are not signs and do
+none of that.
+
+**Arrows point right on Route 3.** Driving south on 101, the coast — and every turn toward it —
+is on the right. The first mockup had the Shelter Cove arrow pointing left.
+
+**Handwriting must not look like a font.** A font's tell is that every repeated letter is the
+same shape. `handLetter()` gives each letter in a `.hand` line a small turn, lift and size of
+its own (about +/-2.5 degrees, +/-1px, 94—106%), derived from the text, so the same card
+always comes out the same way and no two E's match. Each lettered line keeps a hidden plain
+copy for screen readers, which would otherwise spell it out. The player's name goes into the
+book escaped.
+
+**Still open:** real hand-lettering. Ray or friends could letter the card in marker and blue
+ballpoint, chalk the board, and write five lines in the book in five different hands; scans
+would replace the fonts. The player's own line has to stay dynamic and stays lettered type.
+
+**Next candidates, Routes 1 and 2:** any sign the prose already sets on its own line — the
+church marquee on 61 (*REVIVAL THIS WEEK — ALL WELCOME — EVEN YOU*, with the newer black
+letters on the second line), LAST STOP 47 MI. Sparingly: one in every few scenes, or it stops
+breaking up the text and starts being the text.
+
 ### Save and resume **[BUILT 2026-10-09]**
 
 The game saves at every node and again the moment a choice is taken, so closing the app during
