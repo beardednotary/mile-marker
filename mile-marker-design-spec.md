@@ -684,6 +684,131 @@ Rules agreed:
   shows KEPT) as a name rather than a score.
 - What Route 2's keepsake is.
 
+## Route 4 — the Hi-Line, the design **[DECIDED 2026-11-11]**
+
+Fargo, ND to "Nowhere", in deep winter. Ray chose the road (US-2, the Hi-Line), the season, and
+a routes-only store for version 1. Everything below it is the proposal that was then built; the
+ending in particular is the biggest authorial call in the game and is Ray's to overrule.
+
+Recovered intent (see *Routes 2–4 — the standing plan*): **callbacks and finality; convergence;
+Cord as final witness, the one who remembers; he looks at the objects, not the player.**
+
+### The spine
+
+Fargo north on I-29 to Grand Forks, then US-2 west to the Continental Divide. Mileage is built
+from state mileposts (ND: Grand Forks is 355.5 miles from the Montana line; MT: the line is
+milepost 666.6, Browning 220.5, Marias Pass about 198) plus 78 for Fargo–Grand Forks.
+**Unverified by Ray**, and nothing on screen ever posts it: this route is signed `miles: null`.
+
+| Place | Mile | | Place | Mile |
+|---|---:|---|---|---:|
+| Fargo | 0 | | Wolf Point | 509 |
+| Grand Forks | 78 | | Glasgow | 560 |
+| Devils Lake | 167 | | Malta | 629 |
+| Rugby | 225 | | Havre | 718 |
+| Minot | 291 | | Shelby | 819 |
+| Williston | 416 | | Cut Bank | 844 |
+| Montana line | 434 | | Browning | 880 |
+| | | | Marias Pass | **903** |
+
+The longest route of the four. Three days and two nights (Minot, Havre).
+
+### "Nowhere" is three true things
+
+1. **The sign never says how far.** `miles: null`, built for Route 2 and never used at full
+   strength: the green sign names the next town and no distance, and the progress bar hides.
+   Route 3 was the route that counted every mile. This one will not tell you the number.
+2. **Glasgow, Montana is the middle of nowhere, officially.** A 2018 analysis found it the most
+   isolated town in the lower 48 (four and a half hours from any city of 75,000), and the town
+   put it on its map. At mile 560 the player arrives at Nowhere and it is only the middle.
+3. **The towns are named for somewhere else.** Glasgow, Malta, Havre, Harlem, Zurich, Inverness,
+   Kremlin: Great Northern men spun a globe. Route 3's coast was older than its towns; here no
+   place is named for itself.
+
+### Where it ends, and why there
+
+**Marias Pass, the Continental Divide, mile 903.** 5,213 feet, the lowest crossing in the
+northern Rockies, an obelisk and a statue in a pullout in the snow. Snow that falls on the east
+side of that pullout goes down the Marias to the Missouri to the Mississippi, **past Memphis, to
+the Gulf: Route 2's water.** Snow on the west side goes down the Flathead to the Columbia and
+out over the bar **at Astoria: Route 3's first scene.** Route 1 crossed this same divide in New
+Mexico, in the dark, and nobody mentioned it. The roads were separate; the water says they were
+one road. That is the convergence, it is plain geography, and it needs nothing supernatural.
+
+### The mechanic: cold
+
+Route 1 drains fuel by distance, Route 2 drains money, Route 3 drains fuel by the pumps you
+drove past. **Route 4 charges you for stopping.** At twenty below the engine does not get turned
+off, so every stop that was free on the coast costs fuel here, and says so on the sign.
+
+- **Idling.** Any stop with the car running costs tank. Free looks are no longer free.
+- **The storm.** One seeded ground blizzard per run closes the road at one of three real
+  highway gates (west of Devils Lake, west of Wolf Point, west of Cut Bank). Wait it out, follow
+  the plow, or go around the gate. Which gate is drawn from the run seed, so it can be forecast
+  by people on the route and no two runs close the same stretch.
+- **Winter stranding.** Running dry out here is not a truck and twenty-five dollars. The
+  route has its own shoulder scenes and they cost more.
+- **Two nights.** A room has a plug for the block heater. The car does not start itself at
+  thirty below, and sleeping in it means running it all night.
+- **Card-only pumps.** Unattended cardtrol stations are what is open at night on the Hi-Line.
+  This is the Planner's door: the one card that still works is a gas card.
+
+### Memory: what crosses between routes **[ENGINE]**
+
+`state.carried` is now real. Route 2 has read `s.carried?.x` since it was imported and nothing
+ever wrote it, so every cross-route line in the game was dead. On each arrival the engine now
+stores, per route: the ending, the object kept, conduct (`road`), miles actually driven, and a
+whitelist of flags. A new run gets them as `s.carried` (flat flags, as Route 2 expects, plus
+`s.carried.routes[id]` and `s.carried.objects`). No stats or money cross. Only objects and
+recognition, as decided.
+
+Callbacks are **texture, not homework**: every one is a conditional line with a first-time
+fallback, and a player with an empty glovebox loses nothing but the echo.
+
+### Cord: the final witness
+
+He is absent from the road until the end. Before that there are only traces: an El Camino with
+primer on the passenger door, nose-in at the Havre motel, under snow, plugged in.
+
+At the summit the El Camino is on the shoulder with its hazards going and its hood cold, and he
+is leaning on the quarter panel with his arms crossed exactly as he was at the pull-off on I-40,
+at twenty below, **because it will not go and he is never going to say so.** He never asks for
+help (rule 4). The road has spent four routes stopping for the player; a stranger in a truck
+said *"Pay the next one."* This is the next one.
+
+- **Rule 5 inverts.** He always knew where you were going and never said where you had been.
+  At the divide there is nowhere further to be going, so for the first time he says where you
+  have been: one line per route, read off the objects in the car and what the game stored.
+  This is the long-open "conduct reveal after all four", done as prose in his mouth and never
+  as a number.
+- **The note pays off.** Route 1's rarest object is *a highway number and a time*. The number
+  is 2. The time is the time on the dash when the engine goes off at the summit. Ask him if he
+  wrote it: *"Good question."*
+- **The jacket.** A player who took the denim jacket in Kingman is asked nothing. He looks at it.
+
+### Three endings, earned by what you do when it is your turn
+
+| Ending | What happens | Needs |
+|---|---|---|
+| `paid` | You put fuel from your tank into his. He goes over the top ahead of you. | 25 in the tank |
+| `rode` | He gets in. The objects come off the passenger seat and he holds them down the mountain. | nothing |
+| `passed` | You do not slow down. *Nobody does, out here; you've learned that from the other side.* | nothing |
+
+Route 1's endings are conduct, Route 2's information, Route 3's the roads you took. Route 4's is
+one act, and the tank you arrive with decides whether you can afford the generous version. His
+last words in the two endings where you stop are the truck driver's: *"Pay the next one."*
+
+### Route 4's own objects (given, not bought)
+
+A pair of chopper mitts off a nail by a café door; a grain elevator scale ticket from an hour
+of real work; an Empire Builder timetable (the train runs beside the road the whole way: a
+schedule for a train you are not on, as the tide table was for water you were leaving).
+
+### Locked until two roads are driven
+
+Route 4 opens when the player has arrived on any two other routes. A first-time player cannot
+start with the ending, and the lock is what makes "you have brought back" mean something.
+
 ## Route 3 — Pacific Coast, the design **[PROPOSED 2026-10-15 · MILEAGE VERIFIED 2026-10-16]**
 
 Astoria, OR to San Francisco, CA, on US-101 and CA-1. The recovered plan gives the route

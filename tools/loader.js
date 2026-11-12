@@ -13,7 +13,7 @@ const mod = (f) => {
              .replace(/if \(typeof module[\s\S]*$/, '');
   } catch (e) { return ''; }
 };
-const DS = [mod('deep-south.js'), mod('pacific-coast.js')].join(String.fromCharCode(59, 10));
+const DS = [mod('deep-south.js'), mod('pacific-coast.js'), mod('hi-line.js')].join(String.fromCharCode(59, 10));
 
 let src = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).pop();
 
@@ -52,7 +52,7 @@ vm.createContext(sandbox);
 const EXPORT = ';globalThis.__X={NODES:NODES,ARCHETYPES:ARCHETYPES,ROUTES:ROUTES,rollCheck:rollCheck,' +
   'isChoiceLocked:isChoiceLocked,applyDeltas:applyDeltas,mileageCost:mileageCost,' +
   'radioLine:radioLine,keepsakeFor:keepsakeFor,fuelPrice:fuelPrice,runRand:runRand,resolveSlot:resolveSlot,' +
-  'pumpDeltas:pumpDeltas,getLockReason:getLockReason,setState:function(s){state=s}};';
+  'pumpDeltas:pumpDeltas,getLockReason:getLockReason,carriedFor:carriedFor,recordLine:recordLine,setState:function(s){state=s}};';
 vm.runInContext(DS + '\n' + src + '\n' + EXPORT, sandbox);
 
 module.exports = sandbox.__X;

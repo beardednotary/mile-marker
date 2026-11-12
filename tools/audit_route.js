@@ -3,6 +3,8 @@
 const path = require('path');
 const M = require(path.resolve(process.cwd(), process.argv[2] || '../routes/deep-south.js'));
 const N = M.nodes;
+// A route that posts no distance (miles: null) still has a length for the audit.
+if (M.miles == null && M.wearMiles) M.miles = M.wearMiles;
 const SHARED = ['strand_1', 'strand_end', 'strand_resume', '__RESUME__'];
 let problems = 0;
 const bad = (what, detail) => { problems++; console.log('  ✗ ' + what + (detail ? '  — ' + detail : '')); };
@@ -23,7 +25,9 @@ for (const id of Object.keys(N)) for (const t of targets(id)) {
 }
 if (!dangling) ok('every link resolves');
 
-const seen = new Set([M.start]), q = [M.start];
+// The engine jumps to a route's own shoulder scenes; nothing links to them.
+const roots = [M.start].concat(Object.values(M.strand || {})).concat(M.strand ? ['hl_strand_resume'].filter(id => N[id]) : []);
+const seen = new Set(roots), q = roots.slice();
 while (q.length) for (const t of targets(q.shift()) ) if (N[t] && !seen.has(t)) { seen.add(t); q.push(t); }
 const orphans = Object.keys(N).filter(id => !seen.has(id));
 orphans.length ? bad(orphans.length + ' unreachable node(s)', orphans.join(' ')) : ok('every node reachable from ' + M.start);

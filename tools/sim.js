@@ -6,21 +6,25 @@ const { NODES, ARCHETYPES } = X;
 // ROUTE=south picks the route to simulate; default is Route 1.
 const ROUTE_ID = process.env.ROUTE || 'southwest';
 
-function run(arch, policy, routeId) {
+// `carried` is what the run brings from other roads. Route 4 reads it everywhere, so the
+// harness can hand in a profile; the default is an empty glovebox.
+function run(arch, policy, routeId, carried) {
   const RT = X.ROUTES[routeId || ROUTE_ID] || X.ROUTES.southwest;
   const a = ARCHETYPES[arch];
   const st = { archetype: arch, flags: {}, road: 0, choices: 0,
     stats: { ...a.stats }, maxStats: { ...a.max }, currentNode: RT.start,
     lastRoll: null, strandings: 0, strandReturn: null, lastMile: 0, paid: true, run: 1, route: RT.id, taken: 0, extra: 0,
+    carried: carried || { routes: {}, objects: [], arrived: 0 },
     seed: (Math.floor(Math.random() * 0xffffffff) >>> 0) || 1 };
   X.setState(st);
 
   const strandOut = (ret) => {
     st.strandReturn = ret || st.strandReturn || RT.strandFallback;
     st.strandings++;
-    if (st.strandings >= 2) return 'strand_end';                                   // MAX_STRANDINGS
-    if ((st.stats.wallet || 0) < 25 && (st.stats.nerve || 0) <= 2) return 'strand_end'; // nothing left to trade
-    return 'strand_1';
+    const own = RT.strand || {};                                                   // a route may bring its own shoulder
+    if (st.strandings >= 2) return own.end || 'strand_end';                        // MAX_STRANDINGS
+    if ((st.stats.wallet || 0) < 25 && (st.stats.nerve || 0) <= 2) return own.end || 'strand_end'; // nothing left to trade
+    return own.one || 'strand_1';
   };
 
   let node = RT.start, steps = 0;
@@ -37,7 +41,7 @@ function run(arch, policy, routeId) {
     const drove = n.mile != null ? Math.max(0, n.mile - (st.lastMile || 0)) : 0;
     if (n.mile != null) st.lastMile = n.mile;
     X.setState(st); X.radioLine(n, drove);
-    if (node === 'strand_end') return { end: 'RUN_ENDED', st };
+    if (node === 'strand_end' || n.runEnd) return { end: 'RUN_ENDED', st };
     if (n.isVictory) return { end: 'VICTORY', st };
 
     const cs = (n.choices || []).filter(c => (!c.showIf || c.showIf(st)) && !X.isChoiceLocked(c));

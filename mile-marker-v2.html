@@ -46,6 +46,9 @@ body[data-time="night"] {
   --sign-shadow: 0 0 18px rgba(255,255,255,0.18); --fill-low: #e8542a;
 }
 body[data-time="night"][data-wear="3"] { --green: #2f7a58; --blue: #2a5a8c; }
+/* Route 4: the signs stand in snow. Day is white ground; night stays black. */
+body[data-ground="snow"] { --ground: #eef1f4; --rule: rgba(20,40,70,0.14); --muted: #4d5560; }
+body[data-ground="snow"][data-time="night"] { --ground: #05070b; --rule: rgba(255,255,255,0.12); --muted: #9a9fa8; }
 /* outside the car at night: nothing is lit */
 body[data-lit="off"] {
   --green: #10261c; --blue: #0c1a30; --yellow: #6a5600; --white: #6e6e6e;
@@ -428,6 +431,7 @@ body[data-time="night"] .rs-beam { background: #23272a; }
      registers it only if it loaded, so the HTML still plays Route 1 alone. -->
 <script src="routes/deep-south.js"></script>
 <script src="routes/pacific-coast.js"></script>
+<script src="routes/hi-line.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
 // STATE — narrative flags + testable resource stats
@@ -509,6 +513,35 @@ if (typeof PACIFIC_COAST !== 'undefined' && PACIFIC_COAST && PACIFIC_COAST.nodes
     endings: 3,
     keepsakes: 3,
     unfinished: true
+  };
+}
+if (typeof HI_LINE !== 'undefined' && HI_LINE && HI_LINE.nodes) {
+  ROUTES[HI_LINE.id] = {
+    id: HI_LINE.id,
+    name: HI_LINE.name,
+    shield: 'I-29 NORTH',
+    from: 'Fargo, ND',
+    to: 'Nowhere',
+    destination: 'Grand Forks',
+    blurb: 'Fargo → Nowhere — no distance posted',
+    label: 'Route 4',
+    road: 'US 2 West',
+    keepsakeFor: HI_LINE.keepsakeFor,
+    start: HI_LINE.start,
+    strandFallback: HI_LINE.strandReturnDefault,
+    // This road does not say how far it is. The sign names the next town and nothing else.
+    miles: null,
+    wearMiles: HI_LINE.wearMiles,
+    tankPerMile: HI_LINE.tankPerMile,
+    radioBands: HI_LINE.radioBands,
+    radioSilent: HI_LINE.radioSilent,
+    strand: HI_LINE.strand,
+    ground: 'snow',
+    // The finale. It opens once you have arrived on any two other roads.
+    needsArrivals: 2,
+    recordNone: (runs) => runs === 1 ? 'One run. It did not reach the divide.' : runs + ' runs. None of them reached the divide yet.',
+    endings: 3,
+    keepsakes: 3
   };
 }
 const DEFAULT_ROUTE = 'southwest';
@@ -2117,6 +2150,7 @@ const NODES = {
 // never touches mechanics.
 if (typeof DEEP_SOUTH !== 'undefined' && DEEP_SOUTH && DEEP_SOUTH.nodes) Object.assign(NODES, DEEP_SOUTH.nodes);
 if (typeof PACIFIC_COAST !== 'undefined' && PACIFIC_COAST && PACIFIC_COAST.nodes) Object.assign(NODES, PACIFIC_COAST.nodes);
+if (typeof HI_LINE !== 'undefined' && HI_LINE && HI_LINE.nodes) Object.assign(NODES, HI_LINE.nodes);
 
 // ═══════════════════════════════════════════════════════
 // ENGINE
@@ -2333,7 +2367,7 @@ function clearSave() { store.del(SAVE_KEY); }
 function loadSave() {
   const s = store.get(SAVE_KEY);
   if (!s || !s.resumeAt || !NODES[s.resumeAt] || !s.stats) return null;
-  if (s.resumeAt === 'strand_end' || (NODES[s.resumeAt] && NODES[s.resumeAt].isVictory)) return null;
+  if (s.resumeAt === 'strand_end' || (NODES[s.resumeAt] && (NODES[s.resumeAt].isVictory || NODES[s.resumeAt].runEnd))) return null;
   return s;
 }
 function offerResume() {
@@ -2404,8 +2438,10 @@ function recordLine() {
   const n = (x, one, many) => x === 1 ? one : x + ' ' + many;
   const parts = [];
   if (!r.wins) {
-    parts.push(r.runs === 1 ? 'One run. It did not end in Albuquerque.'
-                            : r.runs + ' runs. None of them ended in Albuquerque yet.');
+    const dest = R().destination;
+    parts.push(R().recordNone ? R().recordNone(r.runs)
+      : r.runs === 1 ? 'One run. It did not end in ' + dest + '.'
+                     : r.runs + ' runs. None of them ended in ' + dest + ' yet.');
   } else {
     parts.push(n(r.runs, 'One run', 'runs') + ', ' + n(r.wins, 'one arrival', 'arrivals') + '.');
     const e = Object.keys(r.endings).length;
@@ -2419,6 +2455,68 @@ function recordLine() {
       : 'You have brought back ' + k + ' of the ' + keepsakes + ' things there are to bring back.');
   }
   return parts.join(' ');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MEMORY — what crosses between routes
+//
+// Each route is a self-contained run: no stats, no money and no fuel carry over. What
+// crosses is objects and recognition. On an arrival the road remembers how that route
+// ended, what you came away holding, how you behaved, how far you actually drove and
+// what happened along the way. A later run on a DIFFERENT route reads it as
+// `state.carried`: the run's flags laid flat (so `s.carried.knows_cord_name` works),
+// plus `routes[id]` for the detail and `objects` for what is in the car.
+// Callbacks are texture, not homework: every reader has a first-time fallback.
+// ═══════════════════════════════════════════════════════════════════════════
+const MEMORY_KEY = 'mm_memory';
+const KEEPSAKE_KEY = 'mm_keepsakes';
+function getMemory() {
+  const m = store.get(MEMORY_KEY) || {};
+  if (!m.routes) m.routes = {};
+  // Arrivals from before the memory existed still count for something: the record knows
+  // you got there and the old keepsake store knows what you were holding.
+  const rec = store.get(RECORD_KEY) || {}, ks = store.get(KEEPSAKE_KEY) || {};
+  Object.keys(rec).forEach(id => {
+    if (!m.routes[id] && rec[id] && rec[id].wins) m.routes[id] = { flags: {}, kept: ks[id] ? { id: ks[id] } : null, legacy: true };
+  });
+  return m;
+}
+function rememberArrival(node, kept) {
+  const m = getMemory(), id = R().id, prev = m.routes[id] || {};
+  const flags = {};
+  Object.keys(state.flags || {}).forEach(k => { if (state.flags[k] === true) flags[k] = true; });
+  m.routes[id] = {
+    ending: node.ending || null,
+    // A later arrival with empty hands does not take the object back out of the car.
+    kept: kept ? { id: kept.id, tag: kept.tag || null, label: kept.label || null } : (prev.kept || null),
+    road: state.road || 0,
+    driven: (node.mile != null ? node.mile : (state.lastMile || 0)) + (state.extra || 0),
+    strandings: state.strandings || 0,
+    archetype: state.archetype,
+    flags
+  };
+  store.set(MEMORY_KEY, m);
+  if (kept) { const ks = store.get(KEEPSAKE_KEY) || {}; ks[id] = kept.id; store.set(KEEPSAKE_KEY, ks); }
+}
+// What a run on `routeId` is carrying from the other roads.
+function carriedFor(routeId) {
+  const m = getMemory(), out = {}, routes = {}, objects = [];
+  Object.keys(m.routes).forEach(id => {
+    if (id === routeId) return;
+    const r = m.routes[id];
+    routes[id] = r;
+    Object.assign(out, r.flags || {});
+    if (r.kept) objects.push(Object.assign({ route: id }, r.kept));
+  });
+  out.routes = routes;
+  out.objects = objects;
+  out.arrived = Object.keys(routes).length;
+  return out;
+}
+// How many OTHER roads you have arrived on. The finale asks for two.
+function arrivalsElsewhere(routeId) {
+  const rec = store.get(RECORD_KEY) || {};
+  return Object.keys(rec).filter(id => id !== routeId && rec[id] && rec[id].wins > 0).length;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2609,11 +2707,13 @@ const MAX_STRANDINGS = 2;
 function strandOut(returnNode) {
   state.strandReturn = returnNode || state.strandReturn || R().strandFallback;
   state.strandings = (state.strandings || 0) + 1;
-  if (state.strandings >= MAX_STRANDINGS) { loadNode('strand_end'); return; }
+  // Running dry in a desert and running dry at twenty below are different scenes.
+  const own = R().strand || {};
+  if (state.strandings >= MAX_STRANDINGS) { loadNode(own.end || 'strand_end'); return; }
   // Nothing left to trade — no cash, no nerve to ask with — ends it early.
   const nothingLeftToTrade = (state.stats.wallet || 0) < 25 && (state.stats.nerve || 0) <= 2;
-  if (nothingLeftToTrade) { loadNode('strand_end'); return; }
-  loadNode('strand_1');
+  if (nothingLeftToTrade) { loadNode(own.end || 'strand_end'); return; }
+  loadNode(own.one || 'strand_1');
 }
 
 function applyFlags(flags = {}) { Object.assign(state.flags, flags); }
@@ -2718,6 +2818,7 @@ function startGame() {
   state.miles = null;
   state.shield = null;
   state.extra = 0;
+  state.carried = carriedFor(state.route);
   noteRunStarted();
 
   document.getElementById('char-name').textContent = name;
@@ -2808,7 +2909,7 @@ function isNightNode(id, node) {
 function wearFor(mile) {
   if (mile == null) return document.body.dataset.wear || '0';
   const extra = (typeof state !== 'undefined' && state.extra) || 0;
-  const total = ((typeof state !== 'undefined' && (state.miles || R().miles)) || 675) + extra;
+  const total = ((typeof state !== 'undefined' && (state.miles || R().miles || R().wearMiles)) || 675) + extra;
   const f = total ? (mile + extra) / total : 0;
   return f < 0.296 ? '0' : f < 0.593 ? '1' : f < 0.815 ? '2' : '3';
 }
@@ -2816,6 +2917,7 @@ function setSignage(id, node) {
   document.body.dataset.time = isNightNode(id, node) ? 'night' : 'day';
   document.body.dataset.lit  = node.unlit ? 'off' : 'on';
   document.body.dataset.wear = wearFor(node.mile);
+  document.body.dataset.ground = R().ground || '';
 }
 
 // The station scrolls at a fixed speed in pixels per second, so a long line takes
@@ -2832,7 +2934,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-10-22.1';
+const BUILD = '2026-11-11.1';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;
@@ -2949,7 +3051,7 @@ function loadNode(nodeId) {
   // The shield is the road you are on now, not the one the route started on.
   if (node.shield) { state.shield = node.shield; signRoute(); }
   setSignage(nodeId, node);
-  if (nodeId === 'strand_end') { recordLastCar(); clearSave(); } else saveGame(nodeId);
+  if (nodeId === 'strand_end' || node.runEnd) { recordLastCar(); clearSave(); } else saveGame(nodeId);
   // Capture the distance BEFORE the mile marker advances — the radio needs to know
   // how far you just drove, and updating lastMile first makes that always zero.
   const _drove = node.mile != null ? Math.max(0, node.mile - (state.lastMile || 0)) : 0;
@@ -3183,14 +3285,7 @@ function showVictory(node) {
   const textArr = node.textFn ? node.textFn(state) : (node.text || []);
   const kept = keepsakeFor(state);
   noteArrival(state.road || 0, kept && kept.id, node.ending);
-  if (kept) {
-    // Stub for the cross-route mechanic: one object per route, most recent win.
-    try {
-      const kstore = JSON.parse(localStorage.getItem('mm_keepsakes') || '{}');
-      kstore[R().id] = kept.id;
-      localStorage.setItem('mm_keepsakes', JSON.stringify(kstore));
-    } catch (e) {}
-  }
+  rememberArrival(node, kept);
 
   document.getElementById('main-screen').innerHTML = `
     <div id="victory-screen">
@@ -3256,6 +3351,7 @@ function restartSameRoute() {
     miles: null,
     shield: null,
     extra: 0,
+    carried: carriedFor(state.route || DEFAULT_ROUTE),
     debugRolls: DEBUG_ROLLS
   };
   noteRunStarted();
