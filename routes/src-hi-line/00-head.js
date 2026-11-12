@@ -98,7 +98,7 @@ const HI_LINE = {
   start: 'hl_001',
   miles: null,                // This road does not post a distance. See the design spec.
   wearMiles: 903,             // ...but it is 903 miles to the divide, built from state mileposts.
-  tankPerMile: 0.25,          // Cold air, winter fuel, a headwind most of the way west.
+  tankPerMile: 0.21,          // 903 x 0.21 = 190 before idling. First pass at 0.25 stranded 84-100% of competent runs.
   strandReturnDefault: 'hl_009',
   strand: { one: 'hl_strand_1', end: 'hl_strand_end' },
 

@@ -296,6 +296,24 @@ body[data-time="night"] .rs-beam { background: #23272a; }
 .rs-toll { background: var(--yellow); color: #111; border-color: #111; font-weight: 800; font-size: 20px; letter-spacing: 0.08em; text-align: center; padding: 3px 0 1px; width: 104px; margin: 0 auto 5px; border-radius: 4px; }
 .rs-nocash { background: var(--green); color: var(--sign-text); font-weight: 800; font-size: 30px; letter-spacing: 0.02em; text-align: center; padding: 9px 0 6px; }
 
+/* Route 4 */
+.rs-green { background: var(--green); color: var(--sign-text); padding: 9px 14px 8px 12px; }
+.rs-white { background: var(--white); color: #111; border-color: var(--ink-border); padding: 10px 14px 8px; text-align: center; }
+.rs-centred { text-align: center; padding: 10px 14px 8px; }
+.rs-big { font-weight: 800; font-size: 21px; line-height: 1.12; letter-spacing: 0.01em; }
+.rs-small { font-weight: 800; font-size: 15px; line-height: 1.2; letter-spacing: 0.03em; margin-top: 3px; }
+.rs-white .rs-big + .rs-big, .rs-brown .rs-big + .rs-big { margin-top: 0; }
+/* a bank sign: the same amber board the radio uses, because it is the same kind of sign */
+.rs-led { background: var(--board); border-radius: 4px; padding: 6px 18px 5px; display: flex; gap: 22px; align-items: baseline; font-family: 'VT323', monospace; color: var(--amber); font-size: 40px; line-height: 1; letter-spacing: 0.04em; box-shadow: 0 0 0 3px #2a2a2a, 0 2px 5px rgba(0,0,0,0.35); }
+body[data-lit="off"] .rs-led { color: #7a5a10; }
+/* the gate: a striped arm above and below the sign */
+.rs-gate { width: 100%; max-width: 290px; }
+.rs-bar { height: 12px; border-radius: 2px; background: repeating-linear-gradient(90deg, #c8102e 0 26px, #f4f4f4 26px 52px); box-shadow: 0 0 0 1px rgba(0,0,0,0.3); }
+.rs-gate .rs-white { margin: 6px 0; border-radius: 4px; }
+.rs-gate .rs-big { font-size: 27px; letter-spacing: 0.03em; }
+.rs-gate .rs-small { font-size: 12px; letter-spacing: 0.08em; }
+body[data-lit="off"] .rs-bar { background: repeating-linear-gradient(90deg, #4a1019 0 26px, #6e6e6e 26px 52px); }
+
 /* handwriting: one span per letter, each with its own small turn */
 .hw { display: inline-block; white-space: nowrap; }
 .hc { display: inline-block; }
@@ -2934,7 +2952,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-11-11.1';
+const BUILD = '2026-11-12.1';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;

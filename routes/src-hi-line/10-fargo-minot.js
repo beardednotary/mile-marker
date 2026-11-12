@@ -35,7 +35,7 @@
       return base;
     },
     choices: [
-      { text: "Fill up before the interstate", sub: (s) => pumpSub(s, { rate: 0.27 }, "City prices, the best you will see. The pump handle is cold enough to want a glove."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.27 }, next: "hl_001" },
+      { text: "Fill up before the interstate", sub: (s) => pumpSub(s, { rate: 0.24 }, "City prices, the best you will see. The pump handle is cold enough to want a glove."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.24 }, next: "hl_001" },
       { text: "Buy what the man at the counter says to buy", sub: "Requires $9 — a candle in a coffee can, a wool blanket, a bag of sand. He does not ask if you have them. He can tell.", type: "neutral", showIf: (s) => !s.flags.winter_kit, requires: { walletMin: 9 }, next: "hl_001", deltas: { wallet: -9 }, outcome: "kit", flags: { winter_kit: true } },
       { text: "A caramel roll and coffee at the truck stop", sub: "Requires $5 — the roll is the size of a hubcap. The car stays running outside.", type: "neutral", showIf: (s) => !s.flags.ate_fargo, requires: { walletMin: 5 }, next: "hl_001", deltas: { wallet: -5, gut: +1, tank: -1 }, flags: { ate_fargo: true } },
       { text: "North on 29", sub: "Safe — Grand Forks is an hour and a quarter up the valley.", type: "safe", next: "hl_002" }
@@ -112,7 +112,7 @@
       return base;
     },
     choices: [
-      { text: "Fill up at the last big station", sub: (s) => pumpSub(s, { rate: 0.28 }, "A truck stop with twelve pumps. You will not see twelve pumps again."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.28 }, next: "hl_003" },
+      { text: "Fill up at the last big station", sub: (s) => pumpSub(s, { rate: 0.25 }, "A truck stop with twelve pumps. You will not see twelve pumps again."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.25 }, next: "hl_003" },
       { text: "West on 2", sub: "Safe — the road is dry and the wind is from the northwest, which is the direction you are going.", type: "safe", next: "hl_004" }
     ]
   },
@@ -177,9 +177,9 @@
       return base;
     },
     choices: [
-      { text: "Fill up in town", sub: (s) => pumpSub(s, { rate: 0.30 }, "Rugby is fifty-eight miles and there is a gate between here and there."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.30 }, next: "hl_005" },
+      { text: "Fill up in town", sub: (s) => pumpSub(s, { rate: 0.27 }, "Rugby is fifty-eight miles and there is a gate between here and there."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.27 }, next: "hl_005" },
       { text: "Drive out on the ice", sub: "Nerve check — three miles out and three back, on a lake. The sign says the ice is thirty inches. The sign is hand-painted.", type: "neutral", addMiles: 3, check: { stat: "nerve", difficulty: 5 },
-        success: { next: "hl_005a", flags: { on_the_ice: true } },
+        success: { next: "hl_005a" },
         failure: { next: "hl_006", outcome: "ice_no", deltas: { nerve: -1 }, flags: { turned_at_ice: true } } },
       { text: "West, to the edge of town", sub: "Safe — the highway is on dirt the whole way. Raised dirt.", type: "safe", next: "hl_006" }
     ],
@@ -206,7 +206,7 @@
     ],
     choices: [
       { text: "Ask if he wants a hand with the holes", sub: "Nerve check — an hour outside. Pays cash, and whatever he is frying.", type: "neutral", check: { stat: "nerve", difficulty: 4 }, road: +1, addMiles: 3,
-        success: { next: "hl_006", outcome: "holes", deltas: { wallet: +18, gut: +1, tank: -3 }, flags: { worked_ice: true, storm_told: true } },
+        success: { next: "hl_006", outcome: "holes", deltas: { wallet: +22, gut: +1, tank: -3 }, flags: { worked_ice: true, storm_told: true } },
         failure: { next: "hl_006", outcome: "holes_slow", deltas: { wallet: +8, gut: -1, tank: -3 }, flags: { worked_ice: true } } },
       { text: "Stand at the edge of a hole and look down it", sub: "Engine running — costs a little fuel. It is green down there.", type: "neutral", addMiles: 3, next: "hl_006", deltas: { tank: -2 }, outcome: "hole" },
       { text: "Turn around and go back to the road", sub: "Safe — you drove on a lake. That was the thing.", type: "safe", addMiles: 3, next: "hl_006" }
@@ -216,7 +216,7 @@
         "He hands you the auger as if you had asked for it. It weighs forty pounds and wants to turn you instead of the ice, and by the third hole you have worked out how to stand.",
         (s.flags.got_mitts ? "Arlen's mitts turn out to have been made for exactly this. " : "Your gas-station gloves are not made for this, and he watches them not be made for it and says nothing. ") + "Each hole comes up through thirty inches of ice and then the water wells up green and smoking and stands level with the top.",
         "After an hour he waves you inside. It is seventy degrees in there. There is a stove, a bunk, a television, and four holes in the floor with lines down them, and he fries perch in a pan on the stove and you eat them with your fingers off a paper towel.",
-        "He counts eighteen dollars off a fold and does not ask what you thought it was worth.",
+        "He counts twenty-two dollars off a fold and does not ask what you thought it was worth.",
         "'Going west?' he says. 'It'll blow " + (hlStorm() === 0 ? 'this afternoon, right out here past town' : hlStorm() === 1 ? 'tomorrow, out past Wolf Point' : 'day after tomorrow, up by Cut Bank') + ". Gate'll come down. You don't go round the gate.' He turns a perch. 'People go round the gate.'"
       ],
       holes_slow: [
@@ -267,7 +267,7 @@
     },
     choices: [
       { text: "Wait it out in the cafe", sub: "Requires $8 — pie, coffee, and everybody else who is waiting. The car idles in the lot.", type: "neutral", showIf: () => hlStorm() === 0, requires: { walletMin: 8 }, next: "hl_007", deltas: { wallet: -8, gut: +1, tank: -4 }, outcome: "cafe", flags: { waited_gate: true } },
-      { text: "Wait it out in the car", sub: "Engine running for three hours — costs fuel, and nothing else.", type: "neutral", showIf: () => hlStorm() === 0, next: "hl_007", deltas: { tank: -9, nerve: -1 }, outcome: "car", flags: { waited_gate: true } },
+      { text: "Wait it out in the car", sub: "Engine running for three hours — costs fuel, and nothing else.", type: "neutral", showIf: () => hlStorm() === 0, next: "hl_007", deltas: { tank: -7, nerve: -1 }, outcome: "car", flags: { waited_gate: true } },
       { text: "Follow the plow when it goes", sub: "Gut check — stay in its lights and you are through in an hour. Lose its lights and you are not.", type: "risky", showIf: () => hlStorm() === 0, check: { stat: "gut", difficulty: 5 },
         success: { next: "hl_007", outcome: "plow", deltas: { nerve: +1 }, flags: { followed_plow: true } },
         failure: { next: "hl_007", outcome: "plow_lost", deltas: { nerve: -2, tank: -6 }, flags: { followed_plow: true, lost_plow: true } } },
@@ -316,6 +316,7 @@
       const base = [];
       if (s.flags.ditched_blizzard) base.push("You went around the gate, and the road took the car away from you for a while and then, for reasons of its own, gave it back. Your hands have not finished shaking about it.");
       else if (s.flags.lost_plow) base.push("You keep checking the mirror for tail lights. There is nothing to follow now. The road is clear and you can see for nine miles and you keep checking.");
+      else if (s.flags.followed_plow) base.push("For an hour your whole world was two red lights and a strobe. The road is wide open now and you keep looking for something to follow.");
       else if (s.flags.waited_gate) base.push("The afternoon is three hours shorter than it was meant to be, and the sun is already low and orange in the windscreen.");
       base.push(
         "At Rugby, at the crossroads, in the car park of a Mexican restaurant, there is a stone cairn about fifteen feet high with a sign on it.",
@@ -328,7 +329,7 @@
       return base;
     },
     choices: [
-      { text: "Fill up at the crossroads", sub: (s) => pumpSub(s, { rate: 0.31 }, "Minot is sixty-six miles."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.31 }, next: "hl_007" },
+      { text: "Fill up at the crossroads", sub: (s) => pumpSub(s, { rate: 0.28 }, "Minot is sixty-six miles."), type: "neutral", requires: (s) => pumpOpen(s), lockText: (s) => pumpClosed(s), pump: { rate: 0.28 }, next: "hl_007" },
       { text: "Get out and stand at the centre", sub: "Engine running — costs a little fuel. You have come this far to the middle.", type: "neutral", showIf: (s) => !s.flags.stood_centre, next: "hl_007", deltas: { tank: -2 }, outcome: "centre", flags: { stood_centre: true } },
       { text: "Walk over to the depot", sub: "Engine running — costs a little fuel. The light is on and there is a rack by the door.", type: "neutral", showIf: (s) => !s.flags.took_timetable, next: "hl_007", deltas: { tank: -2 }, outcome: "depot", flags: { took_timetable: true } },
       { text: "West", sub: "Safe — an hour to Minot, into the sun.", type: "safe", next: "hl_008" }
