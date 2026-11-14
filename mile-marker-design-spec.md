@@ -684,6 +684,61 @@ Rules agreed:
   shows KEPT) as a name rather than a score.
 - What Route 2's keepsake is.
 
+## Route 4 built, and the app around it **[BUILT 2026-11-13]**
+
+Build `2026-11-13.1`. Everything below is in the repo and passes `npm run check`.
+
+### Route 4 as built
+
+- 39 scenes, about 13,000 words, three endings (`paid`, `rode`, `passed`), three keepsakes (mitts > scale ticket > timetable). Source is `routes/src-hi-line/*.js`; `node tools/build_hi_line.js` assembles `routes/hi-line.js`. Do not hand-edit the assembled file.
+- No distance is posted. `miles: null`, `wearMiles: 903`. The sign at Grand Forks says US 2 WEST and nothing else.
+- One storm per run, seeded: the gate comes down west of Devils Lake, Wolf Point, or Cut Bank. A third of runs each.
+- The El Camino is back, under snow and plugged in at Havre, gone in the morning, on the shoulder at Rudyard, and at the summit with its hood up. The Havre register is where the name is finally written down.
+- **The ending was written without Ray and is the first thing to read.** At Marias Pass Cord's car will not go. He reads off where each thing in your car came from. You can put fuel in his tank (needs 25, costs 20), tell him to get in, or drive on.
+- Mileages are from state mileposts, not from Ray's map: Fargo 0, Grand Forks 78, Devils Lake 167, Rugby 225, Minot 291, Williston 416, Wolf Point 509, Glasgow 560, Malta 629, Havre 718, Shelby 819, Cut Bank 844, Browning 880, Marias Pass 903. **Unverified.**
+
+### Tuning, after the first pass was far too hard
+
+First pass: competent play won 12–41% and was stranded 76–100% of the time. Changes: burn 0.25 → 0.21 per mile, every pump about 12% cheaper, a night in the car −14 → −10 tank, waiting at the gate −9 → −7, incomes raised (22 / 38 / 28 / 16), rooms $32 / $36 → $24 / $26 because nobody could ever afford them.
+
+Now (`node tools/bal_hiline.js`): competent play wins about 88 / 71 / 63 (Drifter / Planner / Broke Kid), always-safe wins about 0, random 7–31. It has not been played by a person.
+
+### Cross-route memory
+
+`mm_memory` records, per road finished: the ending, the thing kept, the conduct score, miles driven, strandings, the traveller, and the flags. `carriedFor(route)` hands a new run everything from the *other* roads as `state.carried`. Route 2's `s.carried` lines, dead since they were written, are live. Route 4 reads the objects in the car at Fargo and again at the summit.
+
+Route 4 opens after two arrivals on other roads (`needsArrivals: 2`). This was Claude's call, made because the route reads what you brought. **Ray has not agreed to it.** It is one property to delete.
+
+### The roads screen
+
+The game now opens on four highway signs, not on "Who are you?". Each shows its shield, its ends, its length, what you have done on it, and its state: FREE TO MILE 300, DRIVE, a price, or CLOSED. Below them, once anything has been kept, a brown panel lists what is in the car. Continue sits above the list. `?route=` still goes straight to the travellers.
+
+### The shop
+
+Routes only, as decided: $2.99 each, $7.99 for all four. One interface, `SHOP`, and one seam, `window.MMNative`. With no bridge (any browser) the game is the beta: Routes 2–4 open, Route 1's paywall a pass-through. With a bridge it asks the store for prices and ownership, remembers ownership on the device, and offers Restore on the first screen and at the paywall. The paywall saves the run before it shows, so leaving and coming back resumes at Kingman.
+
+Still exactly one paywall in the game.
+
+### The app
+
+Capacitor 8, not a rewrite. `npm run sync` builds `www/` (the same HTML with fonts bundled and the bridge loaded) and copies it into `android/` and `ios/`. `app/native-bridge.js` does two things: copies every save to the phone's own preferences store and reads them back before the first screen (iOS is allowed to clear a web view's storage), and sells routes through RevenueCat, reading entitlements rather than receipts. Bundle id `com.dahvio.milemarker`.
+
+The Android build runs on an emulator: first screen, a scene, a save that survives the app being killed. iOS is generated and configured and has never been opened. No real purchase has been made; there are no store keys yet. `store/STORE.md` is the checklist for the rest.
+
+### Signs, on every road now
+
+Routes 1 and 2 quoted their signs in capitals; they are drawn now. Four new kinds, none of them highway signs, so none of them wear or glow: a church's changeable-letter board (the fourth line is there and blurred until you slow down; when you read it, its letters are blacker than the rest, as the prose says), a hand-painted roadside board (the second trading-post sign has lost its paint on the windward side), a cardboard sign in marker, and a detour sign in the right orange and the wrong lettering. 33 scenes draw something.
+
+### Decisions waiting on Ray
+
+1. Route 4's ending.
+2. Route 4's two-arrival lock.
+3. The store name: "CYOA" in the title, or only in the keyword field (Chooseco's trademark).
+4. The icon. A stand-in is drawn from the game's own mile post; Ray's MILE 0 concept replaces it by dropping PNGs into `assets/`.
+5. Publishing the privacy and support pages drafted in `store/site/`.
+
+---
+
 ## Route 4 — the Hi-Line, the design **[DECIDED 2026-11-11]**
 
 Fargo, ND to "Nowhere", in deep winter. Ray chose the road (US-2, the Hi-Line), the season, and

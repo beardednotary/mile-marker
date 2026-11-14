@@ -194,6 +194,7 @@ body[data-lit="off"] .radio-am { visibility: hidden; }
 .rt-post b { display: block; font-size: 22px; margin-top: 2px; }
 .rt-title { font-size: 28px; font-weight: 800; line-height: 1; letter-spacing: -0.01em; }
 .rt-tag { font-size: 11px; color: var(--muted); margin-top: 4px; }
+#rt-resume .start-btn { margin-bottom: 10px; }
 .rt-card { display: block; width: 100%; text-align: left; font-family: 'Overpass', sans-serif; background: var(--green); color: var(--sign-text); border: 3px solid var(--sign-border); border-radius: 8px; box-shadow: var(--sign-shadow); padding: 10px 12px 9px; margin-bottom: 9px; cursor: pointer; transition: transform 0.1s; }
 .rt-card:active { transform: scale(0.985); }
 .rt-top { display: flex; align-items: center; gap: 8px; }
@@ -3096,7 +3097,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-11-12.4';
+const BUILD = '2026-11-13.1';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;

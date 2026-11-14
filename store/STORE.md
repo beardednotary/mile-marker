@@ -1,7 +1,7 @@
 # Mile Marker — shipping it
 
 Everything needed to get the game from this repo into the App Store and Google Play.
-Written 2026-11-12 against build `2026-11-12.3`, Capacitor 8.6, RevenueCat Capacitor 14.1.
+Written 2026-11-13 against build `2026-11-13.1`, Capacitor 8.6, RevenueCat Capacitor 14.1.
 
 ---
 
@@ -22,7 +22,7 @@ Commands, from the repo root:
 
 ```
 npm install            once, on any machine
-npm run check          the two headless test suites (34 + 54)
+npm run check          the headless suites (34 + 54) and a smoke test that plays every road
 npm run sync           rebuild www/ and copy it into both native projects
 npm run android        sync, then open Android Studio
 npm run ios            sync, then open Xcode            (Mac only)
@@ -113,7 +113,7 @@ No offering or paywall template is needed. The app fetches the five products by 
 
 ## 5. Android — here or on the Mac
 
-A debug build is confirmed working from this machine (see the end of this file).
+A debug build is confirmed building and running from this machine (see the end of this file).
 
 1. `npm run android`, or from a shell with `JAVA_HOME` pointed at Android Studio's JBR:
    `cd android && gradlew.bat assembleDebug` → `android/app/build/outputs/apk/debug/app-debug.apk`.
@@ -303,10 +303,14 @@ Verified on this machine:
 - The store path against a mock bridge: prices from the store, a successful purchase, a
   cancelled one, restore with nothing to restore, ownership surviving a reload.
 - `www/` builds with no network font reference.
-- The Android debug APK builds. (See the commit message for the result.)
+- The Android debug APK builds (9.4 MB) and runs on an API 35 emulator: splash, first screen
+  with bundled fonts, a Route 1 scene, the save written to SharedPreferences, **Continue**
+  offered after force-stopping the app, and "Nothing was charged." when a paid road is tapped
+  with no store key. Screenshots: `store/android-first-screen.png`, `store/android-first-scene.png`.
 
 Not verified, because it cannot be from here:
 - A real purchase. No RevenueCat key exists yet, and StoreKit / Play Billing only answer
   on signed builds with real product records.
 - Anything on iOS. The Xcode project is generated and configured but has never been opened.
-- The app running on a physical phone.
+- The app running on a physical phone. The emulator took about 20 seconds to cold-start under
+  software rendering; a real phone should be near-instant, but look.
