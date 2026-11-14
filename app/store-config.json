@@ -1,0 +1,7 @@
+{
+  "_": "RevenueCat PUBLIC SDK keys (Project settings > API keys). They are meant to ship in the app. iOS keys start appl_, Android keys start goog_. Leave a key empty and that platform runs with the store switched off: prices fall back to $2.99 / $7.99 and every purchase answers 'Nothing was charged.'",
+  "revenuecat": {
+    "ios": "",
+    "android": ""
+  }
+}

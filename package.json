@@ -1,0 +1,38 @@
+{
+  "name": "mile-marker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mile Marker — a text road trip. The game is mile-marker-v2.html; this wraps it for the stores.",
+  "scripts": {
+    "route4": "node tools/build_hi_line.js",
+    "www": "node tools/build_www.js",
+    "sync": "npm run www && npx cap sync",
+    "android": "npm run sync && npx cap open android",
+    "ios": "npm run sync && npx cap open ios",
+    "assets": "node tools/make_icons.js && npx capacitor-assets generate --ios --android --iconBackgroundColor \"#006747\" --iconBackgroundColorDark \"#006747\" --splashBackgroundColor \"#e8e4da\" --splashBackgroundColorDark \"#070707\"",
+    "check": "node tools/verify.js && node tools/verify_legs.js && node tools/smoke_all.js 100",
+    "icons": "npx capacitor-assets generate --ios --android --iconBackgroundColor \"#006747\" --iconBackgroundColorDark \"#006747\" --splashBackgroundColor \"#e8e4da\" --splashBackgroundColorDark \"#070707\"",
+    "apk": "npm run sync && cd android && gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/ios": "^8.6.2",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
+    "@revenuecat/purchases-capacitor": "^14.1.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "@capacitor/cli": "^8.6.2",
+    "@fontsource/caveat": "^5.3.0",
+    "@fontsource/nanum-pen-script": "^5.3.0",
+    "@fontsource/overpass": "^5.3.0",
+    "@fontsource/permanent-marker": "^5.3.0",
+    "@fontsource/reenie-beanie": "^5.3.0",
+    "@fontsource/vt323": "^5.3.0",
+    "esbuild": "^0.28.2"
+  }
+}

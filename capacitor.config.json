@@ -1,0 +1,21 @@
+{
+  "appId": "com.dahvio.milemarker",
+  "appName": "Mile Marker",
+  "webDir": "www",
+  "backgroundColor": "#e8e4da",
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": false
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "launchFadeOutDuration": 200,
+      "backgroundColor": "#e8e4da",
+      "showSpinner": false
+    }
+  }
+}
