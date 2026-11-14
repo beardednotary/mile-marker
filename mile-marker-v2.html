@@ -3097,7 +3097,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-11-13.1';
+const BUILD = '2026-11-13.2';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;
@@ -3377,13 +3377,56 @@ function handleChoice(choice) {
   }
 
   const currentNode = NODES[state.currentNode];
-  if (result.outcome && currentNode && currentNode.outcomes && currentNode.outcomes[result.outcome]) {
+  const prose = result.outcome && currentNode && currentNode.outcomes && currentNode.outcomes[result.outcome];
+  const told = prose ? (typeof prose === 'function' ? prose(state) : prose) : null;
+  // A look, a fill, a word with somebody: you are still where you were.
+  if (result.next && resolveSlot(result.next) === state.currentNode) { stayHere(told); return; }
+  if (told) {
     saveGame(result.next);   // closing the app mid-outcome resumes after the choice, not before it
-    const prose = currentNode.outcomes[result.outcome];
-    showOutcomeThen(typeof prose === 'function' ? prose(state) : prose, result.next);
+    showOutcomeThen(told, result.next);
     return;
   }
   loadNode(result.next);
+}
+
+// The scene is not played again. What happened goes under what you have read, and the
+// choices that are left come back: showIf drops the one you just used.
+function stayHere(texts) {
+  const node = NODES[state.currentNode];
+  saveGame(state.currentNode);
+  const sceneText = document.getElementById('scene-text');
+  const choicesSection = document.getElementById('choices-section');
+  choicesSection.classList.remove('visible');
+  document.getElementById('choices').innerHTML = '';
+  clearTimeouts();
+  state.animating = true;
+  let wait = 320, hr = null;
+  const toRule = () => { try { if (hr) hr.scrollIntoView({ block: 'start', behavior: motionReduced() ? 'auto' : 'smooth' }); } catch (e) {} };
+  if (texts && texts.length) {
+    hr = document.createElement('div');
+    hr.style.cssText = 'border-top:2px solid rgba(128,128,128,0.35);margin:12px 0;scroll-margin-top:110px;';
+    sceneText.appendChild(hr);
+    texts.forEach((t, i) => {
+      const div = document.createElement('div');
+      div.className = 'scene-paragraph';
+      div.style.marginTop = '10px';
+      div.innerHTML = t;
+      handLetter(div);
+      sceneText.appendChild(div);
+      state.timeouts.push(setTimeout(() => div.classList.add('visible'), i * 500 + 100));
+    });
+    // Start reading at the rule, not at the top of a scene you have already read.
+    toRule();
+    document.getElementById('tap-hint').style.display = 'block';
+    wait = texts.length * 500 + 400;
+  }
+  state.timeouts.push(setTimeout(() => {
+    document.getElementById('tap-hint').style.display = 'none';
+    renderChoices(node);
+    choicesSection.classList.add('visible');
+    state.animating = false;
+    toRule();
+  }, wait));
 }
 
 
