@@ -3097,7 +3097,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-11-13.2';
+const BUILD = '2026-11-13.3';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;
@@ -3676,7 +3676,7 @@ function renderRoads(note) {
     <div class="rt-note" id="rt-note">${note || ''}</div>
     <div class="rt-foot">
       ${SHOP.beta() ? '<span>Beta build — nothing to pay</span>' : '<button onclick="restoreRoads()">Restore purchases</button>'}
-      <a href="https://dahvio.com/mile-marker-privacy" target="_blank" rel="noopener">Privacy</a>
+      ${SHOP.beta() ? '' : '<a href="https://dahvio.com/mile-marker-privacy" target="_blank" rel="noopener">Privacy</a>'}
       <span>build ${BUILD}</span>
     </div>`;
   offerResume();
