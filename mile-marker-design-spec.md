@@ -715,7 +715,7 @@ The game now opens on four highway signs, not on "Who are you?". Each shows its 
 
 ### The shop
 
-Routes only, as decided: $2.99 each, $7.99 for all four. One interface, `SHOP`, and one seam, `window.MMNative`. With no bridge (any browser) the game is the beta: Routes 2–4 open, Route 1's paywall a pass-through. With a bridge it asks the store for prices and ownership, remembers ownership on the device, and offers Restore on the first screen and at the paywall. The paywall saves the run before it shows, so leaving and coming back resumes at Kingman.
+**Changed 2026-11-24 (Ray): one $2.99 unlock opens every road.** Product `com.dahvio.milemarker.allroutes`, RevenueCat entitlement `all_roads`. Route 1 stays free to Kingman and that paywall stays the only one. (Was: $2.99 each, $7.99 for all four.) One interface, `SHOP`, and one seam, `window.MMNative`. With no bridge (any browser) the game is the beta: Routes 2–4 open, Route 1's paywall a pass-through. With a bridge it asks the store for prices and ownership, remembers ownership on the device, and offers Restore on the first screen and at the paywall. The paywall saves the run before it shows, so leaving and coming back resumes at Kingman.
 
 Still exactly one paywall in the game.
 

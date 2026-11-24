@@ -22,17 +22,9 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Purchases, PRODUCT_CATEGORY, PURCHASES_ERROR_CODE } from '@revenuecat/purchases-capacitor';
 import CONFIG from './store-config.json';
 
-const PREFIX = 'com.dahvio.milemarker.';
-// RevenueCat entitlement -> the product id the game asks about.
-// The all-roads product is attached to all four entitlements in the RevenueCat dashboard,
-// so owning the bundle simply reads as owning each road.
-const ENTITLEMENTS = {
-  route_southwest: PREFIX + 'route.southwest',
-  route_south:     PREFIX + 'route.south',
-  route_coast:     PREFIX + 'route.coast',
-  route_hiline:    PREFIX + 'route.hiline'
-};
-const ALL = PREFIX + 'allroutes';
+// One product opens every road. In RevenueCat it is attached to one entitlement, all_roads.
+const ALL = 'com.dahvio.milemarker.allroutes';
+const ENTITLEMENT = 'all_roads';
 
 if (Capacitor.isNativePlatform()) {
   const platform = Capacitor.getPlatform();           // 'ios' | 'android'
@@ -51,14 +43,11 @@ if (Capacitor.isNativePlatform()) {
 
   // What a CustomerInfo says is owned, as the product ids the game knows.
   function ownedFrom(info) {
-    const out = {};
     const active = (info && info.entitlements && info.entitlements.active) || {};
-    Object.keys(active).forEach(e => { if (ENTITLEMENTS[e]) out[ENTITLEMENTS[e]] = true; });
-    // Belt and braces: the raw purchase list, in case an entitlement was never attached.
-    const bought = (info && info.allPurchasedProductIdentifiers) || [];
-    const once = ((info && info.nonSubscriptionTransactions) || []).map(t => t.productIdentifier);
-    bought.concat(once).forEach(id => { if (id === ALL || Object.values(ENTITLEMENTS).indexOf(id) >= 0) out[id] = true; });
-    return Object.keys(out);
+    // Belt and braces: the raw purchase list, in case the entitlement was never attached.
+    const bought = ((info && info.allPurchasedProductIdentifiers) || [])
+      .concat(((info && info.nonSubscriptionTransactions) || []).map(t => t.productIdentifier));
+    return (active[ENTITLEMENT] || bought.indexOf(ALL) >= 0) ? [ALL] : [];
   }
 
   async function loadProducts(ids) {
@@ -72,6 +61,9 @@ if (Capacitor.isNativePlatform()) {
 
   window.MMNative = {
     platform,
+    // false: no key in app/store-config.json. The game then runs as the beta (every road
+    // open, nothing to pay), which is what a TestFlight test build should be.
+    store: storeReady,
 
     // ── storage ──────────────────────────────────────────────────────────────
     // Native wins. If native has nothing for a key but the web view does (first run after

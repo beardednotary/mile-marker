@@ -2475,48 +2475,46 @@ const store = {
 // ═══════════════════════════════════════════════════════════════════════════
 // THE SHOP
 //
-// Four routes at one price each and all four for less. Route 1 is free to Kingman.
-// No subscription, no consumables, nothing that sells a way past losing.
-// In the app, window.MMNative talks to the store. On the web there is no bridge and this
-// is the beta: Routes 2-4 are open, and Route 1's paywall lets you through.
+// One purchase, $2.99, opens every road. Route 1 is free to Kingman; the paywall there is
+// the only one in the game. No subscription, no consumables, nothing that sells a way past
+// losing. In the app, window.MMNative talks to the store. With no bridge (a browser), or a
+// bridge with no store key (a test build), this is the beta: Routes 2-4 are open, and
+// Route 1's paywall lets you through.
 // ═══════════════════════════════════════════════════════════════════════════
-const PRODUCTS = {
-  southwest: 'com.dahvio.milemarker.route.southwest',
-  south:     'com.dahvio.milemarker.route.south',
-  coast:     'com.dahvio.milemarker.route.coast',
-  hiline:    'com.dahvio.milemarker.route.hiline',
-  all:       'com.dahvio.milemarker.allroutes'
-};
+const PRODUCTS = { all: 'com.dahvio.milemarker.allroutes' };
 const OWNED_KEY = 'mm_owned';
 const SHOP = {
   prices: {},
-  beta() { return !nativeBridge(); },
+  beta() { const n = nativeBridge(); return !n || n.store === false; },
   owned() { return store.get(OWNED_KEY) || {}; },
+  // The unlock opens every road. Without it, Route 1 is free to Kingman and that is all.
   owns(routeId) {
-    const o = this.owned();
-    if (o.all || o[routeId]) return true;
+    if (this.owned().all) return true;
     return this.beta() && routeId !== 'southwest';
   },
-  ownsAll() { const o = this.owned(); return !!o.all || Object.keys(ROUTES).every(id => o[id]); },
+  ownsAll() { return !!this.owned().all; },
   grant(keys) { const o = this.owned(); keys.forEach(k => { o[k] = true; }); store.set(OWNED_KEY, o); },
   keyFor(productId) { return Object.keys(PRODUCTS).filter(k => PRODUCTS[k] === productId)[0]; },
-  price(key) { return this.prices[key] || (key === 'all' ? '$7.99' : '$2.99'); },
-  // Ask the store what things cost here and what this person already owns.
+  price() { return this.prices.all || '$2.99'; },
+  // Ask the store what it costs here and whether this person already owns it.
   async refresh() {
-    const n = nativeBridge(); if (!n) return;
+    if (this.beta()) return;
+    const n = nativeBridge();
     try { const p = await n.prices(Object.values(PRODUCTS)); Object.keys(p || {}).forEach(id => { const k = this.keyFor(id); if (k) this.prices[k] = p[id]; }); } catch (e) {}
     try { const ids = await n.owned(); this.grant((ids || []).map(id => this.keyFor(id)).filter(Boolean)); } catch (e) {}
   },
-  async buy(key) {
+  // Whatever was tapped, there is only one thing to buy.
+  async buy() {
+    if (this.beta()) return true;                        // the beta: nothing to pay, nothing stored
     const n = nativeBridge();
-    if (!n) { this.grant([key]); return true; }          // the beta: nothing to pay
     let ok = false;
-    try { ok = await n.buy(PRODUCTS[key]); } catch (e) { ok = false; }
-    if (ok) this.grant([key]);
+    try { ok = await n.buy(PRODUCTS.all); } catch (e) { ok = false; }
+    if (ok) this.grant(['all']);
     return ok;
   },
   async restore() {
-    const n = nativeBridge(); if (!n) return 0;
+    if (this.beta()) return 0;
+    const n = nativeBridge();
     try { const ids = await n.restore(); const keys = (ids || []).map(id => this.keyFor(id)).filter(Boolean); this.grant(keys); return keys.length; } catch (e) { return -1; }
   }
 };
@@ -3097,7 +3095,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-11-13.3';
+const BUILD = '2026-11-24.1';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;
@@ -3469,16 +3467,12 @@ function showPaywall(nextNode) {
       <div class="paywall-title">The road ahead is long.</div>
       <div class="paywall-divider"></div>
       <div class="paywall-body">You've made ${state.choices} choices.<br>The hard part is still out there.</div>
-      <div class="paywall-details">Route 1, the whole way. One time, no subscription.<br>Or all four roads for ${SHOP.price('all')}.</div>
-      <button class="paywall-btn" id="pw-one" onclick="buyAtPaywall('southwest', '${nextNode}')">
-        Unlock Route 1 — ${SHOP.price('southwest')}
-        <span class="paywall-btn-sub">${SHOP.beta() ? 'Beta — nothing to pay yet. Keep driving.' : 'Barstow to Albuquerque, start to finish.'}</span>
+      <div class="paywall-details">One purchase opens every road: the rest of this one, the Delta, the coast and the Hi-Line.<br>One time, no subscription.</div>
+      <button class="paywall-btn" id="pw-one" onclick="buyAtPaywall('all', '${nextNode}')">
+        Unlock every road — ${SHOP.price()}
+        <span class="paywall-btn-sub">${SHOP.beta() ? 'Beta — nothing to pay yet. Keep driving.' : 'All four roads, start to finish.'}</span>
       </button>
-      ${SHOP.beta() ? '' : `<button class="paywall-btn" id="pw-all" onclick="buyAtPaywall('all', '${nextNode}')">
-        All four roads — ${SHOP.price('all')}
-        <span class="paywall-btn-sub">The desert, the Delta, the coast and the Hi-Line.</span>
-      </button>
-      <button class="paywall-skip" onclick="restoreAtPaywall('${nextNode}')">Restore purchases</button>`}
+      ${SHOP.beta() ? '' : `<button class="paywall-skip" onclick="restoreAtPaywall('${nextNode}')">Restore purchases</button>`}
       <button class="paywall-skip" onclick="location.reload()">Back to the roads</button>
       <div class="rt-note" id="pw-note"></div>
     </div>
@@ -3640,7 +3634,7 @@ function routeState(id) {
   }
   if (SHOP.owns(id)) return { kind: 'open', text: 'Drive' };
   if (id === 'southwest') return { kind: 'open', text: 'Free to mile 300' };
-  return { kind: 'buy', text: SHOP.price(id) };
+  return { kind: 'buy', text: 'Unlock' };
 }
 // What you have done on a road, in one line. It counts; it does not grade.
 function routeTally(id) {
@@ -3663,7 +3657,7 @@ function renderRoads(note) {
     </button>`;
   }).join('');
   const bundle = (!SHOP.beta() && !SHOP.ownsAll())
-    ? `<button class="rt-card bundle" id="rt-all" onclick="buyRoad('all')"><b>All four roads</b><span>${SHOP.price('all')}</span></button>` : '';
+    ? `<button class="rt-card bundle" id="rt-all" onclick="buyRoad('all')"><b>Unlock every road</b><span>${SHOP.price()}</span></button>` : '';
   const mem = getMemory(), kept = ROUTE_ORDER.filter(id => mem.routes[id] && mem.routes[id].kept).map(id => {
     const k = mem.routes[id].kept;
     return `<li><small>${ROUTES[id] ? ROUTES[id].label : id}</small><span>${k.label || KEPT_FALLBACK[k.id] || 'Something you kept'}</span></li>`;
@@ -3708,9 +3702,9 @@ function pickRoute(id) {
 async function buyRoad(key) {
   const card = document.getElementById('rt-' + key);
   if (card) card.classList.add('busy');
-  const ok = await SHOP.buy(key);
+  const ok = await SHOP.buy();
   if (ok && key !== 'all') { showTravellers(key); return; }
-  renderRoads(ok ? 'All four roads are yours.' : 'Nothing was charged.');
+  renderRoads(ok ? 'Every road is open.' : 'Nothing was charged.');
 }
 async function restoreRoads() {
   const n = await SHOP.restore();

@@ -1,7 +1,7 @@
 # Mile Marker — shipping it
 
 Everything needed to get the game from this repo into the App Store and Google Play.
-Written 2026-11-13 against build `2026-11-13.1`, Capacitor 8.6, RevenueCat Capacitor 14.1.
+Written 2026-11-13, updated 2026-11-24 (one $2.99 unlock; iOS built on Codemagic) against build `2026-11-24.1`, Capacitor 8.6, RevenueCat Capacitor 14.1.
 
 ---
 
@@ -39,79 +39,101 @@ does today: every road open, the Route 1 paywall a pass-through.
 
 ## 2. How the store works in the game
 
+**One purchase, $2.99, opens every road.** (Decided by Ray 2026-11-24; replaces $2.99 per
+road and $7.99 for all four.)
+
 - **Route 1** is free to mile 300 (Kingman). The paywall there is the only one in the game.
-  It offers Route 1 alone or all four, plus Restore.
-- **Routes 2, 3, 4** are bought from the first screen. A road you do not own shows its
-  price where an owned one says DRIVE. Tapping it opens the store sheet.
-- **All four roads** is a blue card under the four routes, until you own everything.
+  It offers the unlock, plus Restore.
+- **Routes 2, 3, 4** say UNLOCK on the first screen until it is bought. Tapping any of them
+  opens the same purchase, and a successful one goes straight to that road.
+- **Unlock every road** is a blue card under the four routes, until it is bought.
 - **Restore purchases** is in the footer of the first screen and on the paywall.
-- **Route 4 is closed until two other roads have been finished**, whether or not it has
-  been bought. That is a story lock, not a price lock: the Hi-Line reads what you brought
-  back. Someone who buys all four on day one owns it and cannot drive it yet.
+- **Route 4 is closed until two other roads have been finished**, whether or not the game
+  has been bought. That is a story lock, not a price lock: the Hi-Line reads what you brought
+  back. Someone who buys on day one owns it and cannot drive it yet.
   → *Your call to keep or drop.* It is one line: `needsArrivals: 2` in the Route 4
   registration. If it stays, the store description has to say so plainly (the draft below does).
 - **For reviewers:** seven taps on the green MILE 0 post on the first screen lifts the
   Route 4 gate until the app is closed. It skips the two arrivals, never the price.
-- Prices shown are whatever the store returns for the buyer's country. `$2.99` / `$7.99`
-  are only the fallback when the store cannot be reached.
-- Ownership is remembered on the device, so a bought road opens with no signal.
+- The price shown is whatever the store returns for the buyer's country. `$2.99` is only
+  the fallback when the store cannot be reached.
+- Ownership is remembered on the device, so a bought game opens with no signal.
+- **A build with no store key is the beta.** With `app/store-config.json` empty, the app
+  behaves exactly like the web version: every road open, nothing to pay, and nothing written
+  to storage, so a tester who later installs the store build does not keep a free unlock.
+  That is what the first TestFlight builds are.
 
 ---
 
 ## 3. Products
 
-Create these five, with exactly these IDs, in **both** stores. All are one-time,
-non-consumable. (Play calls them "one-time products".)
+One product, in **both** stores. One-time, non-consumable. (Play calls it a "one-time product".)
 
 | Product ID | Name shown | Price |
 |---|---|---|
-| `com.dahvio.milemarker.route.southwest` | Route 1: Southwest Desert Run | $2.99 |
-| `com.dahvio.milemarker.route.south` | Route 2: Deep South Backroads | $2.99 |
-| `com.dahvio.milemarker.route.coast` | Route 3: Pacific Coast Run | $2.99 |
-| `com.dahvio.milemarker.route.hiline` | Route 4: The Hi-Line | $2.99 |
-| `com.dahvio.milemarker.allroutes` | All Four Roads | $7.99 |
+| `com.dahvio.milemarker.allroutes` | Every Road | $2.99 |
 
-Descriptions for the purchase sheet (Apple's limit is 55 characters):
-
-- Route 1 — `Barstow to Albuquerque. The whole 675 miles.`
-- Route 2 — `Memphis to Mobile on Highway 61. 547 miles.`
-- Route 3 — `Astoria to San Francisco on US 101. 721 miles.`
-- Route 4 — `Fargo west on US 2 in January. No distance posted.`
-- All — `Every road in the game, for less than buying three.`
+Description for the purchase sheet (Apple's limit is 55 characters):
+`All four roads, start to finish. One time.`
 
 ### RevenueCat
 
 One project, two apps (iOS, bundle `com.dahvio.milemarker`; Android, package the same).
 
-1. **Entitlements** — create four: `route_southwest`, `route_south`, `route_coast`, `route_hiline`.
-2. **Products** — import all five from each store.
-3. **Attach** each route product to its own entitlement. Attach `allroutes` to **all four**.
-   That is how the bundle works: the app never asks "do you own the bundle", only
-   "is this road's entitlement active".
-4. On the Android products, set the type to **non-consumable**. If Play ever consumes one
-   anyway, the entitlement still holds, which is why the app reads entitlements first.
-5. Copy the two **public SDK keys** (`appl_…`, `goog_…`) into `app/store-config.json`, then `npm run sync`.
+1. **Entitlement** — create one: `all_roads`.
+2. **Product** — import `com.dahvio.milemarker.allroutes` from each store and attach it to `all_roads`.
+3. On the Android product, set the type to **non-consumable**. If Play ever consumes it
+   anyway, the entitlement still holds, which is why the app reads the entitlement first.
+4. Copy the two **public SDK keys** (`appl_…`, `goog_…`) into `app/store-config.json`, then
+   commit. The next Codemagic build sells the unlock; until then builds are the free beta.
 
-No offering or paywall template is needed. The app fetches the five products by ID.
+No offering or paywall template is needed. The app fetches the product by ID.
 
 ---
 
-## 4. iOS — on the Mac
+## 4. iOS from a PC — Codemagic
 
-1. `git pull`, `npm install`, `npm run ios`. Xcode resolves the Swift packages itself (no CocoaPods).
-2. Target **App** → Signing & Capabilities → pick your team. Add the **In-App Purchase** capability.
-3. Already set: bundle ID, portrait only, iPhone only, version 1.0 (1), icon, splash,
-   `ITSAppUsesNonExemptEncryption = NO`.
-4. Run on a phone. Check: the first screen appears after the splash; start a run, kill the
-   app, reopen → **Continue** is offered; the text never sits under the notch or home bar.
-5. In App Store Connect, create the app and the five in-app purchases. Each purchase needs a
-   screenshot for review: a picture of the first screen showing the price is enough.
-6. Test purchases with a **sandbox Apple ID** before archiving. Buy one road, delete the app,
-   reinstall, Restore.
-7. Product → Archive → Distribute → App Store Connect.
-8. Submit the five in-app purchases **with** the first build. They are reviewed together.
+iOS apps can only be compiled on macOS, so the build runs on a Codemagic Mac, the same way
+My Social Battery does. `codemagic.yaml` in the repo root is the whole recipe: install,
+run the checks, build `www/`, `cap sync ios`, sign, number the build, build the .ipa,
+upload to TestFlight.
 
-## 5. Android — here or on the Mac
+**Once:**
+1. **Apple Developer** → Certificates, Identifiers & Profiles → Identifiers → **+** →
+   App IDs → App. Bundle ID (explicit): `com.dahvio.milemarker`. Description: Mile Marker.
+   In-App Purchase is on by default; leave it.
+2. **App Store Connect** → Apps → **+** → New App. iOS, name (see section 6; it can change
+   until release), primary language English (U.S.), the bundle ID from step 1, SKU `milemarker`.
+3. **Codemagic** → Add application → GitHub → `beardednotary/mile-marker` → codemagic.yaml.
+4. In `codemagic.yaml`, set `integrations: app_store_connect:` to the name of your App Store
+   Connect API key in Codemagic (Team settings → Team integrations → Developer Portal). It is
+   set to `DahVio` as a guess.
+5. Signing: Codemagic needs an **App Store provisioning profile** for `com.dahvio.milemarker`
+   and your distribution certificate. In Codemagic → Team settings → Code signing identities,
+   the certificate from My Social Battery is reused; under iOS provisioning profiles, fetch
+   or create one for the new bundle ID. If the build stops at "No matching profiles found",
+   this is the step.
+
+**Each build:** Codemagic → Mile Marker → Start new build → `ios-testflight`. About 10–15
+minutes, then Apple takes 5–30 minutes to process it. Internal testers (you) get it in the
+TestFlight app on the iPhone without any further step.
+
+**What the test build is:** the beta — every road open, nothing to pay — because there is no
+RevenueCat key yet. It is for checking the game on a real iPhone: the splash, the notch and
+home bar, saves surviving a force-quit, and the feel of it.
+
+**Later, for the store build:**
+- Create the in-app purchase `com.dahvio.milemarker.allroutes` (non-consumable, $2.99) in
+  App Store Connect, with a review screenshot (the first screen showing the price is enough).
+- RevenueCat (section 3), key into `app/store-config.json`, build again.
+- Test with a **sandbox Apple ID**: buy at Kingman, delete the app, reinstall, Restore.
+- Submit the in-app purchase **with** the build. They are reviewed together.
+
+Already set in the project: bundle ID, portrait only, iPhone only, version 1.0, icon, splash,
+`ITSAppUsesNonExemptEncryption = NO`, and a privacy manifest declaring the one
+required-reason API the app uses (UserDefaults, for saves).
+
+## 5. Android — builds on this PC
 
 A debug build is confirmed building and running from this machine (see the end of this file).
 
@@ -119,7 +141,7 @@ A debug build is confirmed building and running from this machine (see the end o
    `cd android && gradlew.bat assembleDebug` → `android/app/build/outputs/apk/debug/app-debug.apk`.
 2. For Play: Build → Generate Signed App Bundle. Create an upload keystore and **back it up
    somewhere that is not this laptop**. Lose it and the listing is orphaned.
-3. Play Console → create the app → create the five one-time products → upload the bundle to
+3. Play Console → create the app → create the one-time product → upload the bundle to
    **Internal testing** first. Play Billing only answers for builds installed from a testing
    track, by accounts on the licence-tester list.
 4. New personal developer accounts must run a closed test with 12 testers for 14 days before
@@ -179,7 +201,7 @@ WHAT YOU KEEP
 You cannot buy your way out of a bad run. What you can do is arrive, and every road gives you one thing to bring home if you earn it. The last road knows what is in your car.
 
 HOW IT SELLS
-The first 300 miles are free. Each road is a single purchase, or all four together for less. No subscription. No ads. No timers, energy, or coins. Works with no signal, which is the kind of place it is about.
+The first 300 miles are free. One purchase opens all four roads. No subscription. No ads. No timers, energy, or coins. Works with no signal, which is the kind of place it is about.
 
 The roads are real. The distances are measured. The stranger in the El Camino is not on any map.
 ```
@@ -247,11 +269,12 @@ No custom encryption. Already declared in `Info.plist`.
 Mile Marker is a text-based adventure. No account or login is needed.
 
 IN-APP PURCHASES
-Five non-consumable purchases: four routes at $2.99 and all four at $7.99.
+One non-consumable purchase, $2.99, that opens every road.
 - Route 1 is free to mile 300. To reach the paywall quickly: tap Route 1, choose any
   traveler, tap "Hit the road", and keep choosing the first option. It appears after
   roughly 8 choices, at Kingman.
-- Routes 2 and 3 show their price on the first screen. Tap one to buy it.
+- Routes 2 and 3 say UNLOCK on the first screen. Tapping either, or the blue
+  "Unlock every road" card, opens the same purchase.
 - "Restore purchases" is at the bottom of the first screen and on the paywall.
 
 ROUTE 4
@@ -288,9 +311,10 @@ optional; if used, one short line each in Overpass 800, white on the green.
 - [ ] Decide: name option A or B.
 - [ ] Replace `assets/*.png` with your MILE 0 icon if you want it over the stand-in, then `npm run icons`.
 - [ ] Read and publish `store/site/mile-marker-privacy.html` and `mile-marker-support.html`.
-- [ ] RevenueCat: project, entitlements, keys into `app/store-config.json`.
-- [ ] App Store Connect and Play Console: app records, five products, tax and banking.
-- [ ] Mac: signing team, sandbox purchase test, archive.
+- [ ] RevenueCat: project, the `all_roads` entitlement, keys into `app/store-config.json`.
+- [ ] App Store Connect and Play Console: app records, the one product, tax and banking.
+- [ ] Codemagic: bundle ID, app record, API key name in codemagic.yaml, provisioning profile (section 4).
+- [ ] Sandbox purchase test on the iPhone, once there is a RevenueCat key.
 - [ ] Android: upload keystore, backed up off this machine.
 - [ ] Screenshots.
 

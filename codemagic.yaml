@@ -1,0 +1,68 @@
+# Mile Marker — iOS test build to TestFlight, built on a Codemagic Mac.
+#
+# Before the first run (see store/STORE.md, "iOS from a PC"):
+#   1. Apple Developer: register the bundle ID com.dahvio.milemarker.
+#   2. App Store Connect: create the app record with that bundle ID.
+#   3. Codemagic: add this repo as an app, and set the integration name below to the
+#      name of your App Store Connect API key (Team settings > Team integrations >
+#      Developer Portal). It is the same key My Social Battery uses, if it has one.
+#
+# With app/store-config.json empty (it is), the build runs as the beta: every road open,
+# nothing to pay. Paste a RevenueCat iOS key there and the next build sells the unlock.
+
+workflows:
+  ios-testflight:
+    name: iOS → TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    integrations:
+      app_store_connect: DahVio          # ← change to your API key's name in Codemagic
+
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.dahvio.milemarker
+      node: 22                           # Capacitor 8 needs Node 22 or newer
+      # xcode: left at Codemagic's default (a current Xcode 26). Pin it here if a build
+      # ever breaks on a Codemagic image update.
+
+    # No triggering block: it only runs when you press Start new build.
+
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+
+      - name: Check the game
+        script: npm run check
+
+      - name: Build the web bundle and copy it into the iOS project
+        script: |
+          npm run www
+          npx cap sync ios
+
+      - name: Signing
+        script: xcode-project use-profiles
+
+      - name: Build number
+        # Codemagic's own counter for this workflow, so every upload is higher than the last.
+        script: |
+          sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $BUILD_NUMBER;/g" \
+            ios/App/App.xcodeproj/project.pbxproj
+          grep -m1 "CURRENT_PROJECT_VERSION" ios/App/App.xcodeproj/project.pbxproj
+
+      - name: Build the .ipa
+        # Capacitor 8 uses Swift Package Manager: a plain .xcodeproj, no workspace, no pods.
+        script: |
+          xcode-project build-ipa \
+            --project ios/App/App.xcodeproj \
+            --scheme App
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true       # internal testers get it as soon as Apple processes it
