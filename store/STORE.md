@@ -14,7 +14,7 @@ Written 2026-11-13, updated 2026-11-24 (one $2.99 unlock; iOS built on Codemagic
 | `app/store-config.json` | The two RevenueCat public SDK keys. **Empty until you paste them in.** |
 | `tools/build_www.js` | Makes `www/` — the game with fonts bundled (works offline) and the bridge loaded. |
 | `tools/make_icons.js` | Draws the stand-in icon and splash into `assets/`. |
-| `assets/` | Icon and splash sources. The app icon is Ray's art, `assets/source/icon-mile-0.png`; replace that file and run `npm run assets` to change it. The splash is still the drawn stand-in. |
+| `assets/` | Icon and splash sources. The app icon is Ray's art, `assets/source/icon-mile-0.png`; replace that file and run `npm run assets` to change it. The splash (light and dark) is the same art as a rounded tile on the game's ground. |
 | `android/`, `ios/` | The native projects. Committed; open them in Android Studio / Xcode. |
 | `store/site/` | Privacy and support pages in the dahvio.com house format. **Not published yet.** |
 

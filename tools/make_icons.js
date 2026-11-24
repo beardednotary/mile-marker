@@ -84,11 +84,10 @@ function splash(bg) {
 const ART = path.join(OUT, 'source', 'icon-mile-0.png');
 const ART_GREEN = '#026b52';   // sampled from the art, so the Android background layer meets it seamlessly
 
-const jobs = [
+const jobs = [];
+if (!fs.existsSync(ART)) jobs.push(
   ['splash.png', splash(GROUND)],
-  ['splash-dark.png', splash(NIGHT)]
-];
-if (!fs.existsSync(ART)) jobs.unshift(
+  ['splash-dark.png', splash(NIGHT)],
   ['icon-only.png', iconOnly()],
   ['icon-foreground.png', iconForeground()],
   ['icon-background.png', svg(1024, '', GREEN)]
@@ -109,5 +108,17 @@ if (!fs.existsSync(ART)) jobs.unshift(
     .extend({ top: pad, bottom: 1024 - inner - pad, left: pad, right: 1024 - inner - pad, background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .png().toFile(path.join(OUT, 'icon-foreground.png'));
   await sharp(Buffer.from(svg(1024, '', ART_GREEN))).png().toFile(path.join(OUT, 'icon-background.png'));
+  // Splash: the art as a rounded tile in the middle of the game's ground (day and night).
+  // A phone shows only the middle ~1260px of this 2732 square in portrait, so the tile stays
+  // well inside that.
+  const T = 640, R = Math.round(T * 0.2237);   // the corner radius iOS uses on icons
+  const tile = await sharp(ART).resize(T, T)
+    .composite([{ input: Buffer.from('<svg width="' + T + '" height="' + T + '"><rect width="' + T + '" height="' + T + '" rx="' + R + '" fill="#fff"/></svg>'), blend: 'dest-in' }])
+    .png().toBuffer();
+  for (const [name, bg] of [['splash.png', GROUND], ['splash-dark.png', NIGHT]]) {
+    await sharp(Buffer.from(svg(2732, '', bg))).composite([{ input: tile, left: (2732 - T) / 2, top: (2732 - T) / 2 }])
+      .flatten({ background: bg }).png().toFile(path.join(OUT, name));
+  }
+  console.log('  wrote assets/splash.png, splash-dark.png from the same art');
   console.log('  wrote assets/icon-only.png, icon-foreground.png, icon-background.png from ' + path.relative(path.join(OUT, '..'), ART));
 })();
