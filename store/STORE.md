@@ -158,25 +158,28 @@ A debug build is confirmed building and running from this machine (see the end o
 
 ### Name and subtitle
 
-Two options. The second is the recommendation.
+**Decided by Ray, 2026-11-24.** CYOA is the anchor keyword from the earlier research (lower
+difficulty, higher traffic than "road trip game"; see the spec's ASO section).
 
-| | Name (30 max) | Subtitle (30 max) |
-|---|---|---|
-| A | `Mile Marker: CYOA RPG` | `Road Trip Text Adventure` |
-| B | `Mile Marker: Text Adventure` | `A Road Trip You Read` |
+| Name (30 max) | Subtitle (30 max) |
+|---|---|
+| `Mile Marker: CYOA Text RPG` (26) | `Road Trip Text Adventure` (24) — *open, see below* |
 
-"Choose Your Own Adventure" is a registered trademark of Chooseco, and they enforce it
-(they sued Netflix over *Bandersnatch*). Plenty of apps carry "CYOA" in the title and
-nothing happens; some get a takedown notice. Option B keeps the visible name clean and puts
-`cyoa` in the hidden keyword field, where it still ranks. Not legal advice; your risk to weigh.
+The home-screen label stays **Mile Marker**; the store name is only on the listing.
 
-### Keywords (iOS, 100 characters, no spaces, do not repeat words in the name)
+Subtitle: "Text" is now in the name too. Apple counts a word once across name, subtitle and
+keywords, so the second "Text" earns nothing. Something like `Road Trip Adventure Story`
+(25) would give those characters to a new word. Ray's call.
+
+### Keywords (iOS, 100 characters, no spaces, no word already in the name or subtitle)
+
+From the research in the spec:
 
 ```
-cyoa,interactive,fiction,story,choices,gamebook,roguelike,narrative,survival,highway,novel,rpg,road
+choose,path,story,survival,fiction,interactive,choices,route,roguelike,novel
 ```
 
-(If you take option A, drop `cyoa,` and `rpg,` and add `offline,trip`.)
+(71 characters. If the subtitle takes "story", drop it here and add `gamebook,offline`.)
 
 ### Promotional text (170 max — editable without review)
 
@@ -225,7 +228,7 @@ The first four roads.
 
 ### App Store categories
 
-Primary **Games → Adventure**. Secondary **Games → Role Playing**.
+Primary **Games → Role Playing** (per the spec's ASO research). Secondary **Games → Adventure**.
 
 ### URLs
 
@@ -313,7 +316,7 @@ optional; if used, one short line each in Overpass 800, white on the green.
 
 - [ ] Read Route 4's ending (the summit with Cord). It is the largest thing written without you.
 - [ ] Decide: keep Route 4's two-arrival lock, or sell it open.
-- [ ] Decide: name option A or B.
+- [x] Name: Mile Marker: CYOA Text RPG (Ray, 2026-11-24). Subtitle still open.
 - [ ] Replace `assets/*.png` with your MILE 0 icon if you want it over the stand-in, then `npm run icons`.
 - [ ] Read and publish `store/site/mile-marker-privacy.html` and `mile-marker-support.html`.
 - [ ] RevenueCat: project, the `all_roads` entitlement, keys into `app/store-config.json`.

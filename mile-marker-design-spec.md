@@ -2582,7 +2582,7 @@ Enrolled in Apple Small Business Program (15% cut).
 CYOA is the stronger anchor than "road trip game" — lower difficulty, higher traffic,
 and only 2 of the top 30 apps target it directly.
 
-**Name:** `Mile Marker: CYOA RPG` (21 chars)
+**Name:** `Mile Marker: CYOA Text RPG` (26 chars) — **decided by Ray 2026-11-24** (was `Mile Marker: CYOA RPG`)
 **Subtitle:** `Road Trip Text Adventure` (24 chars)
 **Keywords:** `choose,path,story,survival,fiction,interactive,choices,route,roguelike,novel`
 **Category:** Games → Roleplaying
