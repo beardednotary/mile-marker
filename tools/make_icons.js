@@ -79,16 +79,35 @@ function splash(bg) {
   return svg(S, sign((S - w) / 2, (S - h) / 2, w, h, 44, 15), bg);
 }
 
+// Ray's icon (2026-11-24). When assets/source/icon-mile-0.png exists it is the app icon,
+// and the drawn stand-in above is only used for the splash. Never overwrite it from here.
+const ART = path.join(OUT, 'source', 'icon-mile-0.png');
+const ART_GREEN = '#026b52';   // sampled from the art, so the Android background layer meets it seamlessly
+
 const jobs = [
-  ['icon-only.png', iconOnly()],
-  ['icon-foreground.png', iconForeground()],
-  ['icon-background.png', svg(1024, '', GREEN)],
   ['splash.png', splash(GROUND)],
   ['splash-dark.png', splash(NIGHT)]
 ];
+if (!fs.existsSync(ART)) jobs.unshift(
+  ['icon-only.png', iconOnly()],
+  ['icon-foreground.png', iconForeground()],
+  ['icon-background.png', svg(1024, '', GREEN)]
+);
 (async () => {
   for (const [name, source] of jobs) {
     await sharp(Buffer.from(source)).png().toFile(path.join(OUT, name));
     console.log('  wrote assets/' + name);
   }
+  if (!fs.existsSync(ART)) return;
+  // iOS: the art itself, 1024 square, no transparency. iOS rounds the corners.
+  await sharp(ART).resize(1024, 1024).flatten({ background: ART_GREEN }).png().toFile(path.join(OUT, 'icon-only.png'));
+  // Android adaptive: launchers mask the middle two-thirds of the layer into a circle,
+  // squircle or rounded square. The art at 70% fills that visible area edge to edge,
+  // with its own green continuing underneath on the background layer.
+  const inner = Math.round(1024 * 0.70), pad = Math.round((1024 - inner) / 2);
+  await sharp(await sharp(ART).resize(inner, inner).png().toBuffer())
+    .extend({ top: pad, bottom: 1024 - inner - pad, left: pad, right: 1024 - inner - pad, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png().toFile(path.join(OUT, 'icon-foreground.png'));
+  await sharp(Buffer.from(svg(1024, '', ART_GREEN))).png().toFile(path.join(OUT, 'icon-background.png'));
+  console.log('  wrote assets/icon-only.png, icon-foreground.png, icon-background.png from ' + path.relative(path.join(OUT, '..'), ART));
 })();
