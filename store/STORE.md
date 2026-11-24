@@ -108,11 +108,16 @@ upload to TestFlight.
 4. In `codemagic.yaml`, set `integrations: app_store_connect:` to the name of your App Store
    Connect API key in Codemagic (Team settings → Team integrations → Developer Portal). It is
    set to `DahVio` as a guess.
-5. Signing: Codemagic needs an **App Store provisioning profile** for `com.dahvio.milemarker`
-   and your distribution certificate. In Codemagic → Team settings → Code signing identities,
-   the certificate from My Social Battery is reused; under iOS provisioning profiles, fetch
-   or create one for the new bundle ID. If the build stops at "No matching profiles found",
-   this is the step.
+5. Signing. Codemagic cannot create a provisioning profile; it has to exist at Apple first.
+   - **Apple Developer → Profiles → +** → Distribution → **App Store Connect** → Continue →
+     App ID `com.dahvio.milemarker` → pick the **same distribution certificate Codemagic
+     already has** (Codemagic → Team settings → codemagic.yaml settings → Code signing
+     identities → iOS certificates shows which) → name it `Mile Marker App Store` → Generate.
+   - **Codemagic → Code signing identities → iOS provisioning profiles → Fetch profiles** →
+     tick the new one under App Store profiles → Reference name `mile_marker_app_store` →
+     Download selected. A green check in its Certificate field means the certificate matches.
+   - Without this the build stops with "No matching profiles found for bundle identifier
+     com.dahvio.milemarker and distribution type app_store".
 
 **Each build:** Codemagic → Mile Marker → Start new build → `ios-testflight`. About 10–15
 minutes, then Apple takes 5–30 minutes to process it. Internal testers (you) get it in the
