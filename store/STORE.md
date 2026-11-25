@@ -78,7 +78,8 @@ Description for the purchase sheet (Apple's limit is 55 characters):
 
 ### RevenueCat
 
-One project, two apps (iOS, bundle `com.dahvio.milemarker`; Android, package the same).
+One project, two apps: iOS, bundle `com.dahvio.MileMarker` (capital Ms, as registered at Apple);
+Android, package `com.dahvio.milemarker`.
 
 1. **Entitlement** — create one: `all_roads`.
 2. **Product** — import `com.dahvio.milemarker.allroutes` from each store and attach it to `all_roads`.
@@ -100,7 +101,8 @@ upload to TestFlight.
 
 **Once:**
 1. **Apple Developer** → Certificates, Identifiers & Profiles → Identifiers → **+** →
-   App IDs → App. Bundle ID (explicit): `com.dahvio.milemarker`. Description: Mile Marker.
+   App IDs → App. Bundle ID (explicit): `com.dahvio.MileMarker`. **Done 2026-11-24**, with capital
+   Ms; the iOS project and codemagic.yaml match it. Android keeps `com.dahvio.milemarker`.
    In-App Purchase is on by default; leave it.
 2. **App Store Connect** → Apps → **+** → New App. iOS, name (see section 6; it can change
    until release), primary language English (U.S.), the bundle ID from step 1, SKU `milemarker`.
@@ -110,14 +112,14 @@ upload to TestFlight.
    set to `DahVio` as a guess.
 5. Signing. Codemagic cannot create a provisioning profile; it has to exist at Apple first.
    - **Apple Developer → Profiles → +** → Distribution → **App Store Connect** → Continue →
-     App ID `com.dahvio.milemarker` → pick the **same distribution certificate Codemagic
+     App ID `com.dahvio.MileMarker` → pick the **same distribution certificate Codemagic
      already has** (Codemagic → Team settings → codemagic.yaml settings → Code signing
      identities → iOS certificates shows which) → name it `Mile Marker App Store` → Generate.
    - **Codemagic → Code signing identities → iOS provisioning profiles → Fetch profiles** →
      tick the new one under App Store profiles → Reference name `mile_marker_app_store` →
      Download selected. A green check in its Certificate field means the certificate matches.
    - Without this the build stops with "No matching profiles found for bundle identifier
-     com.dahvio.milemarker and distribution type app_store".
+     com.dahvio.MileMarker and distribution type app_store".
 
 **Each build:** Codemagic → Mile Marker → Start new build → `ios-testflight`. About 10–15
 minutes, then Apple takes 5–30 minutes to process it. Internal testers (you) get it in the
@@ -163,23 +165,22 @@ difficulty, higher traffic than "road trip game"; see the spec's ASO section).
 
 | Name (30 max) | Subtitle (30 max) |
 |---|---|
-| `Mile Marker: CYOA Text RPG` (26) | `Road Trip Text Adventure` (24) — *open, see below* |
+| `Mile Marker: CYOA Text RPG` (26) | `Road Trip Adventure Story` (25) |
 
 The home-screen label stays **Mile Marker**; the store name is only on the listing.
 
-Subtitle: "Text" is now in the name too. Apple counts a word once across name, subtitle and
-keywords, so the second "Text" earns nothing. Something like `Road Trip Adventure Story`
-(25) would give those characters to a new word. Ray's call.
+Subtitle decided by Ray 2026-11-24. (The researched `Road Trip Text Adventure` would have
+repeated "Text" from the name; Apple counts a word once across name, subtitle and keywords.)
 
 ### Keywords (iOS, 100 characters, no spaces, no word already in the name or subtitle)
 
 From the research in the spec:
 
 ```
-choose,path,story,survival,fiction,interactive,choices,route,roguelike,novel
+choose,path,survival,fiction,interactive,choices,route,roguelike,novel,gamebook,offline
 ```
 
-(71 characters. If the subtitle takes "story", drop it here and add `gamebook,offline`.)
+(87 characters. "story" moved to the subtitle, so it is not repeated here.)
 
 ### Promotional text (170 max — editable without review)
 
@@ -316,7 +317,7 @@ optional; if used, one short line each in Overpass 800, white on the green.
 
 - [ ] Read Route 4's ending (the summit with Cord). It is the largest thing written without you.
 - [ ] Decide: keep Route 4's two-arrival lock, or sell it open.
-- [x] Name: Mile Marker: CYOA Text RPG (Ray, 2026-11-24). Subtitle still open.
+- [x] Name and subtitle: Mile Marker: CYOA Text RPG / Road Trip Adventure Story (Ray, 2026-11-24).
 - [ ] Replace `assets/*.png` with your MILE 0 icon if you want it over the stand-in, then `npm run icons`.
 - [ ] Read and publish `store/site/mile-marker-privacy.html` and `mile-marker-support.html`.
 - [ ] RevenueCat: project, the `all_roads` entitlement, keys into `app/store-config.json`.
