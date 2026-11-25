@@ -69,6 +69,7 @@ body {
 #app { width: 100%; max-width: 420px; min-height: 100vh; display: flex; flex-direction: column; padding: calc(10px + env(safe-area-inset-top, 0px)) calc(10px + env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) calc(10px + env(safe-area-inset-left, 0px)); }
 /* inside the app shell (native-bridge.js sets the class) */
 html.app, html.app body { overscroll-behavior: none; }
+html.app body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0px); background: var(--ground); z-index: 1000; pointer-events: none; transition: background 0.9s ease; }
 html.app body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 html.app input { -webkit-user-select: text; user-select: text; }
 
@@ -3095,7 +3096,7 @@ function motionReduced() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
 // Bump this on every build that goes to testers, so "which one did you play?" has an answer.
-const BUILD = '2026-11-24.1';
+const BUILD = '2026-11-24.2';
 
 function startRadioTicker(block, tries) {
   if (block.dataset.started) return;
@@ -3625,6 +3626,16 @@ function tapPost() {
   postOpen = true;
   renderRoads('The gate is up.');
 }
+function safeTop() {
+  try {
+    const p = document.createElement('div');
+    p.style.cssText = 'position:absolute;visibility:hidden;padding-top:env(safe-area-inset-top, 0px)';
+    document.body.appendChild(p);
+    const v = parseFloat(getComputedStyle(p).paddingTop) || 0;
+    p.remove();
+    return Math.round(v);
+  } catch (e) { return -1; }
+}
 function routeState(id) {
   const r = ROUTES[id];
   const need = r.needsArrivals || 0, have = arrivalsElsewhere(id);
@@ -3671,7 +3682,7 @@ function renderRoads(note) {
     <div class="rt-foot">
       ${SHOP.beta() ? '<span>Beta build — nothing to pay</span>' : '<button onclick="restoreRoads()">Restore purchases</button>'}
       ${SHOP.beta() ? '' : '<a href="https://dahvio.com/mile-marker-privacy" target="_blank" rel="noopener">Privacy</a>'}
-      <span>build ${BUILD}</span>
+      <span>build ${BUILD}${document.documentElement.classList.contains('app') ? ' · top ' + safeTop() : ''}</span>
     </div>`;
   offerResume();
 }
