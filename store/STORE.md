@@ -109,7 +109,7 @@ upload to TestFlight.
 3. **Codemagic** → Add application → GitHub → `beardednotary/mile-marker` → codemagic.yaml.
 4. In `codemagic.yaml`, set `integrations: app_store_connect:` to the name of your App Store
    Connect API key in Codemagic (Team settings → Team integrations → Developer Portal). It is
-   set to `DahVio` as a guess.
+   `codemagic` (confirmed 2026-11-24).
 5. Signing. Codemagic cannot create a provisioning profile; it has to exist at Apple first.
    - **Apple Developer → Profiles → +** → Distribution → **App Store Connect** → Continue →
      App ID `com.dahvio.MileMarker` → pick the **same distribution certificate Codemagic

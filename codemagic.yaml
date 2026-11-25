@@ -3,9 +3,9 @@
 # Before the first run (see store/STORE.md, "iOS from a PC"):
 #   1. Apple Developer: the App ID is com.dahvio.MileMarker (done 2026-11-24).
 #   2. App Store Connect: create the app record with that bundle ID.
-#   3. Codemagic: add this repo as an app, and set the integration name below to the
-#      name of your App Store Connect API key (Team settings > Team integrations >
-#      Developer Portal). It is the same key My Social Battery uses, if it has one.
+#   3. Codemagic: this repo is added as an app, and the integration name below is the
+#      App Store Connect API key "codemagic" (Team settings > Team integrations >
+#      Developer Portal). Profile: mile_marker_app_store in Code signing identities.
 #
 # With app/store-config.json empty (it is), the build runs as the beta: every road open,
 # nothing to pay. Paste a RevenueCat iOS key there and the next build sells the unlock.
@@ -17,7 +17,7 @@ workflows:
     max_build_duration: 60
 
     integrations:
-      app_store_connect: DahVio          # ← change to your API key's name in Codemagic
+      app_store_connect: codemagic       # the App Store Connect API key in Codemagic (Team integrations > Developer Portal)
 
     environment:
       ios_signing:
