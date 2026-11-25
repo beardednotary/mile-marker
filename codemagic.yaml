@@ -65,4 +65,7 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_testflight: true       # internal testers get it as soon as Apple processes it
+        # Internal testers (you, in an Internal Testing group) get every build as soon as Apple
+        # processes it; that needs no review. Set this to true only for outside testers, and
+        # only after the TestFlight Test Information page (feedback email, review contact) is filled.
+        submit_to_testflight: false
